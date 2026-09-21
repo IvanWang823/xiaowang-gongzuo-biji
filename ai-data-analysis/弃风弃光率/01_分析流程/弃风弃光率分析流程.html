@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="TrZEHFrsLBzQNnfh8hwB3x">
+<head data-page-node-id="Saszs1OARBCWWRtjmHLakX">
+<meta charset="UTF-8" data-page-node-id="kxOUXnBd3Sd02hPYWmlq5R">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="RcmOEkOEkqv5aGZcx2tLij">
+<title>弃风弃光率分析流程手册</title>
+<style>
+  :root{--bg:#f4f7fb;--card:#fff;--ink:#1f2d3d;--sub:#5b6b7e;--line:#e5e9f0;
+    --blue:#2563eb;--wind:#ef4444;--solar:#f59e0b;--accent:#002FA7;--good:#10b981;
+    /* 架构图（照海运价格分析思路升级 V1.8）新增变量 */
+    --accent-light:#3b82f6;--accent-subtle:#dbeafe;
+    --primary:#0a2e5c;--primary-light:#1a4a7a;--primary-dark:#061d3a;
+    --green:#0f6e56;--green-light:#d1fae5;
+    --purple:#6d28d9;--purple-light:#ede9fe;
+    --amber:#b45309;--amber-light:#fef3c7;--red:#b91c1c;
+    --gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-300:#cbd5e1;
+    --gray-400:#94a3b8;--gray-500:#64748b;--gray-600:#475569;--gray-700:#334155;
+    --gray-800:#1e293b;--gray-900:#0f172a;
+    --radius:14px;--radius-sm:8px;
+    --shadow:0 4px 24px rgba(10,46,92,.08);--shadow-hover:0 8px 40px rgba(10,46,92,.14);
+    --transition:.25s cubic-bezier(.4,0,.2,1);
+    --font:'Inter',-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Microsoft YaHei","PingFang SC",Helvetica,Arial,sans-serif;background:var(--bg);
+    color:var(--ink);line-height:1.65;padding:24px 16px 60px}
+  .wrap{max-width:1080px;margin:0 auto}
+  header{background:linear-gradient(135deg,#002FA7,#2563eb);color:#fff;border-radius:16px;padding:24px 28px;margin-bottom:20px}
+  header h1{font-size:23px;font-weight:800}
+  header p{opacity:.9;font-size:13px;margin-top:6px}
+  .sec{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .sec h2{font-size:17px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:var(--accent)}
+  .sec h2::before{content:"";width:4px;height:18px;background:var(--accent);border-radius:2px;display:inline-block}
+  .sub{font-size:13px;color:var(--sub);margin:10px 0 8px;font-weight:600}
+  .flow{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch}
+  .step{flex:1 1 200px;background:#f7f9fc;border:1px solid var(--line);border-radius:10px;padding:14px;position:relative}
+  .step .no{display:inline-flex;width:26px;height:26px;background:var(--accent);color:#fff;border-radius:50%;
+    align-items:center;justify-content:center;font-weight:800;font-size:13px;margin-bottom:8px}
+  .step h3{font-size:14px;font-weight:700;margin-bottom:4px}
+  .step p{font-size:12px;color:var(--sub)}
+  table{width:100%;border-collapse:collapse;margin-top:6px;font-size:13px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#f0f4fa;font-weight:700}
+  code{background:#eef2ff;color:var(--blue);padding:1px 6px;border-radius:4px;font-size:12px}
+  .formula{background:#f7f9fc;border-left:3px solid var(--solar);padding:10px 14px;border-radius:6px;font-size:13px;margin:8px 0}
+  .warn{background:#fff7ed;border-left:3px solid var(--wind);padding:10px 14px;border-radius:6px;font-size:13px;margin:8px 0}
+  .tag{display:inline-block;background:#eef2ff;color:var(--blue);font-size:11px;padding:2px 8px;border-radius:20px;margin-right:5px}
+  ul{margin:6px 0 0 20px} li{margin:5px 0;font-size:13.5px}
+  footer{text-align:center;color:var(--sub);font-size:12px;margin-top:20px}
+/* ===== 工作流信息架构图 ===== */
+.ia-wrap{display:flex;align-items:stretch;margin:4px 0 2px}
+.ia-col{display:flex;flex-direction:column;flex:1;min-width:0}
+.ia-col-mid{flex:1.4;margin:0 4px}
+.ia-arrow{flex:0 0 52px;position:relative;display:flex;align-items:center;justify-content:center}
+.ia-arrow i{display:block;width:100%;height:2px;background:var(--blue)}
+.ia-arrow i::after{content:'';position:absolute;right:-6px;top:-4px;width:0;height:0;border-left:8px solid var(--blue);border-top:5px solid transparent;border-bottom:5px solid transparent}
+.ia-arrow b{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--card);color:var(--blue);font-size:11px;font-weight:600;padding:1px 7px;border-radius:12px;white-space:nowrap}
+.ia-title{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:9px}
+.ia-box{border-radius:9px;padding:9px 12px;margin-bottom:8px;background:#f7f9fc;border:1px solid var(--line)}
+.ia-box:last-child{margin-bottom:0}
+.ia-box .l{font-size:12.5px;font-weight:600;color:var(--ink)}
+.ia-box .d{font-size:11px;color:var(--sub);margin-top:2px;line-height:1.55}
+.ia-tg{display:inline-block;background:#eef2ff;color:var(--blue);font-size:10px;padding:1px 7px;border-radius:20px;margin-right:4px;margin-top:5px}
+.ia-in{background:#eef2ff;border-color:#c7d2fe}
+.ia-rag{background:#f6f4ff;border:1px dashed #8b5cf6}
+.ia-rag .l{color:#6d28d9}
+.ia-engine{background:#fbfcfe;border:1.5px solid var(--blue);border-radius:11px;padding:13px;flex:1;display:flex;flex-direction:column}
+.ia-engine .et{font-size:13.5px;font-weight:700;color:var(--accent);margin-bottom:10px}
+.ia-layer{border-radius:7px;padding:9px 12px;margin-bottom:8px}
+.ia-layer .li{font-size:11.5px;color:var(--ink);padding:1px 0;line-height:1.55}
+.ia-layer .li b{color:var(--accent)}
+.ia-l1{background:#eef2ff;border:1px solid #c7d2fe}
+.ia-l2{background:#fff;border:1px solid var(--line);display:flex;padding:0;overflow:hidden;margin-bottom:8px}
+.ia-l2 .sp{flex:1;padding:9px 11px}
+.ia-l2 .sp+.sp{border-left:1px solid var(--line)}
+.ia-l2 .sp .h{display:inline-block;background:var(--blue);color:#fff;font-size:10.5px;font-weight:600;border-radius:4px;padding:1px 8px;margin-bottom:5px}
+.ia-l3{background:#ecfdf5;border:1px solid #a7f3d0;margin-bottom:0}
+.ia-dn{text-align:center;color:var(--blue);font-size:13px;line-height:13px;padding:1px 0 5px}
+.ia-out{background:#ecfdf5;border-color:#a7f3d0}
+.ia-out .l{color:#065f46}
+.ia-hl{background:#fff7ed;border:1px solid var(--solar);border-radius:8px;padding:9px 12px;margin-top:8px}
+.ia-hl .l{color:#b45309;font-weight:700;font-size:12.5px}
+.ia-hl .d{font-size:11px;color:#b45309;margin-top:2px;opacity:.9}
+@media(max-width:820px){.ia-wrap{flex-direction:column;gap:10px}.ia-arrow{display:none}.ia-col-mid{margin:0}}
+
+/* ===== 工作流信息架构图（照海运价格分析思路升级 V1.8） ===== */
+.main-flow{display:flex;align-items:stretch;gap:0;min-height:440px;margin:8px 0 4px}
+.col{display:flex;flex-direction:column}
+.col-left{flex:1.05;min-width:180px}
+.col-center{flex:1.7;min-width:280px;margin:0 16px}
+.col-right{flex:1.15;min-width:180px}
+.col-title{font-size:15px;font-weight:700;color:var(--accent);margin-bottom:14px;letter-spacing:.2px;flex-shrink:0;display:flex;align-items:center;gap:8px}
+.col-title .emoji{font-size:18px}
+.arrow-col{display:flex;flex-direction:column;justify-content:center;align-items:center;flex-shrink:0;width:80px;min-height:100%;position:relative;z-index:1}
+.arrow-col .arrow-line{position:relative;height:3px;background:var(--blue);border-radius:2px;width:calc(100% - 8px);opacity:.5}
+.arrow-col .arrow-line::after{content:'';position:absolute;right:-10px;top:-5.5px;width:0;height:0;border-left:10px solid var(--blue);border-top:6px solid transparent;border-bottom:6px solid transparent;opacity:.5}
+.arrow-col .arrow-label{font-size:11px;font-weight:700;color:var(--blue);background:#fff;padding:2px 14px;border-radius:999px;border:1px solid var(--gray-200);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);white-space:nowrap;z-index:2;box-shadow:0 2px 8px rgba(37,99,235,.10);letter-spacing:.5px}
+@media(max-width:900px){.main-flow{flex-direction:column;align-items:stretch;gap:0;min-height:0}.col-center{min-width:0;margin:0}.col-left,.col-right{min-width:0}.arrow-col{width:100%;height:48px;flex-direction:column}.arrow-col .arrow-line{width:3px;height:calc(100% - 10px);border-radius:2px}.arrow-col .arrow-line::after{right:auto;left:-5.5px;top:auto;bottom:-10px;border-left:6px solid transparent;border-right:6px solid transparent;border-top:10px solid var(--blue);opacity:.5}}
+.input-box{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;flex-shrink:0;transition:all var(--transition)}
+.input-box:hover{border-color:var(--accent-light);box-shadow:0 2px 12px rgba(37,99,235,.06)}
+.input-box:last-of-type{margin-bottom:0}
+.input-box .label{font-size:13.5px;font-weight:700;color:var(--primary);line-height:1.4}
+.input-box .desc{font-size:11.5px;color:var(--gray-500);margin-top:4px;line-height:1.55}
+.input-box .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.input-box .tag{background:var(--gray-200);color:var(--gray-700);font-size:10px;padding:2px 10px;border-radius:999px;font-weight:600;white-space:nowrap;transition:all var(--transition)}
+.input-box .tag:hover{background:var(--accent-subtle);color:var(--blue)}
+.input-box .period{font-size:11px;color:var(--primary);margin-top:6px;background:#fff;border:1px dashed var(--gray-300);border-radius:6px;padding:5px 10px;line-height:1.5}
+.input-box .period .ph{color:var(--amber);font-weight:700}
+.rag-box{background:var(--purple-light);border:1px solid #c4b5fd;border-radius:var(--radius-sm);padding:12px 16px;margin-top:10px;flex-shrink:0;transition:all var(--transition)}
+.rag-box:hover{border-color:var(--purple);box-shadow:0 2px 12px rgba(109,40,217,.08)}
+.rag-box .label{font-size:13.5px;font-weight:700;color:var(--purple);line-height:1.4}
+.rag-box .desc{font-size:11.5px;color:var(--gray-600);margin-top:4px;line-height:1.55}
+.engine-box{background:linear-gradient(145deg,#f8faff,#f0f5fe);border:1.5px solid var(--blue);border-radius:var(--radius);padding:18px 18px 16px;flex:1;display:flex;flex-direction:column;gap:8px;box-shadow:0 6px 28px rgba(37,99,235,.08);transition:all var(--transition)}
+.engine-box:hover{box-shadow:0 8px 40px rgba(37,99,235,.14)}
+.engine-box .engine-title{font-size:16px;font-weight:800;color:var(--primary);margin-bottom:2px;letter-spacing:.3px;display:flex;align-items:center;gap:8px}
+.engine-box .engine-title .chip{font-size:10px;font-weight:600;background:var(--blue);color:#fff;padding:0 12px;border-radius:999px;line-height:20px}
+.engine-layer{display:flex;flex-direction:column;gap:6px}
+.engine-layer-top{background:#e8f0fe;border-radius:var(--radius-sm);padding:10px 14px;border:1px solid #b8cce4}
+.engine-layer-top .item{font-size:12.5px;font-weight:700;color:var(--primary);padding:2px 0;line-height:1.5}
+.engine-layer-top .sub-item{font-size:11.5px;color:var(--gray-600);padding:1px 0 1px 20px;line-height:1.5}
+.engine-arrow-down{text-align:center;color:var(--blue);font-size:18px;line-height:16px;padding:2px 0;opacity:.5}
+.engine-layer-mid{display:flex;gap:12px}
+.engine-layer-mid .split{flex:1;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:12px 14px;box-shadow:0 2px 8px rgba(10,46,92,.04);transition:all var(--transition)}
+.engine-layer-mid .split:hover{border-color:var(--accent-light);box-shadow:0 4px 16px rgba(37,99,235,.08)}
+.engine-layer-mid .split .head{background:var(--primary);color:#fff;font-size:11px;font-weight:700;border-radius:4px;padding:2px 12px;display:inline-block;margin-bottom:8px;letter-spacing:.3px}
+.engine-layer-mid .split .item{font-size:11.5px;color:var(--gray-700);padding:2px 0;line-height:1.5}
+.engine-layer-mid .split .highlight{font-size:11.5px;font-weight:700;color:var(--primary);margin-top:6px;padding-top:6px;border-top:1px dashed var(--gray-200)}
+.engine-layer-bottom{background:#dce8f7;border-radius:var(--radius-sm);padding:10px 14px;border:1px solid var(--purple)}
+.engine-layer-bottom .item{font-size:12.5px;font-weight:700;color:var(--primary);padding:3px 0;line-height:1.45;display:block;overflow-wrap:break-word}
+.engine-layer-bottom .item::before{content:"◆";color:var(--purple);margin-right:6px;font-size:10px;vertical-align:2px}
+.engine-layer-bottom .sub-item{font-size:11.5px;color:var(--gray-600);padding:1px 0 3px 22px;line-height:1.45;display:block;overflow-wrap:break-word}
+@media(max-width:640px){.engine-layer-mid{flex-direction:column;gap:8px}.engine-box{padding:14px}}
+.output-box{background:var(--green-light);border:1px solid var(--green);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:8px;flex-shrink:0;transition:all var(--transition)}
+.output-box:hover{box-shadow:0 2px 12px rgba(15,110,86,.08)}
+.output-box:last-of-type{margin-bottom:0}
+.output-box .label{font-size:13.5px;font-weight:700;color:var(--green);line-height:1.4}
+.output-box .desc{font-size:11px;color:var(--gray-600);margin-top:3px;line-height:1.5}
+.output-box-important{background:#fff7ed;border:1.5px solid var(--amber);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:8px;flex-shrink:0;transition:all var(--transition)}
+.output-box-important:hover{box-shadow:0 2px 12px rgba(180,83,9,.10)}
+.output-box-important .label{font-size:13.5px;font-weight:700;color:var(--amber);line-height:1.4}
+.output-box-important .desc{font-size:11px;color:#78350f;margin-top:3px;line-height:1.5}
+.strategy-box{background:var(--purple-light);border:1.5px solid var(--purple);border-radius:var(--radius-sm);padding:12px 16px;margin-top:8px;flex-shrink:0;box-shadow:0 4px 16px rgba(109,40,217,.10);transition:all var(--transition)}
+.strategy-box:hover{box-shadow:0 6px 24px rgba(109,40,217,.16)}
+.strategy-box .label{font-size:13.5px;font-weight:700;color:var(--purple);line-height:1.4}
+.strategy-box .desc{font-size:11.5px;color:#5b21b6;margin-top:3px;line-height:1.5}
+.right-connector{display:flex;justify-content:center;align-items:center;padding:4px 0;margin:6px 0;color:var(--purple)}
+.right-connector span{background:var(--purple-light);padding:2px 16px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid #c4b5fd;white-space:nowrap;letter-spacing:.5px;color:var(--purple)}
+.quality-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--radius-sm);padding:8px 14px;margin:8px 0 14px;font-size:11.5px}
+.quality-bar .q-item{display:inline-flex;align-items:center;gap:4px;font-weight:600;color:#065f46}
+.quality-bar .q-item .dot{display:inline-block;width:8px;height:8px;border-radius:50%}
+.quality-bar .q-item.green .dot{background:#10b981}
+.quality-bar .q-item.amber .dot{background:#f59e0b}
+.quality-bar .q-item.red .dot{background:#ef4444}
+.quality-bar .q-sep{color:var(--gray-400);font-size:10px}
+.top3-card{background:linear-gradient(135deg,#fff7ed 0%,#fed7aa 100%);border:2px solid var(--amber);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;flex-shrink:0;box-shadow:0 4px 14px rgba(180,83,9,.12)}
+.top3-card .top-title{font-size:11px;font-weight:800;color:var(--amber);letter-spacing:1px;margin-bottom:6px;display:block}
+.top3-list{list-style:none;padding:0;margin:0;font-size:11.5px;line-height:1.6;color:#7c2d12}
+.top3-list li{padding:3px 0;display:block;overflow-wrap:break-word}
+.top3-list .rank{display:inline-block;width:18px;height:18px;line-height:18px;text-align:center;background:var(--amber);color:#fff;border-radius:50%;font-size:10px;font-weight:800;margin-right:6px;vertical-align:1px}
+.feedback-loop{margin-top:12px;background:#fff;border:1.5px solid var(--purple);border-radius:var(--radius-sm);padding:12px 16px;font-size:11.5px;color:#5b21b6;line-height:1.7;display:flex;align-items:flex-start;gap:10px;box-shadow:0 2px 10px rgba(109,40,217,.06)}
+.feedback-loop .icon{font-size:18px;flex-shrink:0}
+.feedback-loop .content .title{font-size:12.5px;font-weight:800;color:var(--purple);display:block;margin-bottom:3px}
+.feedback-loop .content b{color:var(--purple)}
+.footer-warning{margin-top:24px;background:#fff7ed;border:1.5px solid var(--amber);border-radius:var(--radius-sm);padding:14px 20px;display:flex;align-items:flex-start;gap:14px;box-shadow:0 2px 12px rgba(180,83,9,.06)}
+.footer-warning .icon{font-size:20px;flex-shrink:0;margin-top:2px}
+.footer-warning .content .title{font-size:13px;font-weight:700;color:var(--amber)}
+.footer-warning .content .text{font-size:12px;color:#78350f;line-height:1.7}
+.footer-warning .content .text b{color:var(--amber)}
+.footer-insurance{margin-top:12px;background:#eff6ff;border:1.5px solid var(--blue);border-radius:var(--radius-sm);padding:14px 20px;display:flex;align-items:flex-start;gap:14px;box-shadow:0 2px 12px rgba(37,99,235,.06)}
+.footer-insurance .icon{font-size:20px;flex-shrink:0;margin-top:2px}
+.footer-insurance .content .title{font-size:13px;font-weight:700;color:var(--blue)}
+.footer-insurance .content .text{font-size:12px;color:var(--gray-700);line-height:1.7}
+</style>
+
+<!-- ================= 界面美化层（纯 CSS 覆盖，2026-09-07，不影响内容版本号） ================= -->
+<style>
+  html{scroll-behavior:smooth}
+  *{-webkit-font-smoothing:antialiased}
+  body{font-family:Inter,-apple-system,"SF Pro Text","Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
+    background:
+      linear-gradient(rgba(0,47,167,.026) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,47,167,.026) 1px,transparent 1px),
+      radial-gradient(900px 420px at 85% -10%,rgba(37,99,235,.10),transparent 60%),
+      linear-gradient(180deg,#f8fafd,#eef2f9);
+    background-size:28px 28px,28px 28px,100% 100%,100% 100%;
+    background-attachment:fixed;padding:30px 18px 80px}
+  .wrap{max-width:1120px}
+
+  /* 页头 */
+  header{position:relative;overflow:hidden;border-radius:20px;padding:32px 36px 36px;
+    background:radial-gradient(1050px 360px at 92% -80%,rgba(255,255,255,.28),transparent 62%),
+      radial-gradient(700px 300px at -8% 120%,rgba(37,99,235,.35),transparent 60%),
+      linear-gradient(122deg,#001f6e 0%,var(--accent) 46%,#1d4ed8 100%);
+    box-shadow:0 18px 44px -16px rgba(0,47,167,.35);margin-bottom:26px}
+  header::after{content:"";position:absolute;left:36px;right:36px;bottom:0;height:3px;
+    background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.85),rgba(255,255,255,0));border-radius:2px}
+  header h1{font-size:27px;font-weight:800;letter-spacing:.6px;display:flex;align-items:center;gap:12px}
+  header h1::before{content:"";width:6px;height:30px;border-radius:4px;
+    background:linear-gradient(180deg,#fff,rgba(255,255,255,.25));box-shadow:0 2px 8px rgba(0,0,0,.2)}
+  header p{opacity:.94;font-size:13.5px;margin-top:8px;max-width:820px;line-height:1.8}
+
+  /* 节卡片 */
+  .sec{position:relative;border-radius:16px;padding:22px 26px 24px;margin-bottom:20px;
+    background:linear-gradient(180deg,#ffffff,#fbfcff);
+    border:1px solid #e4eaf4;
+    box-shadow:0 1px 2px rgba(16,24,40,.03),0 12px 34px -18px rgba(23,43,99,.18)}
+  .sec::before{content:"";position:absolute;top:-1px;left:26px;right:26px;height:3px;border-radius:0 0 6px 6px;
+    background:linear-gradient(90deg,var(--accent) 0%,#4f8ef7 60%,rgba(79,142,247,0))}
+  .sec h2{font-size:18px;letter-spacing:.3px;margin-bottom:16px;gap:10px}
+  .sec h2::before{content:"";width:5px;height:20px;background:linear-gradient(180deg,#4f8ef7,var(--accent));border-radius:3px;
+    box-shadow:0 2px 8px rgba(0,47,167,.28);display:inline-block}
+  .sub{font-size:13px;color:var(--sub);margin:14px 0 10px;font-weight:700;letter-spacing:.2px;
+    display:flex;align-items:center;gap:7px}
+  .sub::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--solar);
+    box-shadow:0 0 0 3px rgba(245,158,11,.18);flex-shrink:0}
+  .warn{background:linear-gradient(90deg,#fff7ed,#fffaf3);border-left:4px solid var(--wind);border-radius:8px;
+    padding:11px 15px;font-size:13px;margin:10px 0;line-height:1.75}
+  .formula{background:linear-gradient(90deg,#fff8ea,#fffdf5);border-left:4px solid var(--solar);border-radius:8px;
+    padding:12px 16px;line-height:1.9;box-shadow:inset 0 0 0 1px rgba(245,158,11,.08)}
+  code{background:#edf2ff;color:#17439d;border:1px solid #d6e2ff;border-radius:6px;padding:1.5px 7px;
+    font-family:ui-monospace,"SF Mono",Consolas,"Courier New",monospace;font-size:12px}
+
+  /* 表格 */
+  table{border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:12px;margin-top:8px;
+    border:1px solid #dbe3f0;box-shadow:0 8px 22px -14px rgba(23,43,99,.22)}
+  th{background:linear-gradient(180deg,#0b3ba6,var(--accent));color:#fff;font-weight:700;letter-spacing:.6px;
+    font-size:12.5px;border:none;padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.16)}
+  td{border:1px solid #e6ebf4;border-top:none;border-right:none;padding:10px 13px;font-size:13px;background:#fff}
+  tr td:first-child{border-left:none}
+  tr:last-child td{border-bottom:none}
+  tr:last-child td:first-child{border-radius:0 0 0 10px}
+  tr:last-child td:last-child{border-radius:0 0 10px 0}
+  tr:first-child th:first-child{border-radius:11px 0 0 0}
+  tr:first-child th:last-child{border-radius:0 11px 0 0}
+  tr:nth-child(even) td{background:#f7faff}
+  tr:hover td{background:#f0f6ff}
+  ul{margin:6px 0 0 6px;list-style:none}
+  ul li{position:relative;padding-left:18px;margin:7px 0;font-size:13.5px;line-height:1.8}
+  ul li::before{content:"";position:absolute;left:2px;top:11px;width:5px;height:5px;border-radius:50%;
+    background:var(--blue);opacity:.75}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,47,167,.25);transition:border-color .2s}
+  a:hover{border-bottom-color:var(--accent)}
+
+  /* 架构图微调 */
+  .ia-title{letter-spacing:.4px;display:flex;align-items:center;gap:7px}
+  .ia-title::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--blue);opacity:.9}
+  .ia-box{transition:box-shadow .2s,border-color .2s}
+  .ia-box:hover{border-color:#b9c8ec;box-shadow:0 4px 12px -6px rgba(23,43,99,.16)}
+  .ia-engine{border-color:#9db9ec;box-shadow:0 6px 18px -10px rgba(0,47,167,.22)}
+  .ia-arrow b{box-shadow:0 2px 8px rgba(37,99,235,.22)}
+
+  /* 组件补齐（info / step 与新风格统一） */
+  .info{background:linear-gradient(90deg,#f0f6ff,#f8fbff);border-left:4px solid var(--blue);border-radius:8px;
+    padding:11px 15px;font-size:13px;margin:10px 0;line-height:1.75}
+  .step{background:linear-gradient(180deg,#ffffff,#f8fafe);border:1px solid #dfe7f3;border-radius:12px;
+    padding:16px;position:relative;transition:transform .22s,box-shadow .22s,border-color .22s}
+  .step::before{content:"";position:absolute;top:-1px;left:16px;right:16px;height:3px;border-radius:0 0 6px 6px;
+    background:linear-gradient(90deg,var(--blue),rgba(37,99,235,0))}
+  .step:hover{transform:translateY(-3px);border-color:#b9cdf2;box-shadow:0 12px 24px -12px rgba(23,43,99,.25)}
+  .step .no{background:linear-gradient(135deg,#2563eb,var(--accent));box-shadow:0 4px 10px -2px rgba(0,47,167,.4)}
+  .step h3{font-size:14.5px;letter-spacing:.2px}
+  .warn{font-size:12.5px}
+
+  /* 页脚 */
+  footer{margin-top:30px;padding:14px 22px;text-align:center;border-radius:14px;font-size:12px;
+    color:var(--sub);line-height:1.9;
+    background:rgba(255,255,255,.75);border:1px solid #e4eaf4;backdrop-filter:blur(6px);
+    box-shadow:0 6px 18px -12px rgba(23,43,99,.14)}
+
+  /* ===== UI 修订：扁平商务风统一（2026-09-07） ===== */
+  body{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+    background:#f5f7fb;background-image:none}
+  h1,h2,h3,.sub,.tag,.ia-title,.ia-box .l,.ia-box .d,.ia-layer .li,.ia-tg{font-family:inherit}
+  header{border-radius:10px;padding:26px 30px;background:linear-gradient(120deg,#002FA7,#1d4ed8);box-shadow:none}
+  header::after{display:none}
+  header h1{font-size:25px}
+  .sec{border-radius:10px;padding:22px 26px;border:1px solid #e2e8f2;box-shadow:none;background:#fff}
+  .sec::before{display:none}
+  .sec h2::before,.sub::before{box-shadow:none}
+  table{border:1px solid #dde5f0;box-shadow:none;border-radius:8px}
+  tr:first-child th:first-child{border-radius:7px 0 0 0}
+  tr:first-child th:last-child{border-radius:0 7px 0 0}
+  tr:last-child td:first-child{border-radius:0 0 0 7px}
+  tr:last-child td:last-child{border-radius:0 0 7px 0}
+  .warn,.formula,.info{border-left-width:3px;box-shadow:none;border-radius:6px}
+  .warn{background:#fff8f0}
+  .formula{background:#fffaf0}
+  .info{background:#f2f7ff}
+  .step{border-radius:8px;box-shadow:none;transition:none}
+  .step::before{display:none}
+  .step:hover{transform:none;box-shadow:none;border-color:#cfdcee}
+  .step .no{background:var(--accent);box-shadow:none}
+  footer{border-radius:8px;box-shadow:none;background:#fff;backdrop-filter:none}
+  /* 隐藏「核算引擎 → 产出交付」之间的连接箭头 */
+  .ia-col-mid + .ia-arrow{display:none}
+  .ia-col-mid{margin:0 12px 0 4px}
+  .ia-box,.ia-engine,.ia-arrow b{box-shadow:none;transition:none}
+  .ia-box:hover{box-shadow:none;border-color:var(--line)}
+  .ia-engine{border-color:#c3d4ef}
+  /* 双栏模块：加大字号、行高与留白 */
+  .ia-l2{border-radius:8px}
+  .ia-l2 .sp{padding:16px 18px}
+  .ia-l2 .sp .h{font-size:12px;padding:3px 11px;margin-bottom:9px;border-radius:5px}
+  .ia-l2 .li{font-size:13px;line-height:2;padding:4px 0}
+  .ia-layer .li{font-size:12.5px;line-height:1.9;padding:3px 0}
+  .ia-box .l{font-size:13px}
+  .ia-box .d{font-size:11.5px;line-height:1.7}
+  #toTop{box-shadow:0 4px 12px rgba(0,47,167,.26);transition:opacity .2s}
+  #toTop:hover{transform:none;box-shadow:0 4px 12px rgba(0,47,167,.26)}
+
+  /* 返回顶部 */
+  #toTop{position:fixed;right:26px;bottom:28px;z-index:99;width:46px;height:46px;border:none;cursor:pointer;
+    border-radius:50%;color:#fff;font-size:19px;line-height:1;
+    background:linear-gradient(135deg,#2563eb,var(--accent));
+    box-shadow:0 10px 24px -6px rgba(0,47,167,.45);opacity:0;visibility:hidden;transform:translateY(10px);
+    transition:.28s cubic-bezier(.2,.8,.3,1)}
+  #toTop.show{opacity:1;visibility:visible;transform:none}
+  #toTop:hover{transform:translateY(-3px);box-shadow:0 14px 30px -6px rgba(0,47,167,.5)}
+
+  @media(max-width:820px){
+    body{padding:18px 10px 70px}
+    header{padding:24px 22px 30px;border-radius:16px}
+    header h1{font-size:22px}
+    header p{font-size:12.5px}
+    .sec{padding:18px 16px 20px;border-radius:13px}
+    .sec::before{left:14px;right:14px}
+    table{display:block;overflow-x:auto}
+  }
+  @media print{
+    body{background:#fff;background-image:none;padding:0}
+    .sec,header,footer{box-shadow:none}
+    #toTop{display:none!important}
+    .sec,header{break-inside:avoid}
+  }
+</style>
+<style>
+/* ===== 海运风格统一层（参照 海运价格分析思路.html，2026-09-07）===== */
+:root{
+  --bg:#f8fafc;--card:#fff;
+  --ink:#1e293b;--sub:#64748b;--line:#e2e8f0;
+  --blue:#2563eb;--wind:#b91c1c;--solar:#b45309;--accent:#0a2e5c;--good:#0f6e56;
+  --primary:#0a2e5c;--primary-light:#1a4a7a;--primary-dark:#061d3a;
+  --green:#0f6e56;--green-light:#d1fae5;
+  --amber:#b45309;--amber-light:#fef3c7;
+  --radius:14px;--radius-sm:8px;
+  --shadow:0 4px 24px rgba(10,46,92,.08);
+  --shadow-hover:0 8px 40px rgba(10,46,92,.14);
+  --transition:.25s cubic-bezier(.4,0,.2,1)
+}
+body{font-family:'Inter',-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);line-height:1.7}
+
+/* 页头：深海军蓝 + 柔和阴影 */
+header{border-radius:18px;padding:30px 34px 34px;
+  background:linear-gradient(135deg,#061d3a 0%,#0a2e5c 48%,#1a4a7a 100%);
+  box-shadow:0 14px 40px -16px rgba(10,46,92,.4);margin-bottom:22px}
+header h1{font-size:24px;letter-spacing:.3px}
+header h1::before{width:5px;height:26px;background:linear-gradient(180deg,#fff,rgba(255,255,255,.3));box-shadow:none}
+header p{font-size:13.5px;opacity:.92}
+
+/* 目录导航 */
+.toc{position:sticky;top:12px;z-index:60;background:rgba(255,255,255,.94);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--line);border-radius:16px;padding:10px 16px;margin:0 0 20px;
+  box-shadow:0 4px 20px rgba(10,46,92,.06);display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.toc .toc-label{font-size:12px;font-weight:700;color:var(--primary);margin-right:4px;letter-spacing:.5px}
+.toc a{font-size:12px;font-weight:500;color:var(--sub);text-decoration:none;background:var(--bg);
+  padding:4px 14px;border-radius:999px;border:1px solid transparent;transition:all var(--transition);white-space:nowrap}
+.toc a:hover{background:var(--blue);color:#fff;border-color:var(--blue);transform:translateY(-1px);box-shadow:0 2px 12px rgba(37,99,235,.25)}
+
+/* 节卡片：柔和阴影 + hover */
+.sec{border-radius:14px;padding:22px 26px 24px;margin-bottom:20px;background:#fff;
+  border:1px solid var(--line);box-shadow:var(--shadow);transition:box-shadow var(--transition)}
+.sec:hover{box-shadow:var(--shadow-hover)}
+.sec h2{color:var(--primary);font-size:18px}
+.sec h2::before{width:5px;height:20px;background:linear-gradient(180deg,#2563eb,var(--primary));border-radius:3px;box-shadow:none}
+h2{scroll-margin-top:76px}
+.sub::before{background:var(--blue);box-shadow:none}
+
+/* 表格：浅灰表头 + 斑马纹 + hover */
+table{border-collapse:collapse;border-spacing:0;margin-top:8px;border:1px solid var(--line);
+  border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(10,46,92,.04)}
+th{background:var(--bg);color:var(--ink);font-weight:600;font-size:12.5px;border:1px solid var(--line);padding:10px 14px}
+td{border:1px solid var(--line);padding:10px 14px;font-size:13px;background:#fff}
+tr:nth-child(even) td{background:#fcfcfd}
+tr:hover td{background:var(--bg)}
+tr:first-child th:first-child,tr:first-child th:last-child{border-radius:0}
+tr:last-child td:first-child,tr:last-child td:last-child{border-radius:0}
+
+/* 步骤卡：hover 上浮 */
+.step{border-radius:12px;border:1px solid var(--line);background:#fff;box-shadow:0 1px 3px rgba(10,46,92,.05);
+  transition:transform .25s,box-shadow .25s,border-color .25s}
+.step:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:#c3d4ef}
+.step .no{background:var(--blue);box-shadow:none}
+
+/* 警示 / 公式 / 信息框 */
+.warn{background:#fef2f2;border-left:4px solid var(--wind);color:#7f1d1d;border-radius:8px;box-shadow:none}
+.formula{background:#fffbeb;border-left:4px solid var(--solar);border-radius:8px;box-shadow:none}
+.info{background:#eff6ff;border-left:4px solid var(--blue);border-radius:8px;box-shadow:none}
+
+/* code / 链接 */
+code{background:var(--bg);color:var(--primary);border:1px solid var(--line)}
+a{color:var(--blue);border-bottom:1px solid rgba(37,99,235,.25)}
+a:hover{border-bottom-color:var(--blue)}
+
+/* 页脚 */
+footer{margin-top:28px;padding:14px 22px;border-radius:12px;background:#fff;border:1px solid var(--line);
+  box-shadow:0 1px 3px rgba(10,46,92,.05)}
+
+/* 返回顶部：深海军蓝 */
+#toTop{background:var(--primary);box-shadow:0 8px 24px -6px rgba(10,46,92,.5)}
+#toTop:hover{background:var(--blue);box-shadow:0 12px 30px -6px rgba(37,99,235,.5)}
+
+/* 架构图微调（不覆盖隐藏箭头与双栏留白） */
+.ia-box:hover{border-color:#c3d4ef;box-shadow:0 4px 12px -6px rgba(10,46,92,.12)}
+.ia-engine{border-color:#c3d4ef;box-shadow:0 6px 18px -10px rgba(10,46,92,.2)}
+
+@media(max-width:640px){
+  .toc{top:6px;padding:8px 12px}
+  .toc a{font-size:11px;padding:3px 10px}
+}
+@media print{.toc{display:none!important}}
+</style>
+</head>
+<body data-page-node-id="TjxraryE3ATGqOOsLDhVim">
+<div class="wrap" data-page-node-id="VNQl17RGt0tvIvRC9NuLvC">
+
+<header data-page-node-id="gvI9auZODN10YvDMCISMmf">
+  <h1 data-page-node-id="nZLAuZycwABJtzDBG0O6Qc">弃风弃光率分析流程手册</h1>
+  <p data-page-node-id="dssDY70WPfBrPcW2tJmMle">从数据接入到决策闭环的 8 步标准流程 ｜ 配套《弃风弃光率分析看板》使用 ｜ 适用：发电企业场站级分析</p>
+</header>
+
+<nav class="toc">
+  <span class="toc-label">目录</span>
+  <a href="#flow">总览</a>
+  <a href="#0CKy7PiBGspZ4HNXk1h2ls">一·流程总览</a>
+  <a href="#JfujPGtmcIYxzqMY9tCxjn">二·指标公式</a>
+  <a href="#aPsFNCMsmSqerxEIr14fAc">三·数据清单</a>
+  <a href="#NcMOQAtlrKTED4nyJg0jKV">四·操作要点</a>
+  <a href="#y0L4yVAk8ffz3JHETazCsI">五·归因分类</a>
+  <a href="#VPrVxD5A2NXLdkLF9orjiT">六·看板衔接</a>
+  <a href="#theory">七·理论依据</a>
+  <a href="#reality">八·现势速览</a>
+  </nav>
+
+<!-- 0. 工作流信息架构图（照海运价格分析思路重做 V1.8） -->
+<div class="sec" id="flow">
+  <h2>工作流信息架构图（总览）</h2>
+  <p class="sub">场站台账 + 口径规则 → 8 步闭环核算 → 弃电率与归因看板（对应正文第一、二、五节）</p>
+
+  <!-- 顶部：数据质量评分条 -->
+  <div class="quality-bar">
+    <span class="q-item green"><span class="dot"></span>口径合规 <b>44号文</b></span>
+    <span class="q-sep">·</span>
+    <span class="q-item green"><span class="dot"></span>平衡校验 <b>含场用电</b></span>
+    <span class="q-sep">·</span>
+    <span class="q-item amber"><span class="dot"></span>待补数据 <b>2 项</b>（预测偏差间接路径 / 逐时断面限额）</span>
+    <span class="q-sep">·</span>
+    <span class="q-item green"><span class="dot"></span>跨期校验 <b>通过</b></span>
+    <span class="q-sep">·</span>
+    <span class="q-item green"><span class="dot"></span>数据血缘 <b>已锁定</b> 国能发电力〔2024〕44号</span>
+  </div>
+
+  <div class="main-flow">
+
+    <!-- 左：输入原料 -->
+    <div class="col col-left">
+      <div class="col-title"><span class="emoji">📥</span> ① 喂给分析的数据源</div>
+
+      <div class="input-box">
+        <div class="label">发电量与受限电量台账</div>
+        <div class="period">📅 <b>数据日期/周期</b>：<span class="ph">待填（如 2026-01 月报 / 2026W01~W35 周度）</span></div>
+        <div class="desc">场站 / 区域双口径，逐时段记录实际出力与受限通知</div>
+        <div class="tags"><span class="tag">实测</span><span class="tag">逐时</span><span class="tag">双口径</span></div>
+      </div>
+
+      <div class="input-box">
+        <div class="label">理论可发电量</div>
+        <div class="period">📅 <b>数据日期/周期</b>：<span class="ph">待填（可用功率积分法 / 样板机法，二选一并注明）</span></div>
+        <div class="desc">测算"应发未发"的基准；方法未注明将导致弃电率不可比</div>
+        <div class="tags"><span class="tag">推算</span></div>
+      </div>
+
+      <div class="input-box">
+        <div class="label">口径规则（强制）</div>
+        <div class="desc">国能发电力〔2024〕44号 + 风电场 / 光伏电站消纳统计办法；仅"系统原因受限"计入</div>
+        <div class="tags"><span class="tag">强制</span><span class="tag">口径铁律</span></div>
+      </div>
+
+      <div class="input-box">
+        <div class="label">政策锚（对标）</div>
+        <div class="desc">发改能源〔2025〕1360号：2030 / 2035 新能源消纳调控目标</div>
+        <div class="tags"><span class="tag">对标</span></div>
+      </div>
+
+      <div class="rag-box">
+        <div class="label">📚 ../_元信息/论文辅助.md / 第八节现势</div>
+        <div class="desc">消纳率定义 · 灵活性资源量化 · 2026H1 官方/央企/第三方三套口径实况</div>
+      </div>
+    </div>
+
+    <!-- 箭头 1 -->
+    <div class="arrow-col">
+      <div class="arrow-line"><span class="arrow-label">喂入</span></div>
+    </div>
+
+    <!-- 中：核算引擎 -->
+    <div class="col col-center">
+      <div class="engine-box">
+        <div class="engine-title">⚙️ ② 核算引擎（8 步闭环）<span class="chip">客观分析</span></div>
+
+        <div class="engine-layer engine-layer-top">
+          <div class="item">🔹 口径铁律：仅"系统原因受限"计入，剔除检修 / 故障 / 市场化决策</div>
+          <div class="item">🔹 时间口径统一：供暖季（东北）与自然年 / 月度分别标注</div>
+          <div class="sub-item">→ 电量平衡校验：发电 + 受限 = 理论可发（含场用电）</div>
+          <div class="sub-item">→ 生成「待补充字段清单」</div>
+        </div>
+
+        <div class="engine-arrow-down">▼</div>
+
+        <div class="engine-layer engine-layer-mid">
+          <div class="split">
+            <div class="head">指标计算</div>
+            <div class="item">• 消纳率 η = 实际消纳 ÷ 理论可发</div>
+            <div class="item">• 弃电率 = 1 − η</div>
+            <div class="item">• 与"利用率"互为对偶</div>
+            <div class="highlight">利用率↓ = 弃电率↑</div>
+          </div>
+          <div class="split">
+            <div class="head">归因分类（仅系统原因）</div>
+            <div class="item">• 调峰能力不足</div>
+            <div class="item">• 外送通道受限</div>
+            <div class="item">• 电网断面限额</div>
+            <div class="item">• 灵活性资源不足</div>
+          </div>
+        </div>
+
+        <div class="engine-arrow-down">▼</div>
+
+        <div class="engine-layer engine-layer-bottom">
+          <div class="item">对标：区域 / 全国 / 历史同季（标年份，禁跨期混拼）</div>
+          <div class="item">灵活性资源测算：储能 / 煤电改造 / 需求响应 / 跨省互济</div>
+          <div class="sub-item">预测偏差只标注间接路径，不臆造因果（步骤 6→7 衔接）</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 箭头 2 -->
+    <div class="arrow-col">
+      <div class="arrow-line"><span class="arrow-label">生成</span></div>
+    </div>
+
+    <!-- 右：产出交付 -->
+    <div class="col col-right">
+      <div class="col-title"><span class="emoji">📤</span> ③ 产出交付</div>
+
+      <!-- 关键发现 Top 3 -->
+      <div class="top3-card">
+        <span class="top-title">❶❷❸ 关键发现 TOP 3</span>
+        <ul class="top3-list">
+          <li><span class="rank">1</span>2026H1 官方弃风率 9.1% / 弃光率 8.6%，连续三年回落</li>
+          <li><span class="rank">2</span>高弃电集中在新疆 41% / 青海 29.45%（央企自曝口径）</li>
+          <li><span class="rank">3</span>消纳矛盾根源：装机狂飙 vs 系统调节能力滞后</li>
+        </ul>
+      </div>
+
+      <div class="output-box">
+        <div class="label">📊 弃风 / 弃光率指标</div>
+        <div class="desc">月 / 季 / 年三口径 + 利用率对偶校验</div>
+      </div>
+      <div class="output-box-important">
+        <div class="label">📋 待补充字段清单</div>
+        <div class="desc">明确告知缺什么、来自哪个口径</div>
+      </div>
+      <div class="output-box">
+        <div class="label">🧩 受限原因分布</div>
+        <div class="desc">归因分类表（仅系统原因，见第五节）</div>
+      </div>
+      <div class="output-box">
+        <div class="label">📈 对标与差距</div>
+        <div class="desc">对照 1360 号文 2030 / 2035 目标</div>
+      </div>
+      <div class="strategy-box">
+        <div class="label">⚡ 下一步行动（汇聚）</div>
+        <div class="desc">优先补灵活性资源 / 通道改造，按边际效果排序</div>
+      </div>
+      <div class="right-connector"><span>▼ 交付</span></div>
+      <div class="output-box" style="background:#eff6ff;border-color:var(--blue);">
+        <div class="label" style="color:var(--blue);">📤 present_files 交付</div>
+        <div class="desc">手册 + 看板推送用户核对</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 反馈学习 · 复盘闭环 -->
+  <div class="feedback-loop">
+    <div class="icon">🔁</div>
+    <div class="content">
+      <span class="title">复盘闭环（客观分析持续改进）</span>
+      本期弃电率 → 下期实际 → <b>偏差</b>(pct) → 归因复核（口径 / 数据源是否一致）→ 调整计算规则 / 补数据 → 下一轮分析。<br>
+      <b>目标</b>：系统逐步知道「我以前算得准不准」，从「单次静态核算」升级为「可持续运行的场站级弃电监测」。
+    </div>
+  </div>
+
+  <!-- 护栏红线 -->
+  <div class="footer-warning">
+    <div class="icon">⚠️</div>
+    <div class="content">
+      <div class="title">护栏红线（最高优先级）</div>
+      <div class="text">
+        ① <b>口径铁律</b>：检修、故障、市场化决策不得计入弃电，否则指标虚高；<br>
+        ② <b>平衡校验必做</b>（含场用电），分子分母对不上不出数；<br>
+        ③ <b>季节口径统一</b>：东北供暖季与自然年不得混算；<br>
+        ④ <b>缺数据留空</b>，禁止插值编造；<br>
+        ⑤ <b>本手册为客观数据分析，不构成决策建议</b>。
+      </div>
+    </div>
+  </div>
+
+  <!-- 质量保险栓 -->
+  <div class="footer-insurance">
+    <div class="icon">🛡️</div>
+    <div class="content">
+      <div class="title">质量保险栓</div>
+      <div class="text">
+        ① <b>数据时间戳</b>：左侧每个输入原料框已含「📅 数据日期 / 周期」占位符，喂数时逐项填实，禁跨期混算；<br>
+        ② <b>口径一致性</b>：跨口径（官方 / 央企 / 第三方）结论不混用，对外报送用 44 号文口径；<br>
+        ③ <b>计算过程可追溯</b>：核心指标（弃电率 = 1 − η）须回溯源字段 + 公式；<br>
+        ④ <b>结论置信度评级</b>：数据完整度 / 口径一致性 / 归因覆盖 + 整体评级，缺项不装「全知」。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 1. 总览流程 -->
+<div class="sec" data-page-node-id="3vfsDHsbw6dkzoafH8OlO7">
+  <h2 data-page-node-id="0CKy7PiBGspZ4HNXk1h2ls">一、分析流程总览（8 步闭环）</h2>
+  <div class="flow" data-page-node-id="fcxYomsIIohsxLLw03dkBN">
+    <div class="step" data-page-node-id="zDzkdBNRbijbvr75EI2io5"><div class="no" data-page-node-id="HTW5esigc95ZGFGSDOrkKY">1</div><h3 data-page-node-id="yyDgH6cnj83zH5B57HOOWG">明确口径与目标</h3><p data-page-node-id="62cRbjZBTE4PJLp1EWcDwU">定弃电率定义、统计周期、考核边界（系统原因 vs 自身原因）</p></div>
+    <div class="step" data-page-node-id="2W2D0oxhRaAecS637KmvQ3"><div class="no" data-page-node-id="Hyg63C80sY4y6tqSWA1pzN">2</div><h3 data-page-node-id="BDpcSUGVCCAfdrOcJEZnS6">数据接入与对齐</h3><p data-page-node-id="2q3aWWeLQ1O7MfT6tx8y05">功率预测 / 实际出力 / 受限通知 / 关口电量按时钟对齐</p></div>
+    <div class="step" data-page-node-id="ZLO9HXovOFtZ0AmoImKokz"><div class="no" data-page-node-id="ZLdzE6m7AYd3E6BoFWoE8X">3</div><h3 data-page-node-id="HlHLUATAd790rBeVKF1mHm">数据清洗校验</h3><p data-page-node-id="PgYwoG6ge0WBt8EBNLsbH3">补缺测、剔异常、校时钟、核对电量平衡</p></div>
+    <div class="step" data-page-node-id="BiC7TwuDBFebgj79N5zVGY"><div class="no" data-page-node-id="04iGZnPNjRh1jMDX0pvjTN">4</div><h3 data-page-node-id="LluOd6kHAeU0AAE4uMp4aZ">核心指标计算</h3><p data-page-node-id="fCyGvtofa1kzBbVCCSmQH3">弃电量、弃电率、利用小时、受限占比</p></div>
+    <div class="step" data-page-node-id="AMq7zhFO8pRWejsteaXA5E"><div class="no" data-page-node-id="gztbTfoxpIeaCJ94wtx3Ew">5</div><h3 data-page-node-id="9CITsJbPi7VUbnaUMpq9J5">时空维度拆解</h3><p data-page-node-id="aJYbwMvBFXiEjmHAcgwJNO">逐时/日/月/季，按机型、片区、气象拆分</p></div>
+    <div class="step" data-page-node-id="7yNAcJ2humbeJPiXAEJAjE"><div class="no" data-page-node-id="HqCYG6nczwjCX6MxPhVEjO">6</div><h3 data-page-node-id="4LCv3pxI1CzE5uyKLm2E14">受限原因归因</h3><p data-page-node-id="Sgeo0W0UTUzzgo8bVAdMX3">电网阻塞 / 调峰 / 外送通道 / 预测偏差（仅系统原因）</p></div>
+    <div class="step" data-page-node-id="guFnok7JcTvE1yXRteZ93e"><div class="no" data-page-node-id="k1vY8vjtErtjSyRz3BxgXQ">7</div><h3 data-page-node-id="Gl9SsQwcPggv7BocPJdkO3">损失量化</h3><p data-page-node-id="QGN77W4jgnYcxhEB2LaRAC">电量损失→电费损失→偏差考核费用</p></div>
+    <div class="step" data-page-node-id="EU3xQFyb3s4wsXgbXTyzOI"><div class="no" data-page-node-id="zcVVVAaxGAvCFw8io5WAK8">8</div><h3 data-page-node-id="7cJIchYJ9m9WXfOFuGblBT">看板与决策</h3><p data-page-node-id="uLWLViEPFbfHhx8uLxOPzi">可视化、配储/申报策略、功率预测提升</p></div>
+  </div>
+  <div class="warn" data-page-node-id="g4SlOeunwVYPmt295XmGdt">⚠️ 起点一定是<b data-page-node-id="HAgXN04QTruAfp45wUNGhN">口径</b>：国家能源局口径下，利用率仅按"系统原因受限电量"计算（国能发电力〔2024〕44号）。设备自身检修、故障停机造成的停机<b data-page-node-id="NGO903LIx4XIlCozrRsGUU">不计入</b>弃电率，否则会虚高。</div>
+</div>
+
+<!-- 2. 指标与公式 -->
+<div class="sec" data-page-node-id="JFNjlk6cuvlGdLcqM8MoaU">
+  <h2 data-page-node-id="JfujPGtmcIYxzqMY9tCxjn">二、核心指标与计算公式</h2>
+
+  <div class="warn" style="margin-bottom:10px; border-left-color:var(--blue); background:#f0f4fa;" data-page-node-id="xMvI3dr885k2wGvFRkaxOw">
+    <b data-page-node-id="VePxFBlfBAxmvWCrtooGJ5">📐 逐时计算原则（步骤 4 使用）</b><br data-page-node-id="iLNpwvUaUvWQfus9DVP2Co">
+    <b data-page-node-id="0aWoDWgxf9g5wDSmTFLf5X">弃电量<sub data-page-node-id="juZIxllo2GKWwcQAn59Ku9">t</sub></b> = max(理论可发<sub data-page-node-id="0aDxoYvTXwbtUBfq1aXDNx">t</sub> − 实际出力<sub data-page-node-id="nxDk4XFqER0CDRAdoVreDy">t</sub>, 0)，<b data-page-node-id="YKP3b5BCf0Pdf2arGzMUct">仅当</b>时段 t 被标记为"系统受限"时计入；否则为 0。<br data-page-node-id="ys90wLFiHKzU95V2mmXn49">
+    <b data-page-node-id="A1Aj5H7ZScPmHdJG7y4PMH">理论可发<sub data-page-node-id="1MxKWLOWjxCQqKUmZoTd34">t</sub></b> 优先按<b data-page-node-id="qECLcPfgBsmIo9XKvoVdH2">资源可发</b>计算（风速/辐照度 → 机组出力曲线）；无资源数据时可用<b data-page-node-id="QepOJR2lGR3Shy0MVF1AQn">功率预测<sub data-page-node-id="IwEUtFgSzpNFnxv1QkDHAc">t</sub></b> 作近似，但预测过预测会把误差混入"伪弃电"，最终口径建议用资源可发。<br data-page-node-id="YFrlu7WJ2zuiDtWtQ2DqQF">
+    <b data-page-node-id="yOpnWYNtQm264DptHSSgu4">月度利用率（事后校验）</b> = 实际上网电量 ÷ (实际上网电量 + 系统受限弃电量)
+  </div>
+
+  <div class="formula" data-page-node-id="6GpFCXSRWzWgwcorowZDz9">
+    <b data-page-node-id="nBoiZyaWvxV6KUoFcchikm">弃风率</b> = 系统受限弃风电量 ÷ 风电理论可发电量（逐时优先按资源可发，无资源数据时以预测值为近似）<br data-page-node-id="fu0G0zWFXXyHD3E1Acofhm">
+    <b data-page-node-id="rMLYIynvEWRQYEn60o9iky">弃光率</b> = 系统受限弃光电量 ÷ 光伏理论可发电量<br data-page-node-id="HE4n4UrrhYdGuEoDABO1Wb">
+    <b data-page-node-id="8FApT2fXiZIQYJLuMwllHC">利用率</b> = 1 − 弃电率（仅系统原因受限口径）<br data-page-node-id="j0lY7wbCPfEkUBxbPiL97a">
+    <b data-page-node-id="FaLDeP9Vqpwbfx1f3kHSJK">理论可发（事后反推）</b> = 实际上网电量 ÷ 利用率<br data-page-node-id="5TizBPmJt5bFRrxW8n01Df">
+    <b data-page-node-id="MJIHuVOWKSOnyFvOeWIIuk">弃电量（总量）</b> = 理论可发 − 实际上网电量 = 实际上网电量 × (1 ÷ 利用率 − 1)<br data-page-node-id="Jo1DgftMwWbSPaW7W2PRhP">
+    <b data-page-node-id="TwCON1V0mefpwsfGYcvaRp">利用小时</b> = 上网电量 ÷ 装机（MW→h）；2025 全国参考：风电 1979h、光伏 1088h
+  </div>
+  <table data-page-node-id="0QQD93dAxmDePiXWkCLQEk">
+    <tr data-page-node-id="1lHxzrBvgTIkrM3wdgpJtW"><th data-page-node-id="7pPgrDdLWezseUOfWbkw5S">指标</th><th data-page-node-id="AfaVHBLrgQ2bRthqZNVfCq">含义</th><th data-page-node-id="z4LiacD6Qybc2bD8w3omSV">用途</th></tr>
+    <tr data-page-node-id="ghXkv5eobBPcoHkuqw1x1p"><td data-page-node-id="0vxR3i34U6FFBH7cBpkC4E">弃风/弃光率</td><td data-page-node-id="99KmE0iXGUNdLq2qUHXbqs">系统原因限制未上网电量占比</td><td data-page-node-id="Q1lUqKkzuX4agSA7WLA72K">核心考核、对标全国/本省</td></tr>
+    <tr data-page-node-id="v99UOinud3pwvaNTRpEw0b"><td data-page-node-id="tqK5EHOaEFNjsaiwrCcgzO">弃电量（亿 kWh）</td><td data-page-node-id="Wrn2sZ8bHdpwn1gbaABBD9">绝对损失体量</td><td data-page-node-id="D6iSrDrZCDYztqEsZ9AnrV">折算电费、向上汇报</td></tr>
+    <tr data-page-node-id="Brjcno13srBLuXsBGJr2Bd"><td data-page-node-id="fFQedDAzWZmsyA69NVIYk9">受限时长占比</td><td data-page-node-id="wLHTOmackpAYBmCFBtR9Ga">触发受限的时段 / 总时段</td><td data-page-node-id="PLroQi9aZi40wifZNd2Esh">定位"弃电窗口期"</td></tr>
+    <tr data-page-node-id="CpF7WkSnpEABfAGa27DLzc"><td data-page-node-id="VOMlEOF6Bf40P2HPaFWgty">预测准确率</td><td data-page-node-id="cpQQ3M1hoKPvPTp1hDmpqj">功率预测 vs 实际出力</td><td data-page-node-id="Fn9x1hTWC0RMefVHP0Xl8W">归因"预测偏差导致的考核"</td></tr>
+    <tr data-page-node-id="JDSicQgHg88ZhgKIqlUH0y"><td data-page-node-id="b8c1h7vCSrWQN2VgaUbeFd">损失金额（万元）</td><td data-page-node-id="xuUqrOO5BGTTROJcXsPXPt">弃电量 × 结算电价 + 考核费</td><td data-page-node-id="0tu8CBwb0jk3OVaPUraxEe">量化经营影响</td></tr>
+  </table>
+</div>
+
+<!-- 3. 数据需求 -->
+<div class="sec" data-page-node-id="uwqWBF17d9yBxUYrBr79UQ">
+  <h2 data-page-node-id="aPsFNCMsmSqerxEIr14fAc">三、数据需求清单</h2>
+  <table data-page-node-id="eAJKlsXAnBJnppjTcO1smE">
+    <tr data-page-node-id="ygXsn6nPxgRqzAD9wjta3u"><th data-page-node-id="1IRytOQtWgvuxOFjSvvKQp">数据</th><th data-page-node-id="IvfB444o5FEiAIFLwIZukU">来源系统</th><th data-page-node-id="Aq8A23Lj3qYpcPolBvDazh">频率</th><th data-page-node-id="42qhCKGTjFLZLFFFCl41lQ">在分析中的作用</th></tr>
+    <tr data-page-node-id="avmepwwziFmzGDt8416gy1"><td data-page-node-id="L1S0gxzM0qYfkP0TT2lnNx">风机/逆变器实际出力</td><td data-page-node-id="rD10vPOyI3jrzEHYe9vcdy">SCADA / AGC</td><td data-page-node-id="YZ216OadNxElEcPg04mBQd">15min 或 1h</td><td data-page-node-id="XbNtUkcHG6HffS8FCAVsHp">实际发电量基线，用于逐时对比与关口电量校验</td></tr>
+    <tr data-page-node-id="oUaTIRBakCL6eYbNuPoi6l"><td data-page-node-id="KMN3DQAUOOt9uzSidIfBSq">功率预测曲线</td><td data-page-node-id="nvrk7VIOeqOkfmbh1aGEAN">预测系统（日前/超短期）</td><td data-page-node-id="IhphE1ojOPPmeQzjfFli9o">15min</td><td data-page-node-id="aJVj9ktALip6y9f2zVgOS9">逐时理论可发近似、预测偏差归因</td></tr>
+    <tr data-page-node-id="mW7f5xf4bLOLicfXTBp5o3"><td data-page-node-id="C7UTxpuXc97u1JtYNBnmpJ">调度受限电量通知单</td><td data-page-node-id="7pEYPWT3nR4bKBU7XqsTIS">省调 / 网调</td><td data-page-node-id="UQbo5xlEWBAqb2vnOSPsMT">按次/按日</td><td data-page-node-id="PnCokARe1qRsE8ZcI5vOm5">判定"系统原因"弃电，逐时标记受限时段</td></tr>
+    <tr data-page-node-id="mqCItW1P0fqqLA21EdJerf"><td data-page-node-id="GsUqhojQudGVXfWGHM2S2E">关口上网电量</td><td data-page-node-id="yDPTP1kkyzkIMl0hfHrL2r">计量点电表</td><td data-page-node-id="q9UkE87kIhsvrt8oHRGU35">日/月</td><td data-page-node-id="2TNPDiBzB9VmudnbNpI8ct">结算、月底利用率校验、损失量化</td></tr>
+    <tr data-page-node-id="gsSBb7F9EMap2Ka7YEgDjN"><td data-page-node-id="9ggxDnMIOQ6tZG2g8LOMxq">风速 / 辐照度</td><td data-page-node-id="75FNBHpWn2BkcNgfJKbWDS">气象站 / 资源平台</td><td data-page-node-id="HjPvqQW0HRxhiANfRKNF8G">15min</td><td data-page-node-id="iM3fcyCm9pQTrR8suq7CqF"><b data-page-node-id="wYEYsoCkbk9V6q3Brrowk1">资源可发基准</b>（理论可发首选口径）、资源评估</td></tr>
+    <tr data-page-node-id="ezNxH7KU8xT7h9bnzY6NAl"><td data-page-node-id="mBv6Ze3vn0EhBxHLF9AJRE">机组检修/故障记录</td><td data-page-node-id="8tUIBigB84nO9HUIFkRMMd">生产 MIS</td><td data-page-node-id="GCcUBLkXM9X8hDNy3GvVKj">按次</td><td data-page-node-id="vRjKXfah38LSuECWDLjdDG">剔除"自身原因"停机时段（不计入弃电）</td></tr>
+  </table>
+  <div class="warn" data-page-node-id="fRYr8EwGVrDC2CXiWzme9M">⚠️ 三类必须对齐到同一时间轴（建议 15min 步长）。时钟偏差是常见坑：SCADA、预测、计量三方时钟差几分钟，会让弃电时段对不上。<br data-page-node-id="7ImlIkLlWEu9RME4jBRtJ7">
+  💡 风速/辐照度是"理论可发"的<b data-page-node-id="YHkdkWieHvsG9hSyxog8Ya">首选口径</b>，比功率预测更准；没接气象站时再用预测值近似。</div>
+</div>
+
+<!-- 4. 分步操作要点 -->
+<div class="sec" data-page-node-id="6sajWUx03pwP4pH5vScuxC">
+  <h2 data-page-node-id="NcMOQAtlrKTED4nyJg0jKV">四、分步操作要点</h2>
+
+  <div class="sub" data-page-node-id="aXqZIaIFywZkuXkP3s2QUL">步骤 1 · 明确口径与目标</div>
+  <ul data-page-node-id="wGGmjRYFFeB4YQCGsYX0TH">
+    <li data-page-node-id="PF6wiCc5T8tTKpVi5BXVL9">确认统计周期（日/月/年）、对标对象（2025 全国 5.7%/5.2%，辽宁目标 3% 以内——2025 年消纳目标）</li>
+    <li data-page-node-id="SeKNd88VDAoTzhzAFus7Hx">明确是否只算"系统原因受限"——对外报送必须按 44 号文口径</li>
+  </ul>
+
+  <div class="sub" data-page-node-id="R4ek6qGnndXGDDKipyG7XO">步骤 2 · 数据接入与对齐</div>
+  <ul data-page-node-id="gjjPckaBAPpae7MNbfb7zE">
+    <li data-page-node-id="HWkWeUdSFBzSTkNObHwYIU">把 SCADA 出力、预测曲线、受限通知、关口电量统一 resample 到 15min 网格</li>
+    <li data-page-node-id="q51yNmwrwIdrmzz5k1V5Zk">受限通知是文本/工单的，需结构化提取"开始-结束-受限容量"</li>
+  </ul>
+
+  <div class="sub" data-page-node-id="QkmtdY3U87IPVhbP2x4Dao">步骤 3 · 数据清洗校验</div>
+  <ul data-page-node-id="BIG8SlgaGCP8ylvBvMHJX1">
+    <li data-page-node-id="l8fjzs3rOe9CRuyOtPP3PQ">缺测：连续缺测 <b data-page-node-id="XytDW6EIDayV3zAZNZFucM">≤2 小时</b>采用线性插值；连续缺测 <b data-page-node-id="SFlieOq125yRXpHNYHtj4Y">&gt;2 小时</b>标记为无效时段，不纳入弃电统计，单独出具数据质量报告</li>
+    <li data-page-node-id="TPopUYDA97hfB6uRQOSbMM">异常：出力 &gt; 装机、负电量等剔除</li>
+    <li data-page-node-id="hUXStB1ZY1ZV4gh6msNGdw">电量平衡校验：∑实际出力×步长 ≈ 关口日电量。注意 SCADA 机端出力与关口上网电量之间隔着<b data-page-node-id="7LmIhJxtSPCzP69Pi75SVU">场用电+线损（风电场约 1~3%）</b>，建议先扣除场用电再比对，阈值取 <b data-page-node-id="2z0IL9cDSfQJHfBC9U78iF">3~5%</b>；若做机端对机端对比可用 2%</li>
+  </ul>
+
+  <div class="sub" data-page-node-id="EQBXFY01jyYBax1zaKFX2F">步骤 4 · 核心指标计算</div>
+  <ul data-page-node-id="SP4ZfwJFwtb3Rx0ZgjEWr7">
+    <li data-page-node-id="y6JUImEzMsLldhygmjmAx3"><b data-page-node-id="PQWBruwaaxPu4HvQ1xZLMl">逐时弃电量</b>：若时段 t 被标记为系统受限，则 <code data-page-node-id="gBRvV1FB5yGJCCVXB4c8GY">弃电量_t = max(理论可发_t − 实际出力_t, 0)</code>；否则 <code data-page-node-id="IzYE3JtIsAEYXMyRjMHoF8">弃电量_t = 0</code>（理论可发_t 见第二节口径）</li>
+    <li data-page-node-id="iIfSaBL8Rr39dYnlZFGCqU">聚合到日/月求弃电率，月末用关口电量校验并反推理论可发</li>
+  </ul>
+
+  <div class="sub" data-page-node-id="pxq2pe4qDPe65wFihbnWNo">步骤 5 · 时空维度拆解</div>
+  <ul data-page-node-id="yGtq7XuCWx6UUiVgRIPHOG">
+    <li data-page-node-id="xOpd5FHDhCjS38cNpIb4ZA">时间：逐时热力图找 10–17 时午间光伏尖峰、夜间风电尖峰；逐季看——<b data-page-node-id="npaGHaHgMGoCr7n6qyOOrz">东北场站弃风高发在供暖季（11月–次年3月）</b>，全国对比视角为一季度（春季大风/光照回升+负荷低）高发</li>
+    <li data-page-node-id="j3NtjrUUw7HvAPtw8UmlDt">空间/设备：按机型、片区、集电线路拆分，定位"哪台/哪条线"贡献最多弃电</li>
+  </ul>
+
+  <div class="sub" data-page-node-id="HSiY2BHK2V9y4qxUL3z9As">步骤 6 · 受限原因归因</div>
+  <ul data-page-node-id="OGsHO4VzD0Ue5dgaBPGakA">
+    <li data-page-node-id="GXyRm45MLMwkh4PaqbCKmG">按受限通知分类（<b data-page-node-id="Jk6LMfNHe4AoiF6sDoX6K3">仅系统原因</b>）：电网阻塞 / 调峰不足 / 外送通道受限 / 预测偏差</li>
+    <li data-page-node-id="pweeWHR7i2bvNJEMGNxtS7">供暖季重点看"煤电保供暖锁最小出力"导致的调峰型弃风</li>
+  </ul>
+
+  <div class="sub" data-page-node-id="QKfK3atTrJOkORyKCjwZxs">步骤 7 · 损失量化</div>
+  <ul data-page-node-id="9soiNEpYCFIoqaXkSKSXDZ">
+    <li data-page-node-id="TXc1PhT54vHYEaiY89HMi5">电费损失 = 弃电量 × 结算电价（参考看板测算器，默认 0.30 元/kWh 待替换）</li>
+    <li data-page-node-id="CNi7922hOSyq29KeiLVJiW">叠加现货/偏差考核费用（136 号文全面入市后此项会放大）</li>
+  </ul>
+
+  <div class="sub" data-page-node-id="qxY4YEwfot3oYSzDRur0G2">步骤 8 · 看板与决策</div>
+  <ul data-page-node-id="GkZB3S4S7dCanlBYIts7Lc">
+    <li data-page-node-id="83uQVCTNOZnvEEedZdvhVW">出月度弃电看板 + 归因饼图 + 损失金额卡</li>
+    <li data-page-node-id="9KNYKPNgga21agGWk59pJy">决策：配储充放时段优化、现货申报曲线修正、功率预测模型提升</li>
+  </ul>
+</div>
+
+<!-- 5. 归因分类 -->
+<div class="sec" data-page-node-id="hmSLOuDq76mG95UPawnlPD">
+  <h2 data-page-node-id="y0L4yVAk8ffz3JHETazCsI">五、受限原因归因分类表（仅系统原因）</h2>
+  <table data-page-node-id="ubQ93k9vmoIfJMZjq0NrdI">
+    <tr data-page-node-id="CrxLkMBmRtIxn41LmJXbf6"><th data-page-node-id="6EGwI9C6q25VzfpShzUtTS">原因类别</th><th data-page-node-id="DMA54E8I94EM6P5dANYrpg">典型场景</th><th data-page-node-id="jUeCcZNDQih0w3MZUJ7MFu">可干预性</th><th data-page-node-id="Yk52A5gW0xZamBiMb5bjh7">对应对策</th></tr>
+    <tr data-page-node-id="2tqXdJPN3P9voXoZvGujRE"><td data-page-node-id="NyIZPM1dEVs9aqWL9jvFgN">电网阻塞</td><td data-page-node-id="hDhgVCOHTMKcohoPBK1quN">本地通道满载、变电站约束</td><td data-page-node-id="CZnKHoMosTJFLFISuXmzi4">低（依赖电网）</td><td data-page-node-id="AD8dTe0uUtxudIsb3OQosI">推动网架加强、跨省互济</td></tr>
+    <tr data-page-node-id="OmCUmxqAoHYeiTSw6JJapc"><td data-page-node-id="EJnuUS8ysTPEAAYuuRCpJ4">调峰不足</td><td data-page-node-id="CrBmthLQnXNESJnhLe4Uqt">供暖季煤电锁最小出力</td><td data-page-node-id="gbhB3VHWbFMnNn60jqmT1K">中</td><td data-page-node-id="BDhELApiP4DpmQFHoA3Aon">配储、灵活性改造、制氢消纳</td></tr>
+    <tr data-page-node-id="7Cdu5CfqocYMKKqtjXVtNn"><td data-page-node-id="QutarszlcQXs5IMAFzLWNI">外送通道受限</td><td data-page-node-id="cLliaUOal4fCIDZfZDjDUn">特高压输送占比未达设计</td><td data-page-node-id="NFytAFusz3HRquUbYWZYEO">低</td><td data-page-node-id="fi493P1lYSStH8fDfRLVR8">争取外送份额</td></tr>
+    <tr data-page-node-id="CCxqn4UHAcDnA8TlNxTFCx"><td data-page-node-id="zIHAD842OBBU0G0XBnotpU">功率预测偏差†</td><td data-page-node-id="toPtbdMd6dpW8TZXfNUX1i">预测不准致偏差考核</td><td data-page-node-id="vJPI4Up2x1WXeO5KlsvJVe">高（自身可控）</td><td data-page-node-id="mwuGuTcbkA7vzq5ZqhlCEq">升级预测模型、修正申报</td></tr>
+  </table>
+  <div class="warn" style="margin-top:10px; border-left-color:var(--sub);" data-page-node-id="vVkwY52sclHBZwT8Y1bOMn">
+    ⚠️ <b data-page-node-id="yfCeeRNM7RxLVakxgKZ50X">自身设备检修/故障停机</b>不计入弃电率（非系统原因），但计算"理论可发量"时需扣除故障时段，避免分母虚高。此类记录仅用于内部运维分析，不放进系统原因归因表。<br data-page-node-id="uGIw2TXzBTjBfTLhZqHysG">
+    † <b data-page-node-id="L5wuXZJqRCAFptnkrCx8gF">预测偏差是间接路径</b>：它不直接触发限电指令，而是通过调度备用收紧放大限电，并直接产生两个细则/现货偏差考核费用——该笔损失已在步骤 7 单独量化，<b data-page-node-id="Xx3k7VV67nZeRtx0EAzf2c">勿与弃电损失重复计算</b>。
+  </div>
+</div>
+
+<!-- 6. 衔接 -->
+<div class="sec" data-page-node-id="2VGtEybRcGwbSpSdk2HHqu">
+  <h2 data-page-node-id="VPrVxD5A2NXLdkLF9orjiT">六、与本看板/测算器的衔接</h2>
+  <ul data-page-node-id="eadxeWLTC2BU9PMksyy1vc">
+    <li data-page-node-id="Y4KOfiWjJWRzBylrgHzavG">看板已内置<b data-page-node-id="IlQ3u4dUY0EBHdNu8My1a7">全国趋势、省级对比、日内/季节性弃电窗口、辽宁专题</b>，做场站分析时先对标宏观。</li>
+    <li data-page-node-id="PXtXbgwTiG6cZFIIUNswgP"><b data-page-node-id="Z5BvWkIWFYt0FKqNxtchN3">场站级测算器</b>：填年上网电量 + 利用率 + 电价 → 理论可发/弃电量/电费损失，用于步骤 4、7 的快速估算。</li>
+    <li data-page-node-id="D5xsRxxxPKiWYmMdRzrNUM">当你导出场站<b data-page-node-id="kWtRBbZy2WTU62Y7kkEfMA">逐时出力 + 受限通知</b>后，可接一张<b data-page-node-id="XpRxvI5Dp8DOuLXIPhQfrV">逐时弃电热力图</b>，直接服务配储充放与现货申报（步骤 5、8）。</li>
+  </ul>
+  <div style="margin-top:12px" data-page-node-id="Jz1G97560LJ5D2TiDx8NyZ"><span class="tag" data-page-node-id="KyzGhKgHIdeqFYo4k74zki">交付物</span>本手册 + 《弃风弃光率分析看板.html》组成完整分析包，置于 <code data-page-node-id="2DsfJJrsckFHNG3LhjJkFl">F:\AI数据分析\弃风弃光率</code></div>
+</div>
+
+<!-- 7. 理论依据 -->
+<div class="sec" id="theory">
+  <h2>七、理论依据 · 学术支撑（对应「../_元信息/论文辅助.md」）</h2>
+  <p style="font-size:13px;color:#5b6b7e;margin:8px 0">本节为流程的方法论底层。可验证的政策、机构、方法来源汇总见同目录 <a href="../_元信息/论文辅助.md">../_元信息/论文辅助.md</a>。</p>
+  <ul>
+    <li><b>核心定义对偶</b>：消纳率 η = 实际消纳 / 理论可发；弃风/弃光率 = 1 − η（行业通用定义；《分布式能源》期刊论文明确此定义——该刊由大唐科研总院、清华大学出版社主办）。</li>
+    <li><b>统计口径铁律</b>：利用率仅按「系统原因受限电量」计算，排除检修/故障/市场化决策（国能发电力〔2024〕44号、两则监测统计管理办法）。</li>
+      <li><b>政策锚</b>：发改能源〔2025〕1360号定 2030/2035 消纳调控目标；灵活性资源（储能/煤电改造/需求响应/跨省互济）的量化方法见《分布式能源》储能类研究（储能扩容可显著改善高光伏场景弃光率，具体量级以原文献数据为准）。</li>
+    </ul>
+  </div>
+
+  <!-- 8. 行业现势 -->
+  <div class="sec" id="reality">
+    <h2>八、行业现势与数据速览（2026 年一手资料）</h2>
+    <p class="sub">三套口径并存：官方 / 央企自曝 / 第三方估算差异巨大，分析务必区分</p>
+    <table>
+      <tr><th>口径</th><th>2026 上半年数据</th><th>说明</th></tr>
+      <tr><td><b>官方</b>（全国新能源消纳监测预警中心）</td><td>弃风率 9.1%、弃光率 8.6%（利用率 90.9%/91.4%）</td><td>仅系统原因口径，同比降 2.3/2.6 pct，连续三年回落</td></tr>
+      <tr><td><b>央企自曝</b>（节能风电半年报）</td><td>集团风电限电率 20.84%，弃风损失 15.07 亿度</td><td>单企业全口径；新疆 41%、青海 29.45%</td></tr>
+      <tr><td><b>第三方</b>（CREA+GEM）</td><td>综合弃电率约 26.1%，上半年弃电 3600 亿度（+49%）</td><td>全年或破 7000 亿度，占 2025 绿电 20%+</td></tr>
+    </table>
+    <div class="warn">⚠️ 三套口径差异巨大：对外报送 / 对标必须用 44 号文（官方）口径；企业自曝与第三方口径揭示"系统原因之外的广义弃电"规模，仅用于内部风险研判，<b>不可混用</b>。</div>
+
+    <p class="sub">高弃电地区实况（节能风电分省，2026H1）</p>
+    <table>
+      <tr><th>省份</th><th>弃电量</th><th>弃电率</th><th>备注</th></tr>
+      <tr><td>新疆</td><td>5.1 亿度</td><td><b>41%</b></td><td>光伏结算 &lt;0.1 元/度；装机 1.8 亿 kW 占比&gt;60%</td></tr>
+      <tr><td>青海</td><td>近 1.5 亿度</td><td><b>29.45%</b></td><td>装机 6317 万 kW 占比 74%；光伏午间限电 3–4h 常态</td></tr>
+      <tr><td>甘肃/陕西/内蒙古/河北/山东</td><td>—</td><td>偏高</td><td>远高于官方整体值，多为资源大省</td></tr>
+    </table>
+
+    <p class="sub">行业财务冲击（呼应步骤 7 损失量化）</p>
+    <ul>
+      <li><b>136 号文落地</b>：保量保价时代结束，全面入市；西北光伏现货 &lt;0.15 元/度，山东仅 0.08 元/度。</li>
+      <li><b>2026H1 多央企新能源净利腰斩</b>：三峡能源 −66%~73%、国电电力 −67.3%、金开新能 −85.89% 等；电价每跌 1 分钱，资本金 IRR 降 0.5~0.8 pct。</li>
+      <li><b>投资退潮</b>：光伏新增装机 72.07GW 同比 −66%；新疆/内蒙古超 21 亿光伏 EPC 央企弃标。</li>
+    </ul>
+
+    <p class="sub">深层成因（补充第五节宏观维度）</p>
+    <ul>
+      <li>地方政府"大干快上"：稳增长压力下固定资产投资依赖新能源，短期不考虑消纳。</li>
+      <li>电力央国企"预算软约束"：融资成本低、煤电仍赚钱，盲目接盘上马。</li>
+    </ul>
+
+    <p class="sub">解决路径（对应第五/六节对策系统化）</p>
+    <ul>
+      <li>特高压外送 · 储能 · 需求响应 · 火电灵活性改造 · 源网荷储一体化 · 市场机制 —— 与第五节对策（网架加强/配储/灵活性改造/跨省互济）一脉相承。</li>
+    </ul>
+
+    <div class="info">📚 一手资料见「素材」目录：①素材/新能源消纳-弃风弃光原理与解决路径.md ②素材/2026Q1全国新能源并网消纳情况数据.md ③素材/能源央企利润腰斩弃风弃光暴涨分析.md ④素材/央企自曝弃电15亿度新能源残酷真相.md</div>
+
+    <p class="sub">8.7 国家能源局官方口径（2026 上半年正式发布）</p>
+    <table>
+      <tr><th>指标</th><th>风电</th><th>光伏</th><th>备注</th></tr>
+      <tr><td>截至 2026-06 累计装机</td><td>6.79 亿 kW (+18.5%)</td><td>12.72 亿 kW (+15.8%)</td><td>风光合计约 19.5 亿 kW</td></tr>
+      <tr><td>2026H1 新增并网</td><td>3862 万 kW</td><td>7177 万 kW</td><td>—</td></tr>
+      <tr><td>2026H1 发电量</td><td>5984 亿 kWh</td><td>6555 亿 kWh</td><td>—</td></tr>
+      <tr><td>2026H1 平均利用率</td><td><b>90.9%</b></td><td><b>91.4%</b></td><td>同比降 2.3/2.6 pct</td></tr>
+    </table>
+    <div class="info">数据来源：国家能源局 2026-07-30 上半年可再生能源并网运行情况新闻发布会。该口径利用率与 8.1 监测预警中心口径完全一致，互为官方印证。</div>
+
+    <p class="sub">8.8 消纳红线与政策演变</p>
+    <table>
+      <tr><th>年份</th><th>风电利用率</th><th>光伏利用率</th><th>备注</th></tr>
+      <tr><td>2024</td><td>95.9%</td><td>96.8%</td><td>坚守 95% 红线期</td></tr>
+      <tr><td>2025</td><td>94.3%</td><td>94.8%</td><td>"十四五"首次跌破 95%</td></tr>
+      <tr><td>2026H1</td><td>90.9%</td><td>91.4%</td><td>连续三年回落</td></tr>
+    </table>
+    <ul>
+      <li>2024-03《全额保障性收购可再生能源电量监管办法》(4-1 施行)：保障性收购 + 市场交易电量。</li>
+      <li>2024-05《2024—2025 年节能降碳行动方案》：资源较好地区利用率可降至 90%。</li>
+      <li>2024-06 国家能源局通知：原则上不低于 90%。</li>
+      <li>2025-10 发改能源〔2025〕1360号：分档设置利用率目标。</li>
+      <li>2026-08-03《新型电力系统建设"十五五"规划》：三档目标 第一档≥95% / 第二档≥90% / 第三档≥85%，全国约 90% 左右。</li>
+    </ul>
+    <div class="info">解读：95% 红线已实质松动为"分地区分档、全国约 90%"弹性机制；对外对标须注意目标值已非固定 95%。</div>
+
+    <p class="sub">8.9 新能源发电量占比与"速度-质量"矛盾</p>
+    <ul>
+      <li>2025 可再生能源发电量 3.99 万亿 kWh (+15%) 占 38%；风电 1.13 万亿 + 光伏 1.17 万亿，风光合计 2.3 万亿 kWh 占全社会用电量 22%。</li>
+      <li>2026Q1 可再生能源 8829 亿 kWh (37.1%)；风电+太阳能 5809 亿 kWh (&gt;23%)。</li>
+      <li><b>速度-质量落差</b>：2025 风电光伏以 47.3% 装机量仅贡献 22% 发电量，叠加消纳受限，构成"量增利减"根源。</li>
+      <li>市场化加速：交易电量占比 2021 年 22% → 2022 年 32% → 2023 年 44%；136 号文全面入市；2026-04-01 光伏出口退税取消。</li>
+      <li>三重压力叠加（消纳紧张 + 电价下行 + 政策退坡）：2026H1 光伏新增装机同比 −66%、风电 −24.8%。</li>
+    </ul>
+
+    <p class="sub">8.10 学术论文支撑（对应「弃风弃光率相关论文综述.md」）</p>
+    <div class="info">本节补学术维度。13 篇真实论文（P1–P13）的系统综述与可查证链接见上级 <a href="../03_论文综述/弃风弃光率相关论文综述.md">../03_论文综述/弃风弃光率相关论文综述.md</a>（与第七节对应的「../_元信息/论文辅助.md」互补：彼篇偏政策/方法论来源，本篇偏学术论文）。</div>
+    <table>
+      <tr><th>维度</th><th>代表论文</th><th>对应流程环节</th><th>可借鉴点</th></tr>
+      <tr><td>① 弃电率测算</td><td>P1 非时序概率(电力系统自动化·19)·P2 风-光相关性(IEEE·21)·P3 实时市场量化(IEEE·19)</td><td>指标计算层</td><td>P3 把"市场化主动弃电 vs 系统原因弃电"分开计，呼应口径铁律</td></tr>
+      <tr><td>② 灵活性规划</td><td>P4 分布式能源(19)·P5 上海交大学报(23)</td><td>第五节归因·灵活性缺口</td><td>P5 量化火电改造/燃气/储能谁更能降弃电</td></tr>
+      <tr><td>③ 优化调度</td><td>P6 内蒙古电力技术·P7 山东电力技术·P8 电力自动化设备(24)·P9 电工技术学报(23)</td><td>第五节归因 + 8.5</td><td>火电深度调峰、复合储能、调峰市场，均含降弃电率算例</td></tr>
+      <tr><td>④ 风光配比</td><td>P10 青海最优配比(电气技术)</td><td>8.5 解决路径</td><td>风光 1:3.7/1:1.3 消纳最大——"看菜吃饭"实证</td></tr>
+      <tr><td>⑤ 政策/市场</td><td>P11 Applied Energy(21)·P12 Energy Policy(18)</td><td>8.5 市场机制</td><td>特高压跨区交易、发电权交易降弃电</td></tr>
+      <tr><td>⑥ 战略综述</td><td>P13 中国工程科学(24) 李政院士团队</td><td>第五节宏观 + 8.5</td><td>源网荷储灵活性资源顶层框架</td></tr>
+    </table>
+    <div class="info">提示：论文结论以原文为准，引用具体数据须回查原文献。</div>
+  </div>
+
+  <footer data-page-node-id="AA5W7hNJOsLUwKye69mVrM">版本 V1.9 ｜ 客观数据分析手册，不构成决策建议 ｜ 修订于 2026-09-13 ｜ 口径依据：国能发电力〔2024〕44号 ｜ 第八节新增 8.10「学术论文支撑」挂接《弃风弃光率相关论文综述.md》（P1–P13 六维度落点）</footer>
+
+</div>
+
+<button id="toTop" aria-label="返回顶部" title="返回顶部">↑</button>
+<script>
+(function(){var b=document.getElementById('toTop');
+function t(){b.classList.toggle('show',(window.scrollY||document.documentElement.scrollTop)>560);}
+window.addEventListener('scroll',t,{passive:true});t();
+b.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});})();
+</script>
+</body>
+</html>
