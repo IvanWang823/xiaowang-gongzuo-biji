@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="M203RzF2H5isvDfD02AEAB">
+<head data-page-node-id="s2S5wUOcAgLrTbIIlDIsk8">
+<meta charset="UTF-8" data-page-node-id="HP2MXefQ98ZGs5FPBgeYPS">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="1Vyw86mQOBPiv13DuSXBpd">
+<title>光伏风电出力预测分析思路 V1.5</title>
+<style>
+  :root{--bg:#f4f7fb;--card:#fff;--ink:#1f2d3d;--sub:#5b6b7e;--line:#e5e9f0;
+    --blue:#2563eb;--wind:#ef4444;--solar:#f59e0b;--accent:#002FA7;--good:#10b981;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Microsoft YaHei","PingFang SC",Helvetica,Arial,sans-serif;background:var(--bg);
+    color:var(--ink);line-height:1.65;padding:24px 16px 60px}
+  .wrap{max-width:1080px;margin:0 auto}
+  header{background:linear-gradient(135deg,#002FA7,#2563eb);color:#fff;border-radius:16px;padding:24px 28px;margin-bottom:20px}
+  header h1{font-size:23px;font-weight:800}
+  header p{opacity:.9;font-size:13px;margin-top:6px}
+  .sec{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .sec h2{font-size:17px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:var(--accent)}
+  .sec h2::before{content:"";width:4px;height:18px;background:var(--accent);border-radius:2px;display:inline-block}
+  .sub{font-size:13px;color:var(--sub);margin:14px 0 8px;font-weight:600}
+  table{width:100%;border-collapse:collapse;margin-top:6px;font-size:13px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#f0f4fa;font-weight:700}
+  code{background:#eef2ff;color:var(--blue);padding:1px 6px;border-radius:4px;font-size:12px}
+  a{color:var(--blue);text-decoration:none;border-bottom:1px dotted var(--blue)}
+  .formula{background:#f7f9fc;border-left:3px solid var(--solar);padding:10px 14px;border-radius:6px;
+    font-size:13px;margin:8px 0;font-family:Consolas,"Courier New",monospace;line-height:1.9;white-space:pre-wrap}
+  .warn{background:#fff7ed;border-left:3px solid var(--wind);padding:10px 14px;border-radius:6px;font-size:13px;margin:8px 0}
+  .info{background:#f0f4fa;border-left:3px solid var(--blue);padding:10px 14px;border-radius:6px;font-size:13px;margin:8px 0}
+  .tag{display:inline-block;background:#eef2ff;color:var(--blue);font-size:11px;padding:2px 8px;border-radius:20px;margin-right:5px}
+  ul{margin:6px 0 0 20px} li{margin:5px 0;font-size:13.5px}
+  footer{text-align:center;color:var(--sub);font-size:12px;margin-top:20px}
+/* ===== 工作流信息架构图 ===== */
+.ia-wrap{display:flex;align-items:stretch;margin:4px 0 2px}
+.ia-col{display:flex;flex-direction:column;flex:1;min-width:0}
+.ia-col-mid{flex:1.4;margin:0 4px}
+.ia-arrow{flex:0 0 52px;position:relative;display:flex;align-items:center;justify-content:center}
+.ia-arrow i{display:block;width:100%;height:2px;background:var(--blue)}
+.ia-arrow i::after{content:'';position:absolute;right:-6px;top:-4px;width:0;height:0;border-left:8px solid var(--blue);border-top:5px solid transparent;border-bottom:5px solid transparent}
+.ia-arrow b{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--card);color:var(--blue);font-size:11px;font-weight:600;padding:1px 7px;border-radius:12px;white-space:nowrap}
+.ia-title{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:9px}
+.ia-box{border-radius:9px;padding:9px 12px;margin-bottom:8px;background:#f7f9fc;border:1px solid var(--line)}
+.ia-box:last-child{margin-bottom:0}
+.ia-box .l{font-size:12.5px;font-weight:600;color:var(--ink)}
+.ia-box .d{font-size:11px;color:var(--sub);margin-top:2px;line-height:1.55}
+.ia-tg{display:inline-block;background:#eef2ff;color:var(--blue);font-size:10px;padding:1px 7px;border-radius:20px;margin-right:4px;margin-top:5px}
+.ia-in{background:#eef2ff;border-color:#c7d2fe}
+.ia-rag{background:#f6f4ff;border:1px dashed #8b5cf6}
+.ia-rag .l{color:#6d28d9}
+.ia-engine{background:#fbfcfe;border:1.5px solid var(--blue);border-radius:11px;padding:13px;flex:1;display:flex;flex-direction:column}
+.ia-engine .et{font-size:13.5px;font-weight:700;color:var(--accent);margin-bottom:10px}
+.ia-layer{border-radius:7px;padding:9px 12px;margin-bottom:8px}
+.ia-layer .li{font-size:11.5px;color:var(--ink);padding:1px 0;line-height:1.55}
+.ia-layer .li b{color:var(--accent)}
+.ia-l1{background:#eef2ff;border:1px solid #c7d2fe}
+.ia-l2{background:#fff;border:1px solid var(--line);display:flex;padding:0;overflow:hidden;margin-bottom:8px}
+.ia-l2 .sp{flex:1;padding:9px 11px}
+.ia-l2 .sp+.sp{border-left:1px solid var(--line)}
+.ia-l2 .sp .h{display:inline-block;background:var(--blue);color:#fff;font-size:10.5px;font-weight:600;border-radius:4px;padding:1px 8px;margin-bottom:5px}
+.ia-l3{background:#ecfdf5;border:1px solid #a7f3d0;margin-bottom:0}
+.ia-dn{text-align:center;color:var(--blue);font-size:13px;line-height:13px;padding:1px 0 5px}
+.ia-out{background:#ecfdf5;border-color:#a7f3d0}
+.ia-out .l{color:#065f46}
+.ia-hl{background:#fff7ed;border:1px solid var(--solar);border-radius:8px;padding:9px 12px;margin-top:8px}
+.ia-hl .l{color:#b45309;font-weight:700;font-size:12.5px}
+.ia-hl .d{font-size:11px;color:#b45309;margin-top:2px;opacity:.9}
+@media(max-width:820px){.ia-wrap{flex-direction:column;gap:10px}.ia-arrow{display:none}.ia-col-mid{margin:0}}
+</style>
+
+<!-- ================= 界面美化层（纯 CSS 覆盖，2026-09-07，不影响内容版本号） ================= -->
+<style>
+  html{scroll-behavior:smooth}
+  *{-webkit-font-smoothing:antialiased}
+  body{font-family:Inter,-apple-system,"SF Pro Text","Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
+    background:
+      linear-gradient(rgba(0,47,167,.026) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,47,167,.026) 1px,transparent 1px),
+      radial-gradient(900px 420px at 85% -10%,rgba(37,99,235,.10),transparent 60%),
+      linear-gradient(180deg,#f8fafd,#eef2f9);
+    background-size:28px 28px,28px 28px,100% 100%,100% 100%;
+    background-attachment:fixed;padding:30px 18px 80px}
+  .wrap{max-width:1120px}
+
+  /* 页头 */
+  header{position:relative;overflow:hidden;border-radius:20px;padding:32px 36px 36px;
+    background:radial-gradient(1050px 360px at 92% -80%,rgba(255,255,255,.28),transparent 62%),
+      radial-gradient(700px 300px at -8% 120%,rgba(37,99,235,.35),transparent 60%),
+      linear-gradient(122deg,#001f6e 0%,var(--accent) 46%,#1d4ed8 100%);
+    box-shadow:0 18px 44px -16px rgba(0,47,167,.35);margin-bottom:26px}
+  header::after{content:"";position:absolute;left:36px;right:36px;bottom:0;height:3px;
+    background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.85),rgba(255,255,255,0));border-radius:2px}
+  header h1{font-size:27px;font-weight:800;letter-spacing:.6px;display:flex;align-items:center;gap:12px}
+  header h1::before{content:"";width:6px;height:30px;border-radius:4px;
+    background:linear-gradient(180deg,#fff,rgba(255,255,255,.25));box-shadow:0 2px 8px rgba(0,0,0,.2)}
+  header p{opacity:.94;font-size:13.5px;margin-top:8px;max-width:820px;line-height:1.8}
+
+  /* 节卡片 */
+  .sec{position:relative;border-radius:16px;padding:22px 26px 24px;margin-bottom:20px;
+    background:linear-gradient(180deg,#ffffff,#fbfcff);
+    border:1px solid #e4eaf4;
+    box-shadow:0 1px 2px rgba(16,24,40,.03),0 12px 34px -18px rgba(23,43,99,.18)}
+  .sec::before{content:"";position:absolute;top:-1px;left:26px;right:26px;height:3px;border-radius:0 0 6px 6px;
+    background:linear-gradient(90deg,var(--accent) 0%,#4f8ef7 60%,rgba(79,142,247,0))}
+  .sec h2{font-size:18px;letter-spacing:.3px;margin-bottom:16px;gap:10px}
+  .sec h2::before{content:"";width:5px;height:20px;background:linear-gradient(180deg,#4f8ef7,var(--accent));border-radius:3px;
+    box-shadow:0 2px 8px rgba(0,47,167,.28);display:inline-block}
+  .sub{font-size:13px;color:var(--sub);margin:14px 0 10px;font-weight:700;letter-spacing:.2px;
+    display:flex;align-items:center;gap:7px}
+  .sub::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--solar);
+    box-shadow:0 0 0 3px rgba(245,158,11,.18);flex-shrink:0}
+  .warn{background:linear-gradient(90deg,#fff7ed,#fffaf3);border-left:4px solid var(--wind);border-radius:8px;
+    padding:11px 15px;font-size:13px;margin:10px 0;line-height:1.75}
+  .formula{background:linear-gradient(90deg,#fff8ea,#fffdf5);border-left:4px solid var(--solar);border-radius:8px;
+    padding:12px 16px;line-height:1.9;box-shadow:inset 0 0 0 1px rgba(245,158,11,.08)}
+  code{background:#edf2ff;color:#17439d;border:1px solid #d6e2ff;border-radius:6px;padding:1.5px 7px;
+    font-family:ui-monospace,"SF Mono",Consolas,"Courier New",monospace;font-size:12px}
+
+  /* 表格 */
+  table{border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:12px;margin-top:8px;
+    border:1px solid #dbe3f0;box-shadow:0 8px 22px -14px rgba(23,43,99,.22)}
+  th{background:linear-gradient(180deg,#0b3ba6,var(--accent));color:#fff;font-weight:700;letter-spacing:.6px;
+    font-size:12.5px;border:none;padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.16)}
+  td{border:1px solid #e6ebf4;border-top:none;border-right:none;padding:10px 13px;font-size:13px;background:#fff}
+  tr td:first-child{border-left:none}
+  tr:last-child td{border-bottom:none}
+  tr:last-child td:first-child{border-radius:0 0 0 10px}
+  tr:last-child td:last-child{border-radius:0 0 10px 0}
+  tr:first-child th:first-child{border-radius:11px 0 0 0}
+  tr:first-child th:last-child{border-radius:0 11px 0 0}
+  tr:nth-child(even) td{background:#f7faff}
+  tr:hover td{background:#f0f6ff}
+  ul{margin:6px 0 0 6px;list-style:none}
+  ul li{position:relative;padding-left:18px;margin:7px 0;font-size:13.5px;line-height:1.8}
+  ul li::before{content:"";position:absolute;left:2px;top:11px;width:5px;height:5px;border-radius:50%;
+    background:var(--blue);opacity:.75}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,47,167,.25);transition:border-color .2s}
+  a:hover{border-bottom-color:var(--accent)}
+
+  /* 架构图微调 */
+  .ia-title{letter-spacing:.4px;display:flex;align-items:center;gap:7px}
+  .ia-title::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--blue);opacity:.9}
+  .ia-box{transition:box-shadow .2s,border-color .2s}
+  .ia-box:hover{border-color:#b9c8ec;box-shadow:0 4px 12px -6px rgba(23,43,99,.16)}
+  .ia-engine{border-color:#9db9ec;box-shadow:0 6px 18px -10px rgba(0,47,167,.22)}
+  .ia-arrow b{box-shadow:0 2px 8px rgba(37,99,235,.22)}
+
+  /* 组件补齐（info / step 与新风格统一） */
+  .info{background:linear-gradient(90deg,#f0f6ff,#f8fbff);border-left:4px solid var(--blue);border-radius:8px;
+    padding:11px 15px;font-size:13px;margin:10px 0;line-height:1.75}
+  .step{background:linear-gradient(180deg,#ffffff,#f8fafe);border:1px solid #dfe7f3;border-radius:12px;
+    padding:16px;position:relative;transition:transform .22s,box-shadow .22s,border-color .22s}
+  .step::before{content:"";position:absolute;top:-1px;left:16px;right:16px;height:3px;border-radius:0 0 6px 6px;
+    background:linear-gradient(90deg,var(--blue),rgba(37,99,235,0))}
+  .step:hover{transform:translateY(-3px);border-color:#b9cdf2;box-shadow:0 12px 24px -12px rgba(23,43,99,.25)}
+  .step .no{background:linear-gradient(135deg,#2563eb,var(--accent));box-shadow:0 4px 10px -2px rgba(0,47,167,.4)}
+  .step h3{font-size:14.5px;letter-spacing:.2px}
+
+  /* 页脚 */
+  footer{margin-top:30px;padding:14px 22px;text-align:center;border-radius:14px;font-size:12px;
+    color:var(--sub);line-height:1.9;
+    background:rgba(255,255,255,.75);border:1px solid #e4eaf4;backdrop-filter:blur(6px);
+    box-shadow:0 6px 18px -12px rgba(23,43,99,.14)}
+
+  /* ===== UI 修订：扁平商务风统一（2026-09-07） ===== */
+  body{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+    background:#f5f7fb;background-image:none}
+  h1,h2,h3,.sub,.tag,.ia-title,.ia-box .l,.ia-box .d,.ia-layer .li,.ia-tg{font-family:inherit}
+  header{border-radius:10px;padding:26px 30px;background:linear-gradient(120deg,#002FA7,#1d4ed8);box-shadow:none}
+  header::after{display:none}
+  header h1{font-size:25px}
+  .sec{border-radius:10px;padding:22px 26px;border:1px solid #e2e8f2;box-shadow:none;background:#fff}
+  .sec::before{display:none}
+  .sec h2::before,.sub::before{box-shadow:none}
+  table{border:1px solid #dde5f0;box-shadow:none;border-radius:8px}
+  tr:first-child th:first-child{border-radius:7px 0 0 0}
+  tr:first-child th:last-child{border-radius:0 7px 0 0}
+  tr:last-child td:first-child{border-radius:0 0 0 7px}
+  tr:last-child td:last-child{border-radius:0 0 7px 0}
+  .warn,.formula,.info{border-left-width:3px;box-shadow:none;border-radius:6px}
+  .warn{background:#fff8f0}
+  .formula{background:#fffaf0}
+  .info{background:#f2f7ff}
+  .step{border-radius:8px;box-shadow:none;transition:none}
+  .step::before{display:none}
+  .step:hover{transform:none;box-shadow:none;border-color:#cfdcee}
+  .step .no{background:var(--accent);box-shadow:none}
+  footer{border-radius:8px;box-shadow:none;background:#fff;backdrop-filter:none}
+  /* 工作流信息架构图「喂入 ↔ 产出」对仗：两根箭头都需可见，仅小屏(<820px)回退纵向时隐藏 */
+  .ia-col-mid{margin:0 12px 0 4px}
+  .ia-box,.ia-engine,.ia-arrow b{box-shadow:none;transition:none}
+  .ia-box:hover{box-shadow:none;border-color:var(--line)}
+  .ia-engine{border-color:#c3d4ef}
+  /* 双栏模块：加大字号、行高与留白 */
+  .ia-l2{border-radius:8px}
+  .ia-l2 .sp{padding:16px 18px}
+  .ia-l2 .sp .h{font-size:12px;padding:3px 11px;margin-bottom:9px;border-radius:5px}
+  .ia-l2 .li{font-size:13px;line-height:2;padding:4px 0}
+  .ia-layer .li{font-size:12.5px;line-height:1.9;padding:3px 0}
+  .ia-box .l{font-size:13px}
+  .ia-box .d{font-size:11.5px;line-height:1.7}
+  #toTop{box-shadow:0 4px 12px rgba(0,47,167,.26);transition:opacity .2s}
+  #toTop:hover{transform:none;box-shadow:0 4px 12px rgba(0,47,167,.26)}
+
+  /* 返回顶部 */
+  #toTop{position:fixed;right:26px;bottom:28px;z-index:99;width:46px;height:46px;border:none;cursor:pointer;
+    border-radius:50%;color:#fff;font-size:19px;line-height:1;
+    background:linear-gradient(135deg,#2563eb,var(--accent));
+    box-shadow:0 10px 24px -6px rgba(0,47,167,.45);opacity:0;visibility:hidden;transform:translateY(10px);
+    transition:.28s cubic-bezier(.2,.8,.3,1)}
+  #toTop.show{opacity:1;visibility:visible;transform:none}
+  #toTop:hover{transform:translateY(-3px);box-shadow:0 14px 30px -6px rgba(0,47,167,.5)}
+
+  @media(max-width:820px){
+    body{padding:18px 10px 70px}
+    header{padding:24px 22px 30px;border-radius:16px}
+    header h1{font-size:22px}
+    header p{font-size:12.5px}
+    .sec{padding:18px 16px 20px;border-radius:13px}
+    .sec::before{left:14px;right:14px}
+    table{display:block;overflow-x:auto}
+  }
+  @media print{
+    body{background:#fff;background-image:none;padding:0}
+    .sec,header,footer{box-shadow:none}
+    #toTop{display:none!important}
+    .sec,header{break-inside:avoid}
+  }
+</style>
+<style>
+/* ===== 海运风格统一层（参照 海运价格分析思路.html，2026-09-07）===== */
+:root{
+  --bg:#f8fafc;--card:#fff;
+  --ink:#1e293b;--sub:#64748b;--line:#e2e8f0;
+  --blue:#2563eb;--wind:#b91c1c;--solar:#b45309;--accent:#0a2e5c;--good:#0f6e56;
+  --primary:#0a2e5c;--primary-light:#1a4a7a;--primary-dark:#061d3a;
+  --green:#0f6e56;--green-light:#d1fae5;
+  --amber:#b45309;--amber-light:#fef3c7;
+  --radius:14px;--radius-sm:8px;
+  --shadow:0 4px 24px rgba(10,46,92,.08);
+  --shadow-hover:0 8px 40px rgba(10,46,92,.14);
+  --transition:.25s cubic-bezier(.4,0,.2,1)
+}
+body{font-family:'Inter',-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);line-height:1.7}
+
+/* 页头：深海军蓝 + 柔和阴影 */
+header{border-radius:18px;padding:30px 34px 34px;
+  background:linear-gradient(135deg,#061d3a 0%,#0a2e5c 48%,#1a4a7a 100%);
+  box-shadow:0 14px 40px -16px rgba(10,46,92,.4);margin-bottom:22px}
+header h1{font-size:24px;letter-spacing:.3px}
+header h1::before{width:5px;height:26px;background:linear-gradient(180deg,#fff,rgba(255,255,255,.3));box-shadow:none}
+header p{font-size:13.5px;opacity:.92}
+
+/* 目录导航 */
+.toc{position:sticky;top:12px;z-index:60;background:rgba(255,255,255,.94);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--line);border-radius:16px;padding:10px 16px;margin:0 0 20px;
+  box-shadow:0 4px 20px rgba(10,46,92,.06);display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.toc .toc-label{font-size:12px;font-weight:700;color:var(--primary);margin-right:4px;letter-spacing:.5px}
+.toc a{font-size:12px;font-weight:500;color:var(--sub);text-decoration:none;background:var(--bg);
+  padding:4px 14px;border-radius:999px;border:1px solid transparent;transition:all var(--transition);white-space:nowrap}
+.toc a:hover{background:var(--blue);color:#fff;border-color:var(--blue);transform:translateY(-1px);box-shadow:0 2px 12px rgba(37,99,235,.25)}
+
+/* 节卡片：柔和阴影 + hover */
+.sec{border-radius:14px;padding:22px 26px 24px;margin-bottom:20px;background:#fff;
+  border:1px solid var(--line);box-shadow:var(--shadow);transition:box-shadow var(--transition)}
+.sec:hover{box-shadow:var(--shadow-hover)}
+.sec h2{color:var(--primary);font-size:18px}
+.sec h2::before{width:5px;height:20px;background:linear-gradient(180deg,#2563eb,var(--primary));border-radius:3px;box-shadow:none}
+h2{scroll-margin-top:76px}
+.sub::before{background:var(--blue);box-shadow:none}
+
+/* 表格：浅灰表头 + 斑马纹 + hover */
+table{border-collapse:collapse;border-spacing:0;margin-top:8px;border:1px solid var(--line);
+  border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(10,46,92,.04)}
+th{background:var(--bg);color:var(--ink);font-weight:600;font-size:12.5px;border:1px solid var(--line);padding:10px 14px}
+td{border:1px solid var(--line);padding:10px 14px;font-size:13px;background:#fff}
+tr:nth-child(even) td{background:#fcfcfd}
+tr:hover td{background:var(--bg)}
+tr:first-child th:first-child,tr:first-child th:last-child{border-radius:0}
+tr:last-child td:first-child,tr:last-child td:last-child{border-radius:0}
+
+/* 步骤卡：hover 上浮 */
+.step{border-radius:12px;border:1px solid var(--line);background:#fff;box-shadow:0 1px 3px rgba(10,46,92,.05);
+  transition:transform .25s,box-shadow .25s,border-color .25s}
+.step:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:#c3d4ef}
+.step .no{background:var(--blue);box-shadow:none}
+
+/* 警示 / 公式 / 信息框 */
+.warn{background:#fef2f2;border-left:4px solid var(--wind);color:#7f1d1d;border-radius:8px;box-shadow:none}
+.formula{background:#fffbeb;border-left:4px solid var(--solar);border-radius:8px;box-shadow:none}
+.info{background:#eff6ff;border-left:4px solid var(--blue);border-radius:8px;box-shadow:none}
+
+/* code / 链接 */
+code{background:var(--bg);color:var(--primary);border:1px solid var(--line)}
+a{color:var(--blue);border-bottom:1px solid rgba(37,99,235,.25)}
+a:hover{border-bottom-color:var(--blue)}
+
+/* 页脚 */
+footer{margin-top:28px;padding:14px 22px;border-radius:12px;background:#fff;border:1px solid var(--line);
+  box-shadow:0 1px 3px rgba(10,46,92,.05)}
+
+/* 返回顶部：深海军蓝 */
+#toTop{background:var(--primary);box-shadow:0 8px 24px -6px rgba(10,46,92,.5)}
+#toTop:hover{background:var(--blue);box-shadow:0 12px 30px -6px rgba(37,99,235,.5)}
+
+/* 架构图微调（不覆盖隐藏箭头与双栏留白） */
+.ia-box:hover{border-color:#c3d4ef;box-shadow:0 4px 12px -6px rgba(10,46,92,.12)}
+.ia-engine{border-color:#c3d4ef;box-shadow:0 6px 18px -10px rgba(10,46,92,.2)}
+
+@media(max-width:640px){
+  .toc{top:6px;padding:8px 12px}
+  .toc a{font-size:11px;padding:3px 10px}
+}
+@media print{.toc{display:none!important}}
+
+/* ===== 精修层（2026-09-13：不换色板、不加动画，纯排版层级细化）===== */
+
+/* 1. 正文列表：marker 用主蓝 + 行距 */
+.sec ul,.sec ol{padding-left:22px;margin:10px 0}
+.sec li{margin-bottom:6px;line-height:1.78}
+.sec li::marker{color:var(--blue)}
+.sec li b{color:var(--primary)}
+
+/* 2. 表格精修：交替行 + hover 行 + 表头下边框 + 圆角 */
+table{border-radius:10px;overflow:hidden}
+table tr:first-child th{background:var(--bg);font-weight:700;color:var(--primary);
+  border-bottom:2px solid var(--line);letter-spacing:.2px;font-size:12.5px;text-align:left}
+table td,table th{padding:11px 14px;font-size:13px;line-height:1.65;vertical-align:top}
+table tr:nth-child(even) td{background:#fafbfd}
+table tr:hover td{background:#f0f6ff}
+table b{color:var(--primary)}
+
+/* 3. 引用块统一：圆角 + padding + 字色一致 + formula 等宽字体 */
+.info,.warn,.formula{padding:14px 18px;margin:14px 0;font-size:13.5px;line-height:1.75;border-radius:10px}
+.info{background:#eff6ff;border-left:4px solid var(--blue);color:#1e3a8a}
+.warn{background:#fef2f2;border-left:4px solid var(--wind);color:#7f1d1d}
+.formula{background:#fffbeb;border-left:4px solid var(--solar);color:#78350f;
+  font-family:ui-monospace,'SF Mono',Consolas,'Courier New',monospace;font-size:13px;line-height:1.7;white-space:pre-wrap}
+
+/* 4. 架构图精修：箭头文字更醒目、向下箭头弱化、tag 加粗 */
+.ia-arrow b{font-size:12.5px;padding:3px 12px;letter-spacing:.5px;border:1px solid var(--line);background:#fff}
+.ia-box .l{letter-spacing:.2px}
+.ia-tg{font-weight:600;letter-spacing:.3px}
+.ia-engine .et{letter-spacing:.3px}
+.ia-dn{color:var(--blue);opacity:.55;font-size:11px}
+
+/* 5. 返回顶部：圆形统一 */
+#toTop{width:44px;height:44px;border-radius:50%;font-size:18px;line-height:1;
+  display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;padding:0}
+
+/* 6. 打印友好：章节不分页切、白底 */
+@media print{
+  body{background:#fff}
+  .sec{box-shadow:none;border:1px solid #ddd;page-break-inside:avoid}
+}
+</style>
+</head>
+<body data-page-node-id="7yWqcQc0MxsUhH0HP7eoDH">
+<div class="wrap" data-page-node-id="tC84ecOV7Fm8VmnAA2nqlA">
+
+<header data-page-node-id="vuC3OvtTFPqm3tyU8m0SJr">
+  <h1 data-page-node-id="gPiI583NVzbQfYIQ4jUdDH">光伏风电出力预测分析思路</h1>
+  <p data-page-node-id="OVOCvbksIZGHzDIqIrmr9G">从预测体系、技术路线到考核对标的完整分析框架 ｜ 配套《弃风弃光率分析流程手册 V1.5》使用 ｜ 适用：发电企业场站级（东北区域）</p>
+  <p data-page-node-id="CtZj0l6r7e2lQ1C4Jc7iXI">依据：GB/T 40607-2021、《东北区域电力并网运行管理实施细则》（新版，2024-10-01 实施）｜ 版本 V1.5（V1.4 新增「工作流信息架构图」与第十一节；<b>V1.5 整合 6 份实践参考精华，新增第十二节「方法选型与数据源速查」</b>）｜ 编制于 2026-09-07，修订于 2026-09-13</p>
+</header>
+
+<nav class="toc">
+  <span class="toc-label">目录</span>
+  <a href="#flow">总览</a>
+  <a href="#sZiuuIOHBARJ1AleCfqkbw">一·为什么</a>
+  <a href="#DWDAXKC34dKDtAZ3VzJxij">二·预测体系</a>
+  <a href="#HyDGaXYbdGChuVG2BsJcmF">三·技术路线</a>
+  <a href="#utOmmdtFDWUWF5K6HfBijG">四·数据清单</a>
+  <a href="#BJBrdcjxERxVDHQFFAbqwv">五·建模七步</a>
+  <a href="#kLd6TwVnvBMwrZp6sIlX1R">六·精度对标</a>
+  <a href="#q7KpA1O2LbcofLZ9KwgFPZ">七·误差归因</a>
+  <a href="#N7FZNLAPt3Gi59otuJpT9T">八·实施路线</a>
+  <a href="#fVEA6aOjOQo1UIeSgnCOgP">九·系列衔接</a>
+  <a href="#W7raM6GcRkO2ndYoN3WTM3">十·四道陷阱</a>
+  <a href="#MLnlF8btqLqjFpJ5yOiyku">附录A</a>
+  <a href="#theory">十一·理论依据</a>
+  <a href="#method-toolkit">十二·方法速查</a>
+</nav>
+
+<!-- 0. 工作流信息架构图 -->
+<div class="sec" id="flow">
+  <h2>工作流信息架构图（总览）</h2>
+  <p class="sub">气象 + 实测数据 → AI 建模七步 → 四档时效预测与考核对标（对应正文第三、五、六节）</p>
+
+  <div class="ia-wrap">
+
+    <!-- 左：输入原料 -->
+    <div class="ia-col">
+      <div class="ia-title">① 输入原料</div>
+      <div class="ia-box ia-in">
+        <div class="l">数值天气预报 NWP</div>
+        <div class="d">ECMWF / GFS / WRF 多源，含辐照、风速、温湿压</div>
+        <span class="ia-tg">气象</span><span class="ia-tg">多源</span>
+      </div>
+      <div class="ia-box ia-in">
+        <div class="l">场站实测 SCADA</div>
+        <div class="d">实际功率 / 辐照 / 风速 / 温度 + 历史出力</div>
+        <span class="ia-tg">实测</span>
+      </div>
+      <div class="ia-box ia-in">
+        <div class="l">场站台账</div>
+        <div class="d">装机容量、机型、坐标、限电与检修记录</div>
+        <span class="ia-tg">静态</span>
+      </div>
+      <div class="ia-box ia-in">
+        <div class="l">规则与考核约束</div>
+        <div class="d">GB/T 40607-2021、东北区域两个细则（2024-10-01 实施）、上报时点</div>
+        <span class="ia-tg">强制</span>
+      </div>
+      <div class="ia-box ia-rag">
+        <div class="l">📚 ../_元信息/论文辅助.md</div>
+        <div class="d">GEFCom2014 / HEFTCom2024 基准 · 评估协议 · 防泄漏做法</div>
+      </div>
+    </div>
+
+    <!-- 箭头 1 -->
+    <div class="ia-arrow"><i></i><b>原料喂入</b></div>
+
+    <!-- 中：建模引擎 -->
+    <div class="ia-col ia-col-mid">
+      <div class="ia-engine">
+        <div class="et">② AI 建模引擎（七步主线）</div>
+
+        <div class="ia-layer ia-l1">
+          <div class="li">🔹 时基对齐：15 min / 1 h 统一，注意 UTC+8 与北京时</div>
+          <div class="li">🔹 缺测插补 + 异常值剔除</div>
+          <div class="li">🔹 <b>限电时段必须剔除</b>——否则精度虚高、模型学歪</div>
+          <div class="li">🔹 <b>防信息泄漏</b>：只能用预测发布时刻之前的信息</div>
+        </div>
+
+        <div class="ia-dn">▼</div>
+
+        <div class="ia-l2">
+          <div class="sp">
+            <div class="h">特征工程</div>
+            <div class="li">• NWP 降尺度到场站</div>
+            <div class="li">• 日变化 / 季节项</div>
+            <div class="li">• 爬坡与波动特征</div>
+            <div class="li">• 晴空指数（光伏）</div>
+          </div>
+          <div class="sp">
+            <div class="h">模型层</div>
+            <div class="li">• 物理：辐照-功率 / 功率曲线</div>
+            <div class="li">• 统计：ARIMA 基准</div>
+            <div class="li">• ML：LightGBM / XGBoost / LSTM</div>
+            <div class="li">• <b>混合堆叠</b>（HEFTCom 冠军）</div>
+          </div>
+        </div>
+
+        <div class="ia-dn">▼</div>
+
+        <div class="ia-layer ia-l3">
+          <div class="li">🔹 评估：MAE / RMSE / MAPE / R² + <b>扩展窗口交叉验证</b></div>
+          <div class="li">🔹 概率化：P10 / P50 / P90 分位数带</div>
+          <div class="li">🔹 归因：气象偏差 / 模型 / 限电 / 设备四分类</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 箭头 2 -->
+    <div class="ia-arrow"><i></i><b>产出</b></div>
+
+    <!-- 右：产出 -->
+    <div class="ia-col">
+      <div class="ia-title">③ 产出交付 <span style="font-size:11px;font-weight:400;color:var(--sub);margin-left:4px;">← 引擎终态产物</span></div>
+      <div class="ia-box ia-out">
+        <div class="l">🕐 四档时效预测<span style="color:var(--sub);font-weight:500">（由 NWP+SCADA 经七步建模生成）</span></div>
+        <div class="d">超短期 15 min–4 h / 短期 0–72 h / 中期 / 长期</div>
+      </div>
+      <div class="ia-box ia-out">
+        <div class="l">🎯 精度对标表<span style="color:var(--sub);font-weight:500">（对比国标 GB/T 40607 / 东北区域两个细则考核线）</span></div>
+        <div class="d">合格率 vs GB/T 40607 与两个细则考核线</div>
+      </div>
+      <div class="ia-box ia-out">
+        <div class="l">📉 概率预测带<span style="color:var(--sub);font-weight:500">（基于评估层 P10/P90 分位数输出）</span></div>
+        <div class="d">P10 / P50 / P90，支撑交易报价风险偏好</div>
+      </div>
+      <div class="ia-box ia-out">
+        <div class="l">🔍 误差归因清单<span style="color:var(--sub);font-weight:500">（由限电 / 气象 / 模型 / 设备 四分类拆解）</span></div>
+        <div class="d">改进优先级排序（见第七节）</div>
+      </div>
+      <div class="ia-hl">
+        <div class="l">⚡ 下一步行动（汇聚）</div>
+        <div class="d">按三阶段路线图落地（见第八节）</div>
+      </div>
+      <div class="ia-box" style="background:#eef2ff;border-color:#c7d2fe;margin-top:8px">
+        <div class="l" style="color:var(--accent)">📤 present_files 交付</div>
+        <div class="d">思路文档 + 看板推送用户核对</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="warn" style="margin-top:14px">
+    <b>质量护栏</b>：① <b>限电时段必须剔除</b>——混入会让精度虚高、上线即翻车；② <b>禁跨口径混算</b>——不同时基 / 单位 / 口径的数据不得直接拼接；③ <b>缺数据不编造</b>，缺失明说、留空处理；④ 气象大模型输出须落地校验，警惕第十节「四道陷阱」；⑤ 本框架为客观数据分析，<b>不构成决策建议</b>。
+  </div>
+</div>
+
+<!-- 1 -->
+<div class="sec" data-page-node-id="yvf2TtkvfKXjwWHnkkGnO9">
+  <h2 data-page-node-id="sZiuuIOHBARJ1AleCfqkbw">一、为什么做：预测精度直接连着钱</h2>
+  <ul data-page-node-id="CEoB4HCRBynQ4xmcoPAqvd">
+    <li data-page-node-id="iQsQF7rSw2EVXgHXZ5IMG2"><b data-page-node-id="EakOqBnffD7wJwy2KjBTFy">两个细则考核</b>：东北新版两个细则（<b data-page-node-id="PX7EePuOUTu4IT90Gg8eGC">2024-10-01 起实施</b>，覆盖辽吉黑蒙东省级及以上直调风电/集中式光伏/新型储能）已将新能源预测调整为<b data-page-node-id="AtnPAmKbYbo0A98FMaVRNI">中期 / 短期 / 超短期"三段式考核"</b>——中期按 10 日内整体偏差考核，短期按"误差带外偏差电量"考核（允许合理误差、重点罚大额偏差），超短期以 15min 步长对未来 4h 做 16 次滚动预测；三套指标<b data-page-node-id="KW7Jtfim4fj15avTEDIyCA">独立统计、互不抵消</b></li>
+    <li data-page-node-id="aXXRd82d79fZWb6NifsDQI"><b data-page-node-id="8Y5QBlnodEi03An0EO2yVE">现货市场偏差</b>：136 号文全面入市后，日前申报曲线 = 功率预测曲线，预测偏差直接变成现货偏差收益/考核，此项损失会放大</li>
+    <li data-page-node-id="ZhpbxI0eKYhJUMitQTXr7I"><b data-page-node-id="x9qL8QODLAe1phfi1URQSg">弃电归因与理论可发</b>：弃风弃光分析（配套手册 V1.5）中，功率预测是"理论可发"的近似来源；预测偏差也是弃电归因和两个细则考核的独立损失源</li>
+    <li data-page-node-id="HkArqSp9Azej1YBWQxYVpj"><b data-page-node-id="cdtBZNsBiHSZa42gRjLnp0">经验参照</b>：AI 气象大模型在内蒙古电网 427 个场站部署后，发电量预测精度提升 3.04%，单此项年降本约 4226 万元（企业披露口径）</li>
+  </ul>
+  <div class="info" data-page-node-id="HHvK8agvSNmdCpRkJbX6cw">💡 <b data-page-node-id="8RZDXjK5cBxx5zCyVOQsan">分析定位</b>：回答三个问题——① 我们场站的预测水平在全国什么位置？② 误差从哪来？③ 按什么优先级投入能把准确率提上去、把考核费降下来？</div>
+</div>
+
+<!-- 2 -->
+<div class="sec" data-page-node-id="d4TbOsNhXMHgyb7K9zSyDb">
+  <h2 data-page-node-id="DWDAXKC34dKDtAZ3VzJxij">二、预测体系：四档时效与上报要求（GB/T 40607-2021）</h2>
+  <table data-page-node-id="b8j7OMayk6GbGB8PzZDRBZ">
+    <tr data-page-node-id="H3rnVOYgKrcFGbSSej1Emh"><th data-page-node-id="KrsL1A6DCdd5Lk2dFbboBg">时效</th><th data-page-node-id="a3LSYw1C73Z8aqV0MCTeUr">范围与分辨率</th><th data-page-node-id="CA8WDGgwrvnbsqrYlMx8sH">更新频率</th><th data-page-node-id="1x36ishdTgcoD8knH2ppsI">主要用途</th></tr>
+    <tr data-page-node-id="HH8suiUDOeu1wQUziYIhcj"><td data-page-node-id="G4FxiWAgnLOYRDWEDaTtmH"><b data-page-node-id="gwZ233EnAtPKMmAmQjJXzQ">超短期</b></td><td data-page-node-id="JJnL3K9dujjk8oQXn2QtUC">未来 15min~4h，逐 15min</td><td data-page-node-id="FpKN5Q7FA4OuUWoDXmCua1">每 15min 滚动（16 个时间点）</td><td data-page-node-id="Fnd6GLMLVDIwfzRMl8s242">实时调度、AGC、超短期考核</td></tr>
+    <tr data-page-node-id="NLfYSN7fyKgwaAffwa57R8"><td data-page-node-id="pX8Y5xBhb2M0eRqtlLbdUR"><b data-page-node-id="GzA8jB8N0QeX1fJkmNtcJx">短期（日前）</b></td><td data-page-node-id="fjkxb7mrUmUidGsckJS3Zt">未来 72h，逐 15min</td><td data-page-node-id="yI3nnVBmxw8QN5lZi4RjSB">每日上报（华北口径每日 9 时前报次日 0 时起曲线，东北以省调规定为准）</td><td data-page-node-id="CwNiMcBLiu3twYTmN3ozto">日前调度计划、现货申报、日前考核</td></tr>
+    <tr data-page-node-id="KqtEFdAgOIuwXbw1aXvacW"><td data-page-node-id="fpkUjsU4XJGuAjyt41JfzX"><b data-page-node-id="LDTeaLfsbEOcbNxzc0YGy2">中期</b></td><td data-page-node-id="C8zeanbVjkryLB5iOvTuGy">未来 240h，逐 15min</td><td data-page-node-id="Ll1yGziEBCAPNtY24sxn1A">每日至少两次</td><td data-page-node-id="P629vanLBakGZ36Kr7gvzk">检修安排、中期考核（东北新版按 10 日整体偏差）</td></tr>
+    <tr data-page-node-id="GKRbSZuCO9okejP7ZWr7MF"><td data-page-node-id="snQC69uTCBk5Q4ynAfaGd7"><b data-page-node-id="k7VmM4KbF7dsAdIN9QkH8Q">长期</b></td><td data-page-node-id="VP5uG9Dt4RlVxAmCNtkNeI">未来 12 个月，逐月电量</td><td data-page-node-id="exh5TSs7o2JRxFtDNe79ZG">逐月滚动</td><td data-page-node-id="SEXrdBDOWAEHE9GuIYojEu">电量计划、经营预算</td></tr>
+  </table>
+  <div class="warn" data-page-node-id="mbVfH8gBATFv0STSfkg18Z">⚠️ <b data-page-node-id="4hlyVUsXdrs8dRq0cmvn12">口径注意</b>：① 统计准确率时段一般<b data-page-node-id="BIqbhS46KiFxBNI4lnRN9E">不含受限（限电）时段</b>，夜间时段不纳入光伏准确率计算（2025 版光伏功能规范）；② 上报率要求 <b data-page-node-id="rC4IUewecnfADPxPC3B2Pu">100%</b>，漏报/迟报直接考核，且传送率考核力度通常最重——<b data-page-node-id="0M63FA2iSwfgWNwDcUvTQF">先把上报通道做稳，再谈精度</b>；③ 东北区域具体门槛以现行细则文本为准。</div>
+</div>
+
+<!-- 3 -->
+<div class="sec" data-page-node-id="ExM4x3bLqhK7JXtG2OQZSU">
+  <h2 data-page-node-id="HyDGaXYbdGChuVG2BsJcmF">三、技术路线：物理、统计、混合 + AI 大模型新变量</h2>
+  <table data-page-node-id="TVXt2iSGgjsVWywfqz7Alg">
+    <tr data-page-node-id="a0tkA2x4j2ZfJNHpVbLjM5"><th data-page-node-id="2OOG42lIfUkgNzeXFMygOV">路线</th><th data-page-node-id="zXizAGqk6AllhJQN8KfAFW">原理</th><th data-page-node-id="m7UK4UNK8PaG9xZvfpshvZ">优点</th><th data-page-node-id="PwImD9XKHFIZmi06FEIa0r">短板</th><th data-page-node-id="W0O6TaaHFUmP2F8CXKak8J">适用</th></tr>
+    <tr data-page-node-id="s1Fwb9GiEUdzlRKtTHH8m1"><td data-page-node-id="OFA9CXA9eIYfeBtfWQjeYm"><b data-page-node-id="85aeq7bYz9nMpKzmzY6Ue0">物理法</b></td><td data-page-node-id="FPWddQ7IXhctLlGjWIlZO6">NWP 气象要素 → 功率曲线/晴空模型转换</td><td data-page-node-id="1H9OqeKgny7id0ApF4RCkD">不依赖历史数据，新场站可用，可解释</td><td data-page-node-id="GFn3eBRdEO3qH7FuBQekYD">NWP 系统偏差直接传导</td><td data-page-node-id="5Fy95jWopi4qeHnDz6dvfc">新建场站、缺历史数据</td></tr>
+    <tr data-page-node-id="C6FTfFOuF7QtbDWKQ4AA7G"><td data-page-node-id="RQ4Wrd3F6wNbmkgawWz9Da"><b data-page-node-id="VqAdD78aBDTwmPqLZFeTEf">统计法</b></td><td data-page-node-id="YmaQ4eEY6hqolv9x84f7T5">历史"气象-出力"对训练 ML 模型（LightGBM / LSTM / Transformer）</td><td data-page-node-id="tQv5hIhqYhgXiH24vqKXbG">自动吸收场站特性（尾流、衰减、限电记忆）</td><td data-page-node-id="1h0L6Ea6uAIsq1vHDhzpys">需 1 年以上优质历史数据，极端天气外推弱</td><td data-page-node-id="q09Icl6FBafejaWjLdxsYf">数据积累充分的老场站</td></tr>
+    <tr data-page-node-id="xHw4Aq9rtgp4Yp5MfWL317"><td data-page-node-id="P983aLFZ8WnkP1bF5Hbj0N"><b data-page-node-id="4pi29goJfTj9yGeHfrRjGV">混合法（主流）</b></td><td data-page-node-id="y9GEPV3KKt25rWeAD5Abkd">多源 NWP 订正 → 统计/ML 后处理 → 集成</td><td data-page-node-id="RQWa5mSFbRhUHpt4xiv87k">两条腿走路，精度上限最高</td><td data-page-node-id="bYuTfsagVOzGt9MMxLiRCJ">工程复杂度最高</td><td data-page-node-id="1kjzp2oTpWg2VJF86qKfKW">追求考核达标+现货收益的场站</td></tr>
+  </table>
+
+  <div class="sub" data-page-node-id="EG4ZxGEVpg4P2q50lilFWT">风电与光伏的链路差异</div>
+  <ul data-page-node-id="TYqSYzyAHpHy4SiScdDUbB">
+    <li data-page-node-id="unf73nkxH4PzPhAXwdMF4H"><b data-page-node-id="Zx3CkR5SnnuDMpmBJv2nwE">风电链路</b>：全球模式（EC/GFS）→ 中尺度降尺度（WRF）→ 轮毂高度风速插值 + 地形/稳定度修正 → 功率曲线（含尾流修正）→ 场站聚合。误差放大的关键在"降尺度+轮毂插值"这一段</li>
+    <li data-page-node-id="v7yBFCHyETHoO0n7ncBGKL"><b data-page-node-id="xuTD2Z8kF9m9ufNYGAkt2V">光伏链路</b>：NWP 云量/辐照 → 晴空模型基准 + 云衰减 → 水平面转倾斜面（转置模型）→ 组件温度修正 → 逆变器效率 → 功率。<b data-page-node-id="2RSCuw61AkwFJyBc3COXBg">超短期（0~4h）的核心是卫星云图外推</b>（风云四号/葵花），不是 NWP</li>
+    <li data-page-node-id="n2kV1FJRdzp8rk58rAJ7G5"><b data-page-node-id="EHaUvJZhg8gVHkY1EvAd76">东北场站重点关注</b>：供暖季寒潮大风转折、冬季积雪/低温（组件温度反而利好出力）、春季大风季；辽宁沿海场站注意海陆风日循环；<b data-page-node-id="9QRkVlbY9gfOG3P7Jh4kfF">低温结冰会让测风/测光设备观测失真</b>，是冬季误差的隐性来源</li>
+  </ul>
+
+  <div class="sub" data-page-node-id="DJRemZSs04d3p1G2VnHi4o">2025–2026 新变量：AI 气象大模型</div>
+  <table data-page-node-id="7sUk7gEqqAI3K4Hc1fAIyC">
+    <tr data-page-node-id="o3IthZekZEh6DSKFLxhVjj"><th data-page-node-id="L18p9cDzdiBYtaWiT3zza3">模型</th><th data-page-node-id="qob6U558uo9CnilAA9HyFm">来源</th><th data-page-node-id="JSEmgXZNQ5UAVsEXubReX6">新能源预测实测表现（披露口径）</th></tr>
+    <tr data-page-node-id="oCa5pCnZ8370PtRlPU6zsF"><td data-page-node-id="BlLin567nMwYa4036nh16B">盘古气象（+降尺度）</td><td data-page-node-id="r01MVKXZNDEBz3vwYw3qfe">华为 × 深圳能源（2025.6 发布）</td><td data-page-node-id="A9Gyhvbcg8uGuSXn5RCFK9">4 个试点场站：气象预报准确率 +15%，<b data-page-node-id="v2BNI6zn0HS4B4cjpEpGnA">风电功率预测准确率 +10%</b>，光伏 +2%；短期精度达分钟级</td></tr>
+    <tr data-page-node-id="abiXsZ5a69XOOupqJi2TUf"><td data-page-node-id="hq1HZXgNrRLxLUmoN1zRGn">风乌 GHR</td><td data-page-node-id="WCsRVfLqvE2Y4YzBFoK6zL">上海AI实验室（相风科技）</td><td data-page-node-id="29GlarlQFLOC726kF6c4H9">内蒙古电网 427 场站部署：发电量预测精度 +3.04%，年降本约 4226 万元；单卡 GPU 30s 出 10 天全球预报</td></tr>
+    <tr data-page-node-id="iNvgmlNPdQyOahxyROoDRG"><td data-page-node-id="H2zwv2pGxAbALqaHSo0stR">伏羲 2.0</td><td data-page-node-id="LQUulxvVfoEBuu3lmulgyk">复旦 × 上海科学智能研究院（2024.6）</td><td data-page-node-id="fPMD1xEZHCC9R7PLcC6O7q"><b data-page-node-id="faeKU9SKhczdAWUBojCNcM">0.1° 空间分辨率 / 1 小时时间分辨率 / 88 个变量 / 含海气耦合</b>；面向新能源优化（纳入总云量、低云量）；与南方电网合作做风速与辐照预测</td></tr>
+  </table>
+  <div class="warn" data-page-node-id="o4CCcPogMhFN71rV5dgu1Q">⚠️ <b data-page-node-id="jo60SPAv1uDoH9YAojqkfg">版本易混</b>：开源实现（tpys/FuXi）是 <b data-page-node-id="fxrDxGLqGfqTE2l5ArEC2q">0.25° / 6 小时 / 70 变量</b>，与"伏羲 2.0"（0.1° / 1 小时 / 88 变量）<b data-page-node-id="AZfjScHPEictYT4igIHjVN">不是同一个东西</b>。开源版 70 变量 = Z/T/U/V/R 各 13 层（65）+ T2M/U10/V10/MSLP/TP（5），<b data-page-node-id="Qzo7NC4jjAPZEtKAw7jUcn">其中没有任何辐射变量</b>——详见第十节陷阱 1。</div>
+  <div class="info" data-page-node-id="KeumeAKoSCoURP2sZ9lAEc">💡 <b data-page-node-id="VJBe3yyDsJ0ZXsSnMoRBzd">关键认知（行业复盘 2023–2026）</b>：全球级神经 NWP 的精度红利传导到<b data-page-node-id="GwMHl6MGTfppsAAZ7IjxRz">单个场站</b>时会被"地形修正、轮毂高度插值、尾流/云衰减"稀释——<b data-page-node-id="BC9XBGdsgPd1EwfDW3KrRh">资产级精度提升的大头来自"用本场站历史数据训练的 ML 后处理"，而不是单纯换更好的 NWP 源</b>。商业级大机队风电 MAE 已从 5 年前的 10~15% 降到 7% 以内，主要功劳就在后处理。第十节的实测证据进一步支持这一点。</div>
+</div>
+
+<!-- 4 -->
+<div class="sec" data-page-node-id="n1oKxiB6qkrWl0f1xRH8F3">
+  <h2 data-page-node-id="utOmmdtFDWUWF5K6HfBijG">四、数据需求清单</h2>
+  <table data-page-node-id="LRPcOuJq0aROMr6ug1ChtZ">
+    <tr data-page-node-id="DSBBDTVxeMolgdF4lywXaz"><th data-page-node-id="rdTJ2VCFgFO5b7GAI1pBJo">数据</th><th data-page-node-id="K3NgOJ0kadNNyysPYs3TAz">来源</th><th data-page-node-id="Sb5g45eZEQBYUKAbSn7GCR">频率</th><th data-page-node-id="vOgWEzf2kEJ1srmA9Z7uSE">作用</th></tr>
+    <tr data-page-node-id="tZoFmYD8JX4tXMCC8M2vV5"><td data-page-node-id="agXZBu597S1DMQD1CRLmje">多源 NWP（至少 2 源）</td><td data-page-node-id="YnAQVJrFDfa80xkMjJUi0W">EC/GFS 全球模式、中尺度 WRF、AI 大模型（盘古/风乌类）</td><td data-page-node-id="M5Bkxt9lEdbtDoAkBNgGH2">逐 15min / 逐小时</td><td data-page-node-id="KcgfFODi6jtHnJ4hiinNEB">预测的气象输入底盘；多源是集成与订正的前提</td></tr>
+    <tr data-page-node-id="GjVA9a5qYCm5BBseHxJ2Lv"><td data-page-node-id="zVKfOm7RCIQAq5aLeFOVZH">卫星云图</td><td data-page-node-id="0Xvv4tgc8l87tiHZGYpUG2">风云四号 / 葵花系列</td><td data-page-node-id="U4fLHVqsFqIqz7nzejBh1w">10~15min</td><td data-page-node-id="LeDfsCJGKeBZn6rIe8sABI"><b data-page-node-id="rgo0GjlzkBwEw9t2B8YE9O">光伏超短期（0~4h）核心输入</b>，云团外推</td></tr>
+    <tr data-page-node-id="59BJPB5BE2XlYzwSfYF9Oc"><td data-page-node-id="UPj3sOzCPF3jnsAP7FngNf">场站气象实测</td><td data-page-node-id="03asChx6C5Zc1WERBWZcQq">测风塔（多层高度）/ 辐照仪 / 组件温度</td><td data-page-node-id="PNuvxbnmGCg4Hk1DUIQuYI">5~15min</td><td data-page-node-id="J1dPSPsEadv3ZqRVIAiwy9">NWP 订正基准、资源可发计算；<b data-page-node-id="MFeXV5GOpmtiLYAAF2AVn0">冬季需做结冰失真校验</b></td></tr>
+    <tr data-page-node-id="WjIS9UG5QdNgKLjOIF4WBt"><td data-page-node-id="ESNwMpq3nECkU0RVimScmd">实际出力 + 机组状态</td><td data-page-node-id="OG2EoaxVpcBrCRGlh7yOZB">SCADA / AGC</td><td data-page-node-id="NrnjznRoEdVSCU6usjNPq1">15min</td><td data-page-node-id="WLRPHtTPIAMMirsbQAnTv1">训练标签；需剔除检修/故障/限电时段再训练，避免模型"学会弃电"</td></tr>
+    <tr data-page-node-id="C4CkGEEBxuxMFbLdQatOOe"><td data-page-node-id="lEiGRLmOs2ib5HkrGCB1iF">静态参数</td><td data-page-node-id="tVgzGWz1cofAORkBgPdm51">设计资料</td><td data-page-node-id="eFqSlc71CSxAAyXqWp1Y3S">静态</td><td data-page-node-id="R9WF5vFg95dElEdJAX5TzN">功率曲线、装机、PV 倾角/方位、逆变器容量配比（容配比 &gt;1 时光伏中午会削顶）</td></tr>
+    <tr data-page-node-id="7GdB5HFCSlZBTUUblDsRyU"><td data-page-node-id="hL5mPXPAvmrBsit4K08dKY">检修计划 + 限电记录</td><td data-page-node-id="NSeAAKAqz1H4RE7G5DBDAN">生产 MIS / 调度通知</td><td data-page-node-id="5h58mQqrKH22NmOCtkP59j">按次</td><td data-page-node-id="ZV4RG6Dt3GyOMGOfatGo9H">构造"可用容量"序列——所有准确率公式的分母都是<b data-page-node-id="35kioGVpqYrNu5tjja4xE6">开机容量</b>而非装机</td></tr>
+  </table>
+  <div class="warn" data-page-node-id="cuIGoS100vkxO9BsL0byA4">⚠️ 与弃电分析手册同一条铁律：<b data-page-node-id="OEXJDVWekx95MuXF35bRsH">时间轴对齐到 15min 网格</b>。NWP 时次、卫星时次、SCADA 时次差几分钟，误差统计就会失真。</div>
+</div>
+
+<!-- 5 -->
+<div class="sec" data-page-node-id="ZDYQEze9TYKzE8lodcE1Ii">
+  <h2 data-page-node-id="BJBrdcjxERxVDHQFFAbqwv">五、建模七步（分析主线）</h2>
+  <table data-page-node-id="rHgcYc7eG0WAcNa7HFYT2X">
+    <tr data-page-node-id="1PHWoneppljmiltVhqK4yl"><th data-page-node-id="dLBtSMqpST4raAcjQa946w">步骤</th><th data-page-node-id="5IDvFWhUrokJgDyAJR4gdk">环节</th><th data-page-node-id="1kE0umE05ALbMegMSPCyEj">要点</th></tr>
+    <tr data-page-node-id="8JEFhu40R7kUxFw0jT7DTI"><td data-page-node-id="4Osugrx3Bl5g1WauZEmn66">1</td><td data-page-node-id="N7W4SGVAzVx3RRhWk6k5H9">数据治理</td><td data-page-node-id="Sqwhb2DMxdBGCPRhywVnSD">对齐 15min 网格、剔限电/检修时段、构造开机容量序列</td></tr>
+    <tr data-page-node-id="WIvQuZA5PEXIc48bJwLIF8"><td data-page-node-id="nx2f9iLFbuhBzrffa4FADn">2</td><td data-page-node-id="AlfmnmW2aXzGw9Htr7TqFP">NWP 订正</td><td data-page-node-id="jH2sKCuQA0sph0rBGTRiOI">对风速/辐照做系统性偏差订正（分季节、分风向扇区）</td></tr>
+    <tr data-page-node-id="GL1Y9NcdFgel1dyXyvkg7A"><td data-page-node-id="Go77ZqJfkMAq9GqhKCnpix">3</td><td data-page-node-id="gS6nywe4Wgynhcpvi65tcB">特征工程</td><td data-page-node-id="qFa4NuZjrAIW5MluzlQwdx">气象特征 + 时间特征 + 滞后特征 + 机组状态特征</td></tr>
+    <tr data-page-node-id="BjlGxTswn9bC7nrItdHUNS"><td data-page-node-id="YgxI1rMMFHiNpL2I6htjnt">4</td><td data-page-node-id="l7pFllR4iyFuQ12BOZT9Bn">基线先行</td><td data-page-node-id="qwKRpMg7Gvlx4AFNAzTvAr">持续性预报/气候均值做 baseline，ML 打不赢基线不上线</td></tr>
+    <tr data-page-node-id="vk9Qkb4jEh2Pho9GKXPwYb"><td data-page-node-id="xUt2jwFSkoyPuP9kL6Z5lr">5</td><td data-page-node-id="BDWSP9XuXrQVC5mx5oUv17">模型训练</td><td data-page-node-id="Lf204avogjwO4Zt42LuYUm">LightGBM 起步 → LSTM/Transformer 时序模型，按季节划分验证集防泄漏</td></tr>
+    <tr data-page-node-id="CtDL40VsWWGtVu81v1iB7o"><td data-page-node-id="a0ZF4RfuxF79RN00UYjmZD">6</td><td data-page-node-id="Sw7PGeSNA8crp31TEboqpE">多源集成</td><td data-page-node-id="f3l4KwrnHUQEECduGE1ngM">物理模型 + 多个 ML 模型加权融合，转折天气切换权重</td></tr>
+    <tr data-page-node-id="znnvTkpJlv5N0L0csSjNgZ"><td data-page-node-id="ClRABZTlhs1yBFrXMMxCL7">7</td><td data-page-node-id="kpFvJG318Jp7Mc8wIDSrAH">滚动评估+人工修正</td><td data-page-node-id="5wh71YEpSlgN3ikxGUzUDd">日/月准确率监控，寒潮大风等转折天气人工介入修正</td></tr>
+  </table>
+  <ul data-page-node-id="9WvjucKOdD8jiSltLQbqjD">
+    <li data-page-node-id="hmMKtRL6r7V6dBAD33oT39"><b data-page-node-id="OmGsK1TUpUIx7FEDmfXoBN">训练集必须剔除限电时段</b>（或还原为"应发功率"），否则模型把限电学进去，放开后预测系统性偏低</li>
+    <li data-page-node-id="UWy8XXnGK2XEfFZJY9NyCA"><b data-page-node-id="z4wVBvWwJ23srFGf9fiK2K">验证按季节切分</b>（train 春夏 → test 秋冬），随机划分会造成时间泄漏、精度虚高</li>
+    <li data-page-node-id="jzjIVSO3ANy4J27S5HNRtW"><b data-page-node-id="He4Mh1LcWRPwLwznuqvfIA">光伏利用物理先验</b>：晴空模型给出"上限包络"，ML 只需学云衰减偏差——比纯黑盒稳得多</li>
+    <li data-page-node-id="RckbaCn5VTWmVGSxffDiN4"><b data-page-node-id="2uQNRa5ljwGCE6uAzEtSrT">风电利用轮毂高度实测</b>：测风塔多层风速做 NWP 垂直订正，是低价高收益的改进项</li>
+    <li data-page-node-id="kwhkL0SmIBISOOUEibYuoi"><b data-page-node-id="3zww3Dek7FlGAWUrAGbA0Z">输出概率预测（P10/P50/P90）</b>：东北新版短期按"误差带外偏差电量"考核，概率区间能提前识别大额偏差风险时段，比单点曲线更匹配新规则</li>
+  </ul>
+</div>
+
+<!-- 6 -->
+<div class="sec" data-page-node-id="60qPROqUXs08NCQcSsDC46">
+  <h2 data-page-node-id="kLd6TwVnvBMwrZp6sIlX1R">六、精度评估公式与考核对标</h2>
+  <div class="formula" data-page-node-id="tBCNdomHbo08Trdt8wA5eX">准确率（GB/T 40607-2021）:  CR = 1 − √( (1/n) · Σ ( (P实,i − P预,i) / Cap )² )，Cap 为开机容量
+RMSE = √( (1/n) · Σ ( (P实,i − P预,i) / Cap )² )，即 1 − CR 的根号项
+合格率 = |P实 − P预| / Cap &lt; 阈值 T 的时段占比（T 一般 ≤0.25）</div>
+  <table data-page-node-id="5JQlUEZEoDOAFw48iKNGrz">
+    <tr data-page-node-id="p5GX2jkwgyJH6Ub9nmR4BX"><th data-page-node-id="3gunwE6il1eAURLmXDY3aV">口径</th><th data-page-node-id="zI8RsIuBanbfSo6C48yiuv">风电</th><th data-page-node-id="wXLkdvJKSuuzn1HeavcJQs">光伏</th><th data-page-node-id="rHfovxtmuQO4WDTV6hggRF">出处</th></tr>
+    <tr data-page-node-id="BcCbXjNlqlWEe1yNKM0hXZ"><td data-page-node-id="JfrqD2z8Z1j299J2zds6Zu">国标·日前（短期）</td><td data-page-node-id="HGRkDgxb8v08FzYL61S312">≥83%</td><td data-page-node-id="24sPjEvitwIje7LY15ED1R">≥85%</td><td data-page-node-id="cgD2R6NpzPmG2VLTnHMqZs">GB/T 40607-2021（场站级，开机容量分母）</td></tr>
+    <tr data-page-node-id="6AAyOc6u6WPPC58AZ4VYJx"><td data-page-node-id="LZjfLfUN5YBWLgdOKEj9Y5">国标·超短期（第4h）</td><td data-page-node-id="ALPMbUHyhzEy4JrdPLm7CO">≥87%</td><td data-page-node-id="VSOR044qqgsxvvHo7XTZto">≥90%</td><td data-page-node-id="TzpE1rPA6d6tJ5YP1H8tPc">同上</td></tr>
+    <tr data-page-node-id="p8oIaUoTTEe7YQrvQzNZa7"><td data-page-node-id="vJLeAnvizB5vspzvaNE9oW">国标·中期（第4d）</td><td data-page-node-id="SJrF7VOYRYO5zYEHJhh3PB">≥70%</td><td data-page-node-id="oOcxB1MysPqzPm4yUJAp6Z">≥75%</td><td data-page-node-id="I9G6gEh3lSenXIRoVoOfxq">同上</td></tr>
+    <tr data-page-node-id="KEngvpUrF8UNr3Cc6LY4rg"><td data-page-node-id="xS07IDFP0OTeo2UlbSiVrM"><b data-page-node-id="iHWiDTLuFBs9z53bigCIFW">东北新版·短期（日前）</b></td><td data-page-node-id="AhvAL5DJLzNCjJEkO2WHgc"><b data-page-node-id="xz1QEXC9ivbDMC1NbfmaHn">≥75%</b></td><td data-page-node-id="FtcaaWA5UdhMqWWTLy6Dqn"><b data-page-node-id="aJ7LAoMEBVqYtW6gO6gWK7">≥85%</b></td><td data-page-node-id="uEUV7hxN6gD8FeAYXOLS2l">东北新版两个细则（2024-10-01 实施）；月合格率统一 ≥80%；<b data-page-node-id="1AhQOc4baBhlwFD3vUpz5s">改按"误差带外偏差电量"考核</b></td></tr>
+    <tr data-page-node-id="w6QBlUdBSVN6fp40eAPPPO"><td data-page-node-id="sJIivnqrL9vtRJitlALh5h"><b data-page-node-id="XKrBVQGVV7RzybKu2Vu9NA">东北新版·超短期（15min~4h）</b></td><td data-page-node-id="vkBRtuZ01RbluIVSlquDBD"><b data-page-node-id="xaHknqZPVIFE7iTI2nkuZQ">≥80%</b></td><td data-page-node-id="s9RubtAEYiTKN8PKWfF7hZ"><b data-page-node-id="t23l4fij7wfWB4BtHpO1c0">≥85%</b></td><td data-page-node-id="6qF3tg94XGZhiRvbAHq2pY">同上；16 次滚动逐点评价；预测/实发功率 &lt; 额定容量 10% 时免考核</td></tr>
+    <tr data-page-node-id="23yGHdAsFA0rslgmpk1SAF"><td data-page-node-id="SwqrHFULeLPkaqbCml2GwW"><b data-page-node-id="T0rS2yDddp1tZPOaKVbZpn">东北新版·中期（第 10 日）</b></td><td data-page-node-id="7GnqKgiPFjJyqSBekbDB21">准确率、合格率均 <b data-page-node-id="yb4un2HxhfjPGJ57Sx5AuL">≥70%</b>（风/光不分）</td><td data-page-node-id="PTPB9yi2aU7C9oe57PMa8W">同左</td><td data-page-node-id="bKrqPOSGqfZjxHOR4EHdUk">同上；每降 1 个百分点按额定容量 × 0.02 分/万千瓦考核</td></tr>
+    <tr data-page-node-id="Q40iFL5JrcEv8kefhOy7qb"><td data-page-node-id="gSLvZbET0OhADCnEA1GAkJ">华北细则·日前/超短期</td><td data-page-node-id="FnFkLAJKcARldWyClu61ql">—</td><td data-page-node-id="MnDViJ3GarrKiws4oKWSEh">≥85% / ≥90%</td><td data-page-node-id="qpQCUUKy5LC73UGZPTQcVT">华北能监局（风电同光伏口径）</td></tr>
+  </table>
+  <ul data-page-node-id="wflkLN1xNCSOlFzEOB5XWw">
+    <li data-page-node-id="zY2ZjiVpv50dEjeFqHfNT9"><b data-page-node-id="bAhkDRHC6OpnWFLqq0N5Tl">全国实际水平（场站级短期风电）</b>：RMSE 集中在 <b data-page-node-id="kYEOZIUfAolt4sRi7l6bHi">10%~26%</b>、合格率 82%~96%；省级聚合后 RMSE 降至 6%~18%（区域平滑效应）</li>
+    <li data-page-node-id="FNErICRUCSFU24VgL8Q3fl"><b data-page-node-id="sx1RP18Gx59O3c1vnLKSkj">误差地域规律</b>：西高东低、北高南低；东北属温带季风气候，资源可预报性中等——<b data-page-node-id="eWvAaf20uEeuG0VlhOoFiS">寒潮/大风转折性天气是东北误差的主要来源</b></li>
+    <li data-page-node-id="cKqNRXADbFEXjdCRVqDaQ1"><b data-page-node-id="do15o4OKAKQGywq60R8mjN">新旧交替关键提醒</b>：东北新版短期门槛数字（风 75% / 光 85% / 合格率 80%）与 2020 版<b data-page-node-id="z3C1uPm7gHTkCBBF1ud1O8">一致</b>，但<b data-page-node-id="cDG4ue2XDOFHxtBxQ9DhSB">考核方式已由"三率"改为"误差带外偏差电量"</b>——均值达标不再安全，大额偏差时段才是真正的罚点</li>
+    <li data-page-node-id="7y38F5VCNunLmBRNQyCfEB"><b data-page-node-id="EV0Jr4GZFLKHDJEMc7F9ih">传送率与封顶</b>：中期/短期/超短期报文传送率均须 <b data-page-node-id="Y8GdhZ9gePMQC7baTD7jcA">100%</b>，每降 1 个百分点按每万千瓦扣 2 分；功率预测全部项目月度考核总分封顶 = 额定容量 × 10 分/万千瓦（<b data-page-node-id="e4fVt9BSimRSTZ44gWBr0m">1 分 = 1000 元</b>）</li>
+    <li data-page-node-id="QJUzzzGxHnTWoEhIJzESoH"><b data-page-node-id="dqbSgY1nzf4fHzSuNJxi3T">免考核情形已收紧</b>：新版为并网 <b data-page-node-id="bMv5O5q7Uy79CFhJ3SFMw9">90 日内</b>（2020 版为 12 个月，已废止）、不可抗力、经调度同意的预测系统计划检修、非自身原因数据异常</li>
+  </ul>
+  <div class="warn" data-page-node-id="SaXAyh2Mbs0iSyvvM5ct4x">⚠️ <b data-page-node-id="8yMLFSXPwvL6XvnrFF9FH7">易混项（务必分开统计）</b>：<b data-page-node-id="Pfc684cvuRI7F3L7GYH0Rq">功率预测准确率</b> ≠ <b data-page-node-id="sVWiXdE83oAqRQSimBE2uH">发电计划曲线执行偏差</b>。后者是另一独立考核项（东北按 ±2% 电量偏差允许范围考核），与 AGC、一次调频、AVC 并列。预测不准会连带加大调频/调压压力，出现"预测罚款 + 调频扣分"双重损失，但两项考核不可合并计算。</div>
+</div>
+
+<!-- 7 -->
+<div class="sec" data-page-node-id="5KdWLZD9VDONuDIBId9ldZ">
+  <h2 data-page-node-id="q7KpA1O2LbcofLZ9KwgFPZ">七、误差归因与改进优先级</h2>
+  <table data-page-node-id="3YLIS9Ef4qE5lA2wEsn3vS">
+    <tr data-page-node-id="LnRcHNk6g84XNvWOUdL7vE"><th data-page-node-id="1WcIXsEygukqo7OZEGsLmQ">误差环节</th><th data-page-node-id="z4on8WtTKNZNFWTPvXYL4u">典型占比</th><th data-page-node-id="Hzmp9kFvhHiNWYdPRxaJ1p">特征</th><th data-page-node-id="BtiClFlOKSjJbWAU3zBFIe">可干预性</th><th data-page-node-id="inNsAcEKX0MAFBvYRlmAtT">改进动作</th></tr>
+    <tr data-page-node-id="RnsxTekvaK8Vaqgm3N8UWJ"><td data-page-node-id="uHGnhtCGUcWS25LApKRUQL">NWP 源误差</td><td data-page-node-id="vmz6wp45sAMT0RmbHG8krD">最大头</td><td data-page-node-id="t4DhAJNCRPqvBZZFpFOFGG">转折性天气（寒潮、锋面大风、云系突变）下急剧放大</td><td data-page-node-id="lZ7cPzVJBqZ3XeHlkEtr2R">中</td><td data-page-node-id="GQGmfuCX42pQxbJgNafytF">多源 NWP + AI 大模型接入、集合预报</td></tr>
+    <tr data-page-node-id="QiojyGpmgIcmDHTEWBTvGq"><td data-page-node-id="t5OBIGlXSud02yTqMav6wp">降尺度/垂直插值</td><td data-page-node-id="rCfMUJkPtCFyqQVHBBldM6">次大</td><td data-page-node-id="cmukrncTbkWSXW3W6g38xu">复杂地形、轮毂高度外推偏差</td><td data-page-node-id="gbQ0eDwOkriJ8t1OrWruza">高</td><td data-page-node-id="fBIHOKr8BxFx4OHMDbi0OT">测风塔多层实测订正、WRF 局地细化</td></tr>
+    <tr data-page-node-id="e8XrKrSftr0VuJYxQCilDI"><td data-page-node-id="w66sbTD80CATrhU7MMf3cI">功率转换误差</td><td data-page-node-id="KmKxorGWUCldOsP3KIZSvp">中</td><td data-page-node-id="4KRvCeW9Ww8dVi4T9qmO1U">功率曲线老化、尾流、光伏组件衰减/积雪</td><td data-page-node-id="uP2utz9XW9oB0ndK1O6MTB">高</td><td data-page-node-id="uTIF6SGhjArFYnxpM0lLub">曲线在线更新、组件温度/衰减修正</td></tr>
+    <tr data-page-node-id="yD79bwdCpoEwnI1lVcVo4l"><td data-page-node-id="9N7ilJr2JvUAh62dmcHZnM">时移误差</td><td data-page-node-id="HdRholTyXFGc42tvo2pP7U">小但致命</td><td data-page-node-id="NrkZL0mE8NIzbaiQZcQQJU">锋面到达时间偏差几小时 → 大额偏差电量考核</td><td data-page-node-id="gvp0AJHa3UFpKanLcCPGfs">中</td><td data-page-node-id="mYSsbEgZG8GSJamGX6HBSK">卫星/雷达短临订正、人工修正机制</td></tr>
+    <tr data-page-node-id="bPsCOwnEnkLg3WmTtpx7Jo"><td data-page-node-id="ZH0oGSw5FQPoAWYhw1gr8K">观测失真（东北特有）</td><td data-page-node-id="ZVuTkxtB6GvUTUFmzKPBk5">冬季显著</td><td data-page-node-id="hGuwxVKHxiuAKDiSlgBCAB">测风塔/辐照仪结冰、极寒漂移</td><td data-page-node-id="Ns0rDpJwiMn0HcN21PNa5v">高</td><td data-page-node-id="SH6aP0Pa5hBNB4tmFPuxZh">冬季除冰巡检、观测质量校验</td></tr>
+  </table>
+  <div class="info" data-page-node-id="MTCPOWyD5EEizZuFNA4LGB">💡 <b data-page-node-id="mV858Ndu4qMBP60Jawa4XQ">投入顺序建议（性价比降序）</b>：① 上报通道稳定性（传送率 100%，零成本免罚）→ ② 限电时段剔除后的模型重训（防系统性低估）→ ③ NWP 订正 + 多源集成 → ④ 概率预测 + 大额偏差预警（直接对冲新版"误差带外偏差电量"罚点）→ ⑤ AI 气象大模型接入（已有电网级验证案例；<b data-page-node-id="DrKvsj6k13iXrhkH0bIUdk">但须先过第十节四道陷阱，且东北寒潮等破纪录极端天气下 AI 模型仍可能弱于物理模式，务必保留物理模式冗余</b>）→ ⑥ 自建深度学习团队（投入最大，最后考虑）</div>
+</div>
+
+<!-- 8 -->
+<div class="sec" data-page-node-id="8flq3Jy9MUOMh3rF3O7DF1">
+  <h2 data-page-node-id="N7FZNLAPt3Gi59otuJpT9T">八、实施路线图（三阶段）</h2>
+  <table data-page-node-id="6kISTcXBD1ydGNrCB3qDPV">
+    <tr data-page-node-id="d4n8iGemBrlYDeO8v23cuw"><th data-page-node-id="hMFpkcf5dVs5o0tKrbwmmV">阶段</th><th data-page-node-id="c3dZE0LCgVmiEILiOnAXu6">目标</th><th data-page-node-id="h73scungKuihiopHJWRR16">动作</th><th data-page-node-id="5ahZXegCAvJTIYlOBq3BJK">产出</th></tr>
+    <tr data-page-node-id="ZfbtYWw2uu6HWrHNUbOVBa"><td data-page-node-id="eaGyCzlJ2Pkc3l70Btax2i"><b data-page-node-id="E7Jrcc8JqJUI0PVowoqLeE">1 · 摸底诊断</b>（1~2 月）</td><td data-page-node-id="QUepSbTzvEg4x805Du0gTr">搞清现状：我们的 RMSE/准确率在哪、误差从哪来</td><td data-page-node-id="jcV54wZ57DepMPJB1WO0ks">拉齐历史预测 vs 实出力数据，按第六节公式逐日/月复算；<b data-page-node-id="qWQYEAQbxuEOxsuMrrHJYy">对标标尺必须按东北新版三档分别统计（短期/超短期/中期独立算，不可混算）</b>；按第七节拆误差来源；对标全国 10~26% 区间定位</td><td data-page-node-id="4FdLF0buQqXMdI4nHiOGu9">现状精度报告 + 误差归因排序 + 考核费用基线</td></tr>
+    <tr data-page-node-id="92jGhxjy09vZ75HSHsKnDG"><td data-page-node-id="nCvJDmpyu97kydLFn825sR"><b data-page-node-id="QZ506oPkCe3Blvhsu6ST0V">2 · 精度提升</b>（3~6 月）</td><td data-page-node-id="4qyj9p0uV7H8b5ABRISBXq">准确率提升 3~5 个百分点，考核费下降</td><td data-page-node-id="Hf86CDsBG4R7kvJzEaCSsg">限电/检修时段清洗重训；NWP 订正；多源集成；基线对比验证；转折天气人工修正流程；<b data-page-node-id="zf1mEaIObXKHXsw5LuJ0zy">月度考核账单按三档拆解复盘</b></td><td data-page-node-id="aEXgDFvqd04Ddamth56gna">新版预测模型 + 月度精度看板（准确率/合格率/考核费三曲线）</td></tr>
+    <tr data-page-node-id="Lzy4kBA1b52iYngTeLPYWP"><td data-page-node-id="uQzKFanOyADvNQSyB4asff"><b data-page-node-id="kX7S4IYOJemt6HOHxJVzAW">3 · 进阶融合</b>（6 月+）</td><td data-page-node-id="HnAU6Gvuo0Ey3G091Mj7QI">对接现货申报与配储决策</td><td data-page-node-id="FLEjfwRT6zDGxuNZ6bA5xB">AI 大模型气象源接入评估（<b data-page-node-id="BG3DcOrmNBVv7KwfCrmDNJ">按第十节四道陷阱逐项验收</b>）；概率预测（P10/P50/P90）支撑申报策略与储能协同；预测-现货偏差收益联动分析</td><td data-page-node-id="TJz36U7HJCMu81nGp49ymq">预测驱动的申报决策支持</td></tr>
+  </table>
+</div>
+
+<!-- 9 -->
+<div class="sec" data-page-node-id="CY6uDjoyWmcL3TkFc9qbNu">
+  <h2 data-page-node-id="fVEA6aOjOQo1UIeSgnCOgP">九、与本系列分析包的衔接</h2>
+  <ul data-page-node-id="ktrfk1eAJgdkbejzD8C86H">
+    <li data-page-node-id="8BSBdH6hygpyZATGXphqLV"><b data-page-node-id="lcaWjkP9g9uqGok7vGj9An">《弃风弃光率分析流程手册 V1.5》</b>：功率预测 = 手册第二节"理论可发"的近似口径（优先资源可发，预测次之）；预测偏差损失对应手册第五节 † 注（间接路径，勿与弃电重复计算）</li>
+    <li data-page-node-id="s5RWodLEX1H7XXE0XQS01G"><b data-page-node-id="yGRcIhlaSIZxrvHJSYbGkE">《弃风弃光率分析看板》</b>：场站级测算器（上网电量 + 利用率 + 电价 → 损失）可直接用于量化"预测偏差 × 电价"的考核费</li>
+    <li data-page-node-id="19Exp8rc4DRDHz0oyptlJ2"><b data-page-node-id="mM7yk7MaGfKCCvZwsRGmRq">辽宁上网侧电价调研</b>：136 号文入市后，预测曲线 = 现货申报曲线，预测精度直接决定偏差结算——三者构成"预测 → 弃电 → 电价 → 收益"完整链路</li>
+    <li data-page-node-id="flSSCAHopFOz6lXcfh3BTV"><b data-page-node-id="EoGEZqLmaV1jketeaalPOS">本地文件直达</b>（相对路径，整个 <code data-page-node-id="nYMqCr1LKUHi472NaMk9OC">F:\AI数据分析</code> 文件夹一起拷走仍有效）：<a href="../../弃风弃光率/01_分析流程/弃风弃光率分析流程.html" data-page-node-id="4u3OA2EveZDUegGfzxUJUk">弃风弃光率分析流程手册 V1.5</a> ｜ <a href="../../弃风弃光率/02_分析看板/弃风弃光率分析看板.html" data-page-node-id="Yrq7fnx4I5zh1xKaCw8QJk">弃风弃光率分析看板</a></li>
+  </ul>
+</div>
+
+<!-- 10 -->
+<div class="sec" data-page-node-id="lIQ2jY21J6Ed9GmLAiyIlA">
+  <h2 data-page-node-id="W7raM6GcRkO2ndYoN3WTM3">十、气象大模型落地的四道陷阱（工程约束清单）</h2>
+  <div class="info" data-page-node-id="3WhZYWF4LZaRHB7hEr7cWc">📌 <b data-page-node-id="1MsTshUDKMHRJ4JQpPyoxd">为什么加这一节</b>：以开源伏羲（FuXi）为例，其输出规格是 <b data-page-node-id="mNwXGJZBsh1IhdaneI4q4R">0.25°（≈25 km）网格、6 小时步长、70 个变量</b>。这个规格离"可直接上报的场站功率曲线"还差<b data-page-node-id="SGnmmcyh7vnhjpp8CR7OeN">四道工序</b>。跳过任何一道，跑出来的数都不能申报、不能对标、不能汇报。</div>
+  <table data-page-node-id="DEHT0dM2F35BFY37lgIEbd">
+    <tr data-page-node-id="Wcnv711cev8M0bJxVjL1tq"><th data-page-node-id="49DwfMDxxug0NpB6kdlhvr">#</th><th data-page-node-id="gImCPXHDIP6TgSuVc1oTe1">陷阱</th><th data-page-node-id="dPMR5JIKcAKUBag6dvEAa9">具体问题</th><th data-page-node-id="j1yYwRgROBAHULpxGbDDvj">正确做法</th><th data-page-node-id="YIBpacZinlJTadaXuPo1np">出处</th></tr>
+    <tr data-page-node-id="yg9Nrcu0Zr5FawRaFDW8WS"><td data-page-node-id="GuKdQmZgrmj2CVF1l3RXci">1</td><td data-page-node-id="gEGjQ5pOFrw7AXJ2zKXQBR"><b data-page-node-id="mO5l0YhtcZgj5FWd7vTvMw">辐射变量缺失</b></td><td data-page-node-id="OZIK4yDQ1uQDfbX6zc2Aa0">开源伏羲 70 变量中<b data-page-node-id="ZuJVeR8OJAkrsnHUXEiBGP">没有任何辐射量</b>（无 GHI / SSRD），光伏链路从源头就断</td><td data-page-node-id="hqpxU3TOAwm4LTLuUXEHhI">光伏必须另接辐照源（卫星反演 / 区域 NWP / 晴空模型），或改用已含辐射的商业大模型</td><td data-page-node-id="rqxwBcMnGzQ0cly80Cwzor">附录 A-11、A-4</td></tr>
+    <tr data-page-node-id="FlXQ77P3a3FC8q25GGZbhz"><td data-page-node-id="anvKDDk2FWFuZ1nRfp9qSx">2</td><td data-page-node-id="q5Vn7cAnEA4cUKzyn6rCoW"><b data-page-node-id="arpsSasTX4geFRF8tF27ZX">时间粒度差 24 倍</b></td><td data-page-node-id="GDjJAHHtQqF8u00pQ3c9FS">6 h 输出 vs 业务要求 15 min，一天只有 4 个时间点</td><td data-page-node-id="T7Q0I5F21mTNfn0o8IDbCo">必须做时间降尺度（线性/二次插值或 PMA 相似搜索）。注意文献常讨论的是 1h→15min（4 倍），<b data-page-node-id="ncwU1H4bqx5NZtzWknCcin">6h→15min 是 24 倍，苛刻得多</b></td><td data-page-node-id="iggWVxqz6RDsoyxguPOopk">附录 A-5、A-6</td></tr>
+    <tr data-page-node-id="4uEA4PF8PrfDiAMOw6Hees"><td data-page-node-id="03w5TqljUPKXpQ84owd54U">3</td><td data-page-node-id="S1aAdyDMIERdLLTO422SJH"><b data-page-node-id="GuKBzSJ7yXEkEiqbsTLVhZ">10 m 风 ≠ 轮毂高度风</b></td><td data-page-node-id="BrbQmhMAUVVwKNXoNm8NnQ">U10/V10 是 10 m 高度，风机轮毂 80–120 m。幂律外推 10m→100m 风速为 <b data-page-node-id="YKaseSPXLJlzF2GzhmYnco">1.38–1.58 倍</b>，因 P ∝ v³ ⇒ 不做外推会<b data-page-node-id="kztbliRGcBgZHkOlbE8c8k">低估功率 2.6–4 倍</b></td><td data-page-node-id="DCEoxwZqMe5FJjlEt1CTBh">用幂律/对数律做风廓线外推，α 用本地实测拟合（<b data-page-node-id="fdSi7YiiJf3jOFuhHJfEOY">勿默认 1/7</b>）；最好用测风塔多层实测订正</td><td data-page-node-id="G8FUKd9QoqGtNryEaagzei">附录 A-2、A-3</td></tr>
+    <tr data-page-node-id="5AxjnoWeaU98lzGabmEfNH"><td data-page-node-id="evdd3AAN0hcy8DqMLziSrb">4</td><td data-page-node-id="5IKDBUSko2qghbLVEBIvOK"><b data-page-node-id="tHX53VBfErpKxwDZaKoLdN">"精确经纬度选点"是错觉</b></td><td data-page-node-id="bHGCvY5byzizlyPcM4JAwa">0.25° ≈ 25–30 km 网格，最近邻选点等于在 ±12 km 内取一个格点，与"精确"无关</td><td data-page-node-id="YOUbUDqmS0GoiIs3yaFzff">空间降尺度 + 本场站历史数据订正（MOS / ML）。<b data-page-node-id="wA9qfmBFOPtylAlp1s5MDm">这步比追求更细的 NWP 更关键</b></td><td data-page-node-id="rLan4Sy3v3tttpQtRCNr8W">附录 A-7、A-8</td></tr>
+  </table>
+
+  <div class="sub" data-page-node-id="8cnAjVQ1LHzmEkAI2G81Wb">⚠️ 重要澄清：不是"分辨率越细越好"</div>
+  <div class="warn" data-page-node-id="jQbwl8Jo6oZUr8Ymzy7C63">这一点极易被误导，实测证据恰好相反：
+    <ul data-page-node-id="Pme0A9svcq0ECv2Dj8OCKh">
+      <li data-page-node-id="AsR5Hrj75f24gFZoYHCX24"><b data-page-node-id="ZR0H2DQjU0QSrYWso1ExOV">挪威气象局 / DTU（Bremnes &amp; Giebel, 2017）</b>：对 1–32 km 的 6 个 NWP 做对比，<b data-page-node-id="Xgj72jx2FkYCqMPYioXso1">高分辨率区域模式并没有带来更好的风电功率预测，最优结果反而来自最粗的全球模式之一</b></li>
+      <li data-page-node-id="F1N8QqsTfoIFkxO0sMIYEH"><b data-page-node-id="jeHKAYskx7eNKbEQvQZCOS">华北电力大学 WRF 试验</b>：输出分辨率存在<b data-page-node-id="F6BZwPuaFH5fxqGlu1drvT">最优值</b>——9.25 km 最优（RMSE 2.46 m/s），继续细化到 5.55 km 反而变差（2.68）</li>
+      <li data-page-node-id="3FnahgGvOLVdbi1QOuCX7I"><b data-page-node-id="Hy0wF1ZrabBesSpF4BfXeE">Meteomatics EURO1k（AMS 2025）</b>：1 km 分辨率要真正有效，必须<b data-page-node-id="ItlJnPEQdjcGkjv3ywJyXa">同时参数化风机尾流</b>，才拿到日内 RMSE −8.1%、日前 −8.5%</li>
+    </ul>
+    ⇒ <b data-page-node-id="A0dOvuSymzSk6Dv1vTtFFQ">结论：粗网格 + 好的统计后处理 &gt; 细网格不做后处理。</b> 这与第三节"精度大头在本场站 ML 后处理"互为印证，也解释了为什么"换个更细的 NWP"常常投了钱却没效果。</div>
+
+  <div class="sub" data-page-node-id="8dbNGYOVIKh4CuIw5MpfCk">附：风电「气象 → 功率」正确转换式</div>
+  <div class="formula" data-page-node-id="B8H5sHxVYvuqeHPDSGK0ms">风能功率：      P = ½ · ρ · A · Cp(λ,β) · v³        ← v 必须是轮毂高度风速
+空气密度修正：  v_C = v_M · (ρ/ρ₀)^(1/3)             ρ₀ = 1.225 kg/m³（IEC 61400-12-1）
+风廓线外推：    v(z₂) = v(z₁) · (z₂/z₁)^α            α 由本地实测拟合，勿默认 1/7
+运行区间：      0（v&lt;切入）→ 立方区（切入~额定）→ 恒功率（额定~切出）
+                注：额定前还有一段线性过渡区（约 9.8–11.3 m/s），不是纯立方</div>
+  <div class="warn" data-page-node-id="nfYr6OtPc4BAvj5HwhtPaw">⚠️ <b data-page-node-id="aASYuZMXfXm0HazWKioSlP">常见错误写法</b> <code data-page-node-id="GisXlqqM7ZttHJNaFEwBRt">P = P额定 × ((v − v切入)/(v额定 − v切入))³</code>：形状错误，且在 <b data-page-node-id="2TyFTAIMHIxhO8WcIrCxco">4–8 m/s（风电场最常出现的风速区间）系统性低估约 2–3 倍</b>。东北冬季 −20℃ 空气密度比标准高 10% 以上，漏掉密度修正会再叠加一层偏差。</div>
+
+  <div class="sub" data-page-node-id="CYUHUtBKNGes2yvMSMsnmu">附：光伏模型链（缺一不可）</div>
+  <div class="formula" data-page-node-id="8GK934srtBRZIumSE0arBi">太阳位置 → GHI → POA 倾斜面分解 → 组件温度（NOCT 模型）→ DC → 逆变器 AC → 容配比削顶</div>
+  <div class="info" data-page-node-id="TrF7KnvGOsMvBoPS6zQdvI">💡 <b data-page-node-id="0NdcUaHRpdgTk4uxjunYB4">GHI 预报精度是光伏出力不确定性的主导因素</b>，温度误差的影响显著更小——所以"先把辐照搞准"比"把温度模型搞复杂"划算得多（中科院大气所西北电站实测：先校正 GHI 使 MAE/RMSE 降 23%+，再进功率模型使 RMSE 降 15%）。</div>
+</div>
+
+<!-- 附录 A -->
+<div class="sec" data-page-node-id="M6E03fFY0jA9AzV2uH8siZ">
+  <h2 data-page-node-id="MLnlF8btqLqjFpJ5yOiyku">附录 A｜参考文献与出处</h2>
+  <div class="info" data-page-node-id="90k8TuiWsXptrdXaKuxh1p">📚 本框架中的关键公式、量级判断与"反直觉结论"均标注如下出处，便于复核与汇报时应对追问。</div>
+  <table data-page-node-id="TbnkDcGw6fEXS0xzJH5MXo">
+    <tr data-page-node-id="vxg1dRQ2ms9kYr7vSoDtBy"><th data-page-node-id="HEZgdn5l6lvWm4tcAIuQEL">#</th><th data-page-node-id="eVbUd0f3OjErIcu8sCEXje">结论 / 数据</th><th data-page-node-id="jlFx4Z0Fsx9V5L8HvvX9Jt">出处</th></tr>
+    <tr data-page-node-id="gEn4vK8Q4reAVn3BmQwNH6"><td data-page-node-id="TgOWv5crp7OzeVnxjkYJxA">1</td><td data-page-node-id="rcT5gptV9HG4UYs87JjlUn">风机功率曲线 <code data-page-node-id="XNBCOjfYy7LpvdBQgRzOlk">P = ½ρACp(λ,β)v³</code>（v 为<b data-page-node-id="ik0veWecktnMhW7I0iJeJm">轮毂高度</b>风速）；空气密度修正 <code data-page-node-id="FlRCdL2T7DLQ9TNqACpjnK">v_C = v_M(ρ/ρ₀)^⅓</code>；含 region 2.5 线性过渡段</td><td data-page-node-id="S6EfvVNAPUxljFXN5JSW6m"><i data-page-node-id="4glEGJyOjKlLzganLNWp3V">Energies</i> 综述：Applications and Modeling Techniques of Wind Turbine Power Curve for Wind Farms—A Review（energies-16-00180）；IEC 61400-12-1</td></tr>
+    <tr data-page-node-id="lVSYVWMjI4RCYaSM4qozpm"><td data-page-node-id="lURKcSxeNGphUBSwmflc9I">2</td><td data-page-node-id="r0nQGNEhHDFaBsxYOQdNfO">风廓线外推：幂律最常用（73.5%），最优变体风速 MAE 4%、<b data-page-node-id="EcDsY8CdJoKTFd8bIvDMeh">能量输出误差 8.9%</b>；α=1/7 属最差之一；对数律已不适合现代多 MW 机组</td><td data-page-node-id="1jDQiHlp2IwRiTq7PaPLpF">Gualtieri, <i data-page-node-id="Jvyu35CTrDPUUa9fnJxkxP">Renewable and Sustainable Energy Reviews</i> 102 (2019) 215–233（40 年 / 332 应用 / 96 站点综述）</td></tr>
+    <tr data-page-node-id="XDXSEdfEimsCvUVz0eX2pT"><td data-page-node-id="JWVOikcDl507BsSjsvPBw8">3</td><td data-page-node-id="XPJhcA1eAD8FtgbLABOBoN">风剪切指数 α 是极敏感参数；"预测误差很常见，且在估算发电量时被<b data-page-node-id="AQvfbVI4lnvtq2hXL28HUa">进一步放大</b>"</td><td data-page-node-id="CLc6mc03Kis8wDW2MNhkuZ">Kubik, Coker &amp; Hunt（University of Reading，West Freugh 站点敏感性分析）</td></tr>
+    <tr data-page-node-id="ul84y7VSSYgcPxhz58xhX3"><td data-page-node-id="gTot9f3Y2b8xqebjAo9b4g">4</td><td data-page-node-id="QWu3ubmJfJZuUvr27lPOB8">光伏模型链标准流程（pvlib）：太阳位置 → GHI→POA 分解 → NOCT 组件温度 → DC/AC；"<b data-page-node-id="LEx3MikBt54zHcVvgZlLoN">GHI 预报精度是光伏出力不确定性的主导因素</b>，温度影响显著更小"</td><td data-page-node-id="1L0wO27k1LV9MLSAMcUPXI"><i data-page-node-id="l90JEVniUSX7Oz1cbVKsn2">Energies</i> 2026, 19(2), 318（基于 PVLib 的光伏预测建模研究）</td></tr>
+    <tr data-page-node-id="lOiYNBN8l8RoDMHNvMjWPn"><td data-page-node-id="TEo2xFmfWSB1A8oYLvCfgk">5</td><td data-page-node-id="xzW71QD7nC8Bv2gU7uCmOv">"多数 NWP（及卫星）只产出小时级预报，粒度不足以满足实时市场要求；<b data-page-node-id="Z00NUKJ5gJeyJ7PqntdSvp">这种分辨率错配在文献中很少被讨论</b>"——需专门降尺度（相似搜索 / PMA）</td><td data-page-node-id="5P7bGgfzhu8MrizwWTmyL4"><i data-page-node-id="DlDljkz9c0TxAGZbFSp9n5">International Journal of Forecasting</i>（CAISO 实时市场业务化光伏预测）</td></tr>
+    <tr data-page-node-id="H4Md9e1cYEDrINDxzMS4f1"><td data-page-node-id="WkLjeqdehHACZuxOwznih0">6</td><td data-page-node-id="108zRuXdQDOXs8RTCtqSOo"><b data-page-node-id="2OcDfdV9NhBvWOF0mQ2F0Y">15 min 是中国各区域电网的通用要求</b>；1h→15min 降尺度中文献推荐 PMA，但实证中简单线性插值反而更准</td><td data-page-node-id="MLjtLm4Nhsk40PsQncYg9Z"><i data-page-node-id="HGQEiLjtQf12zB1ydRFKHF">Applied Energy</i> 2022（倾角 / 逆变器配比 / 行距对光伏预测精度的影响）</td></tr>
+    <tr data-page-node-id="EXiV2d6yUCfEgX0MOz7Q4i"><td data-page-node-id="ZDtystqe9wGnKcQEKitRKu">7</td><td data-page-node-id="v9qT6XxCGoaPW3mySP3JEE"><b data-page-node-id="nwRliG62M0umoyLUokPwdE">高分辨率区域 NWP 并未带来更好的风电功率预测</b>，最优结果来自最粗的全球模式之一（6 个 NWP，1–32 km，3 个挪威风场，66h 预见期）</td><td data-page-node-id="AKLM8QTblISHFkOalCFhI1">Bremnes &amp; Giebel, 挪威气象局 MET Report No. 07/2017</td></tr>
+    <tr data-page-node-id="CDwxHxh0Zyhm3eT386dfSK"><td data-page-node-id="qY7JaDKnbaahHhcS213bBA">8</td><td data-page-node-id="Cbw2M00MOkd4uC5GgS9e52">WRF 输出分辨率存在最优值：9.25 km 最优（RMSE 2.46 m/s），5.55 km 反而变差（2.68）</td><td data-page-node-id="0RGPOLaO2Nl3lModSxYFZK">华北电力大学硕士学位论文（WRF 物理-数据融合风速预报）</td></tr>
+    <tr data-page-node-id="nJnB2cNFLi2heizY2Z05zH"><td data-page-node-id="LIo1EhbelWSgUDAk5WhsGg">9</td><td data-page-node-id="5EHYBqaErdH1CxBHGFrkWv">1 km 分辨率 + 风机尾流参数化：日内 RMSE −8.1%、日前 −8.5%；低分辨率 WRF 单独用更差（+1.27% NMAE），纳入 ML 框架后转为改善</td><td data-page-node-id="6LV8M8o4mQ0o6GhF5TMuEw">Meteomatics EURO1k（AMS 105th Annual）；WESC 2021（HAL hal-03255549）</td></tr>
+    <tr data-page-node-id="piyJ6I6ek7A68RRm1G12bD"><td data-page-node-id="gmqCrnIbJDXB1j5OnBkUQ7">10</td><td data-page-node-id="OsD0RieVIfeKyKwzqjVsEI">中国西北光伏电站实测：先校正 GHI（分位数映射 + TPA-LSTM，MAE/RMSE 降 23%+），再进 PINNs-iTransformer，功率 RMSE −15% / MAE −12%</td><td data-page-node-id="U5gJnW7cwrwyPkwya171Oy">中科院大气物理所 × 宁夏大学, <i data-page-node-id="ejoZHnqedWVizjMCm3AOCj">Geoscientific Model Development</i> 19 (2026) 4999–5017（MIPV-NWP-PINNs V1.0）</td></tr>
+    <tr data-page-node-id="rzKeV929rA84rVxhBhC2eX"><td data-page-node-id="36JrwKd8P6rB6lVTjiIhvp">11</td><td data-page-node-id="gUg4bYq6DhALJpsIIhAcjf">伏羲开源版规格：输入 <code data-page-node-id="7CGOAoeOgNYEiBGTLgz15b">(2, 70, 721, 1440)</code>，即 <b data-page-node-id="ZCTDr9YXclPvYvfSC2E7On">0.25° 网格 / 70 变量 / 6 h 步长</b>；70 变量 = Z/T/U/V/R 各 13 层 + T2M/U10/V10/MSLP/TP，<b data-page-node-id="op2RWSY0YeT2Iu4FAiuhv7">无辐射变量</b>；级联 short(0–36h) / medium(36–144h) / long(144–360h)</td><td data-page-node-id="B5C702e9glDvmATffvD9hk">tpys/FuXi（npj Climate and Atmospheric Science 论文实现）；PaddleScience FuXi 文档</td></tr>
+    <tr data-page-node-id="WvUXom5WyT70bqJDhHiCHM"><td data-page-node-id="tsmcpCpbWn5MaIGiD2kIn9">12</td><td data-page-node-id="HqzrHOHg02OrlzEnr5pARM">伏羲 2.0（2024.6，复旦 × 上海科学智能研究院）：<b data-page-node-id="zrKeHRhsDczq4o9KEv2wi3">0.1° / 1 小时 / 88 变量 / 含海气耦合</b>；面向新能源优化，与南方电网合作做风速与辐照预测</td><td data-page-node-id="NEXvkjwN5EqLmBkxxUPMiN">复旦大学 / 上智院官方发布；FuXi-2.0 相关报道（MarkTechPost）</td></tr>
+    <tr data-page-node-id="GYoglbbsccF2EFO8pXfGWo"><td data-page-node-id="GNGqnw1HamFDpAmWdcaUfP">13</td><td data-page-node-id="zgfuPZxjhE0B6z8AANer2i"><b data-page-node-id="616Lc0vGnvL3QNjODSpOlN">破纪录极端天气中，GraphCast、盘古、伏羲整体仍落后于 ECMWF HRES，且倾向低估强度</b></td><td data-page-node-id="YzPP4808bANWp0LNCIXFqJ"><i data-page-node-id="pVeYZt2AzIlT6cSgv2Hp18">Science Advances</i> 2026</td></tr>
+    <tr data-page-node-id="1IcbBpuAjJ3lCP70XvqyTh"><td data-page-node-id="nF1cX6EBmZBxspC9ECtzz1">14</td><td data-page-node-id="A3nCJ4jBn7xEcQystpVF9P">政策目标：<b data-page-node-id="WjBXeI2lCjl0M3E4LuG3Iz">1 km、15 分钟级</b>区域风光资源预报产品；到 2027 年基本建立一体化能源气象服务体系</td><td data-page-node-id="sQcGoW8mxAhAKwfy20jH1K">中国气象局 + 国家能源局《关于推进能源气象服务体系建设的指导意见》</td></tr>
+    <tr data-page-node-id="AugIMzgrkmklXQKETGc4TA"><td data-page-node-id="s0xGrH7o4pJ7AGg4F16GS1">15</td><td data-page-node-id="NT2RxGCbeD6BjhelnOtRyf">通用气象模型落地的三大断层：① 0.25°/6h vs 场站需要的 3 km/15min；② <b data-page-node-id="qnadNYCwxaWxm98BWuroAA">关键变量缺失（轮毂高度风速、地表总辐射）</b>；③ 极端天气下物理一致性存疑</td><td data-page-node-id="czN8dEpbLexCrHlYReZQAS">行业分析（2026，AI 气象大模型"场景适配层"）</td></tr>
+    <tr data-page-node-id="tjQyA92lB9zvReuYmp3PEy"><td data-page-node-id="FrAJ3d5142pb7G5n3BAnX4">16</td><td data-page-node-id="RBeHprEaIDiT9ez7EiDVDe">东北新版两个细则门槛（短期 风≥75%/光≥85%/合格率≥80%；超短期 风≥80%/光≥85%；中期 ≥70%；传送率 100%；免考保护期 90 日）</td><td data-page-node-id="dUL8HE0iThuS2sM8dh4uqC">《东北区域电力并网运行管理实施细则》（2024-10-01 实施）及配套政策解读</td></tr>
+    <tr data-page-node-id="Cdpk58FKRVOfF7Plh7FMRm"><td data-page-node-id="8v9dh6j1vliW5s1wILs70I">17</td><td data-page-node-id="eWluQGKILrtgKZDzeSxuY8">四档时效与准确率门槛（日前 风≥83%/光≥85%；超短期 ≥87%/≥90%；中期 ≥70%/≥75%）</td><td data-page-node-id="9raLuB9DlTNXMN4ZjoCi5d">GB/T 40607-2021《风电场功率预测功能规范》及光伏对应规范</td></tr>
+  </table>
+</div>
+
+<!-- 11 -->
+<div class="sec" id="theory">
+  <h2>十一、理论依据 · 学术支撑（对应「../_元信息/论文辅助.md」）</h2>
+  <div class="info">📚 本节为分析框架的方法论底层。可验证的文献、方法、机构来源汇总见同目录 <a href="../_元信息/论文辅助.md">../_元信息/论文辅助.md</a>。</div>
+  <ul>
+    <li><b>三层技术路线对应</b>：物理（NWP：WRF/ECMWF/GFS 区域加密 1–3 km）→ 统计/ML 纠偏（LightGBM/LSTM/XGBoost）→ 概率预测（P10/P50/P90 分位数），与学界「混合/堆叠为主流」结论一致</li>
+    <li><b>评估协议</b>：准确率/RMSE 须配<b>扩展窗口交叉验证</b>防信息泄露；行业基准竞赛 GEFCom / HEFTCom2024 验证树集成为主、序列模型为辅</li>
+    <li><b>反直觉结论的学理支撑</b>：「粗网格 + 好的统计后处理 &gt; 细网格不做后处理」（Bremnes &amp; Giebel 2017；华北电力大学 WRF 试验），与附录 A 互为印证</li>
+  </ul>
+</div>
+
+  <div class="sec" id="method-toolkit">
+    <h2>十二、方法选型与数据源速查（整合自 6 份实践参考）</h2>
+    <div class="info">本节将 <code>03_实践参考/</code> 下 6 份工程 / 行业参考文档的<strong>决策级精华</strong>整合为一处速查，避免主报告与参考文档割裂。每份均有完整出处与查证方式，详见对应文档（指针见 <code>_元信息/论文辅助.md</code> 第六～十一节）。</div>
+
+    <div class="sub">12.1 算法谱系定位表（方法选型决策依据）</div>
+    <p>不同算法<strong>不存在"先进—落后"排序，而是承担不同功能</strong>。选型按"时间尺度 × 天气类型 × 地形 × 数据基础 × 业务目标"组合判断（来源：<code>清徕美_算法谱系与技术链方法论.md</code> §2）：</p>
+    <table>
+      <tr><th>方法</th><th>最擅长</th><th>主要局限</th><th>更适合的位置</th></tr>
+      <tr><td>Persistence / ARIMA</td><td>短时惯性、时间连续性</td><td>难处理天气突变</td><td>超短期基线；复杂模型的对照基线</td></tr>
+      <tr><td>SVM / RF / XGBoost / LightGBM</td><td>结构化表格非线性 P=f(X)</td><td>时空表达有限</td><td>偏差订正、残差预测；小样本稳定、可解释</td></tr>
+      <tr><td>LSTM / GRU</td><td>时间依赖</td><td>只喂历史功率无未来气象时仍是外推</td><td>时序建模（需配未来气象）</td></tr>
+      <tr><td>CNN</td><td>空间图像（云图/雷达）</td><td>长序列能力有限</td><td>光伏云图、雷达、空间场</td></tr>
+      <tr><td>Transformer</td><td>长序列、多变量、多站点</td><td>数据/算力要求高</td><td>时空融合</td></tr>
+      <tr><td>GNN</td><td>多场站空间传播</td><td>图结构设计复杂</td><td>场群预测</td></tr>
+      <tr><td>物理模型</td><td>天气→功率因果映射</td><td>难描述真实运行偏差</td><td>基础功率模型；新场站冷启动</td></tr>
+      <tr><td>物理 + AI（融合）</td><td>兼顾机理与实际偏差</td><td>系统复杂度高</td><td><strong>当前较成熟工程路线</strong></td></tr>
+    </table>
+    <div class="info">💡 <b>关键认知</b>：Persistence 仍是极强的超短期基线——评价任何复杂 AI 模型，先问"相比 Persistence 提高了多少？"；复杂模型不能创造不存在的信息（NWP 错/降尺度错/标签错，再复杂也只是更"漂亮"地拟合错误）。</div>
+
+    <div class="sub">12.2 风电五类模型对比（风电专项）</div>
+    <p>主报告 §三为高层三路线（物理/统计/混合），下表为风电落地版五类对比（来源：<code>AlphaEmpower_风电功率预测方法综述.md</code> §3，与 12.1 通用谱系表互补）：</p>
+    <table>
+      <tr><th>类别</th><th>代表方法</th><th>优点</th><th>局限</th><th>典型适用</th></tr>
+      <tr><td>物理模型</td><td>WRF/ECMWF+CFD+功率曲线+地形</td><td>少历史数据、新场站可用、可解释</td><td>依赖参数精度、计算重</td><td>日前/新场址</td></tr>
+      <tr><td>统计模型</td><td>ARIMA/卡尔曼/持久性</td><td>成熟快、平稳好</td><td>难捕捉非线性与突变</td><td>超短期基线</td></tr>
+      <tr><td>机器学习</td><td>SVR/RF/XGBoost/LightGBM</td><td>高维非线性、精度高、实时快</td><td>数据量要求、黑箱</td><td>短期主力</td></tr>
+      <tr><td>深度学习</td><td>LSTM/CNN/Transformer/GAN</td><td>强非线性、自动时空特征</td><td>数据/算力极大、不透明</td><td>高精度/超短期提升</td></tr>
+      <tr><td>混合/集成</td><td>物理+统计校正、Stacking</td><td>优势互补、精度最高</td><td>建模/维护复杂</td><td><strong>当前主流方向</strong></td></tr>
+    </table>
+
+    <div class="sub">12.3 标签污染三概念解耦（数据治理前提）</div>
+    <p>训练数据 ≠ 自然出力。限电/故障/检修/AGC 场站须区分（来源：<code>清徕美_算法谱系与技术链方法论.md</code> §3，与申威"限电识别"交叉）：</p>
+    <ul>
+      <li><b>Pavailable（可发功率）</b>：当前气象条件下理论上能发的功率（天气驱动）</li>
+      <li><b>Pactual（实际并网功率）</b>：受调度限发/AGC/检修约束后实际并网功率</li>
+      <li><b>Pschedule（计划功率）</b>：申报/计划/AGC 指令给定功率</li>
+    </ul>
+    <div class="warn">⚠️ 气象可发 500 MW、因限发实出 300 MW，若直接把 300 当标签，模型学到"这种天气只能发 300"，放开后系统性低估。<b>对策</b>：训练前识别运行状态（正常/限电/故障/检修/AGC/覆冰），把天气驱动功率与电网控制功率解耦（呼应 §五 建模七步第 1 步）。</div>
+
+    <div class="sub">12.4 概率预测方法族 + 区间校准</div>
+    <p>点预测之外须量化不确定性（来源：<code>AlphaEmpower</code> §4 + <code>申威睿思</code> §3，与 <code>行业标准</code> §5 呼应）：</p>
+    <ul>
+      <li><b>方法族</b>：核密度估计（KDE）、分位数回归（QR）、上下边界估计（LUBE）、启发式气象情景生成</li>
+      <li><b>工程表达</b>：P10 / P50 / P90 分位（P50 核心点，P10–P90 不确定带）</li>
+      <li><b>区间校准（常被遗漏）</b>：用<strong>共形预测（Conformal Prediction）/ ACI 自适应共形推断</strong>对 P10–P90 做统计校准；ACI 在线模式不改 P50 而动态调区间，适应分布漂移。否则区间过宽/过窄失真。</li>
+      <li>评估比确定性更复杂（可靠性 + 分辨率），是未来重点。</li>
+    </ul>
+
+    <div class="sub">12.5 公开数据源清单（可复用）</div>
+    <table>
+      <tr><th>类别</th><th>来源</th><th>本项目可复用点</th></tr>
+      <tr><td>电站目录</td><td>Global Energy Monitor (GEM)、WRI Global Power Plant Database</td><td>场站元信息底表、容量口径</td></tr>
+      <tr><td>气象预报</td><td>Open-Meteo；ECMWF IFS / GFS / ICON</td><td>NWP 边界条件原料</td></tr>
+      <tr><td>卫星影像</td><td>日本气象厅 Himawari-9（葵花九号）</td><td>云量/辐照辅助、超短期云移追踪</td></tr>
+    </table>
+    <div class="info">各源更新周期/延迟/缺测/覆盖不同，引用须标清来源与时间（来源：<code>晴川观象_物理模型工具链参考.md</code> §4）。</div>
+
+    <div class="sub">12.6 评价体系升级：平均准确率 → 事件性能 + 运营价值</div>
+    <p>除 MAE/RMSE/MAPE/R²/WRMSE 外，补（来源：<code>清徕美</code> §5）：</p>
+    <ul>
+      <li>爬坡事件是否识别、发生时间是否准确</li>
+      <li>极端天气下是否持续失效、连续误差持续多久</li>
+      <li>模型是否存在系统偏差、失效后能否诊断原因</li>
+    </ul>
+    <div class="info">💡 事件性能与可诊断性，可能比平均准确率提高 0.5 个百分点更重要——"全年平均很好、每次寒潮都错"的模型对电网价值未必高。</div>
+
+    <div class="sub">12.7 GEFCom：学界标准基准（可直引出处）</div>
+    <p>本系列反复以 GEFCom 为基准，其最权威出处（来源：<code>GEFCom数据集与基准参考.md</code>，已核实 DOI 入 <code>02_论文文献/文献清单.md</code> #14–#16）：</p>
+    <ul>
+      <li><b>GEFCom2014</b> 设<strong>风电(W)+光伏(S)双赛道</strong>，与本项目两主题直接对口（W：澳 10 风场/风矢量 u,v；S：澳 3 光伏站/12 ECMWF 气象变量）</li>
+      <li>三篇奠基论文（Hong et al., <i>IJF</i>）：#14 GEFCom2012 <code>10.1016/j.ijforecast.2013.07.001</code>；#15 GEFCom2014 <code>10.1016/j.ijforecast.2016.02.001</code>；#16 GEFCom2017 <code>10.1016/j.ijforecast.2019.02.006</code></li>
+      <li>模型如需对标学界，优先用 GEFCom2014-S/W 作外部验证集。</li>
+    </ul>
+  </div>
+
+<footer data-page-node-id="zNtBJWAZngwwCalSZ5RsWM">客观数据分析框架，不构成决策建议 ｜ 版本 V1.5 ｜ 修订于 2026-09-13 ｜ V1.5 整合 6 份实践参考新增第十二节</footer>
+
+</div>
+
+<button id="toTop" aria-label="返回顶部" title="返回顶部">↑</button>
+<script>
+(function(){var b=document.getElementById('toTop');
+function t(){b.classList.toggle('show',(window.scrollY||document.documentElement.scrollTop)>560);}
+window.addEventListener('scroll',t,{passive:true});t();
+b.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});})();
+</script>
+</body>
+</html>
