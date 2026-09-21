@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>辽宁2026年7月 三类机组收益画像（假设情景）</title>
+<style>
+  :root{ --bg:#f7f8fa; --card:#ffffff; --ink:#1f2329; --sub:#5a6472; --line:#e3e7ee; --acc:#2563eb; --warn:#c00000; --red:#d64545; --green:#2e9e5b; }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);padding:26px;max-width:960px;margin:0 auto;}
+  h1{font-size:21px;margin:0 0 4px;}
+  .lead{color:var(--sub);font-size:13px;margin:0 0 14px;}
+  .banner{background:#fce4d6;border:1px solid #f0b27a;color:#9a4a00;font-size:12px;padding:8px 12px;border-radius:6px;margin-bottom:18px;line-height:1.5;}
+  .chart{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px;margin-bottom:18px;}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;margin-bottom:10px;color:var(--sub);}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px;}
+  svg{width:100%;height:auto;display:block;}
+  .axis{stroke:var(--line);stroke-width:1;}
+  .axislabel{fill:var(--sub);font-size:11px;}
+  .barcap{fill:var(--ink);font-size:11px;font-weight:600;}
+  .grp{fill:var(--sub);font-size:12px;font-weight:600;}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px;}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:center;}
+  th{background:#eef2f8;color:#1f4e79;font-weight:600;}
+  td.l{text-align:left;}
+  .neg{color:var(--red);font-weight:600;}
+  .pos{color:var(--green);font-weight:600;}
+  .foot{color:var(--sub);font-size:11px;line-height:1.6;margin-top:10px;}
+</style>
+</head>
+<body>
+<h1>三类机组收益画像 · 2026年7月辽宁</h1>
+<p class="lead">基真源价格(31天×96点) + 假设机组参数，把"价格"翻译成"对不同机组意味什么"。单位：元/MWh（现货段示意）。</p>
+<div class="banner">⚠ 假设情景，非真实账：燃料成本280、利用小时4500h、调峰参与率15%、签约比例70% 等均为演示假设。勿将"火电综合+5.9"等数字抽离上下文当结论。</div>
+
+<div class="chart">
+  <div class="legend">
+    <span><i style="background:#2563eb"></i>现货收入</span>
+    <span><i style="background:#d64545"></i>燃料成本(−)</span>
+    <span><i style="background:#9b59b6"></i>容量电价</span>
+    <span><i style="background:#2e9e5b"></i>深度调峰补偿</span>
+    <span><i style="background:#f0a500"></i>综合收益</span>
+  </div>
+  <svg viewBox="0 0 900 420" id="svg"><line class="axis" x1="46" y1="200.32258064516128" x2="880" y2="200.32258064516128"/><line x1="46" y1="40.64516129032257" x2="880" y2="40.64516129032257" stroke="#eef0f4"/><text class="axislabel" x="40" y="43.64516129032257" text-anchor="end">300</text><line x1="46" y1="93.8709677419355" x2="880" y2="93.8709677419355" stroke="#eef0f4"/><text class="axislabel" x="40" y="96.8709677419355" text-anchor="end">200</text><line x1="46" y1="147.0967741935484" x2="880" y2="147.0967741935484" stroke="#eef0f4"/><text class="axislabel" x="40" y="150.0967741935484" text-anchor="end">100</text><line x1="46" y1="200.32258064516128" x2="880" y2="200.32258064516128" stroke="#eef0f4"/><text class="axislabel" x="40" y="203.32258064516128" text-anchor="end">0</text><line x1="46" y1="253.5483870967742" x2="880" y2="253.5483870967742" stroke="#eef0f4"/><text class="axislabel" x="40" y="256.5483870967742" text-anchor="end">-100</text><line x1="46" y1="306.77419354838713" x2="880" y2="306.77419354838713" stroke="#eef0f4"/><text class="axislabel" x="40" y="309.77419354838713" text-anchor="end">-200</text><line x1="46" y1="360" x2="880" y2="360" stroke="#eef0f4"/><text class="axislabel" x="40" y="363" text-anchor="end">-300</text><text class="grp" x="155" y="378" text-anchor="middle">火电</text><rect x="65" y="91.64612903225806" width="46" height="108.67645161290322" rx="2" fill="#2563eb"><title>火电 现货收入: 204.18</title></rect><text class="barcap" x="88" y="86.64612903225806" text-anchor="middle" font-size="10">+204.18</text><rect x="125" y="200.32258064516128" width="46" height="149.03225806451616" rx="2" fill="#d64545"><title>火电 燃料成本: -280</title></rect><text class="barcap" x="148" y="362.35483870967744" text-anchor="middle" font-size="10">-280</text><rect x="185" y="180.78870967741935" width="46" height="19.533870967741933" rx="2" fill="#9b59b6"><title>火电 容量: 36.7</title></rect><text class="barcap" x="208" y="175.78870967741935" text-anchor="middle" font-size="10">+36.7</text><rect x="245" y="176.3709677419355" width="46" height="23.951612903225794" rx="2" fill="#2e9e5b"><title>火电 调峰: 45</title></rect><text class="barcap" x="268" y="171.3709677419355" text-anchor="middle" font-size="10">+45</text><rect x="305" y="197.19290322580648" width="46" height="3.129677419354806" rx="2" fill="#f0a500"><title>火电 综合: 5.9</title></rect><text class="barcap" x="328" y="192.19290322580648" text-anchor="middle" fill="#9a4a00">+5.9</text><text class="grp" x="433" y="378" text-anchor="middle">风电</text><rect x="343" y="91.64612903225806" width="46" height="108.67645161290322" rx="2" fill="#2563eb"><title>风电 现货收入: 204.18</title></rect><text class="barcap" x="366" y="86.64612903225806" text-anchor="middle" font-size="10">+204.18</text><rect x="583" y="91.64612903225806" width="46" height="108.67645161290322" rx="2" fill="#f0a500"><title>风电 综合: 204.2</title></rect><text class="barcap" x="606" y="86.64612903225806" text-anchor="middle" fill="#9a4a00">+204.2</text><text class="grp" x="711" y="378" text-anchor="middle">光伏</text><rect x="621" y="107.17741935483872" width="46" height="93.14516129032256" rx="2" fill="#2563eb"><title>光伏 现货收入: 175</title></rect><text class="barcap" x="644" y="102.17741935483872" text-anchor="middle" font-size="10">+175</text><rect x="861" y="107.17741935483872" width="46" height="93.14516129032256" rx="2" fill="#f0a500"><title>光伏 综合: 175.0</title></rect><text class="barcap" x="884" y="102.17741935483872" text-anchor="middle" fill="#9a4a00">+175.0</text><text class="axislabel" x="16" y="18">元/MWh</text></svg>
+</div>
+
+<div class="chart">
+  <table>
+    <tr><th class="l">机组</th><th>现货收入</th><th>−燃料成本</th><th>+容量</th><th>+调峰</th><th>综合</th><th class="l">解读</th></tr>
+    <tr><td class="l">火电</td><td>204.18</td><td class="neg">−280.00</td><td>+36.7</td><td>+45.0</td><td class="pos"><b>+5.9</b></td><td class="l">现货段亏，四轨托底后微利</td></tr>
+    <tr><td class="l">风电</td><td>204.18</td><td>0</td><td>0</td><td>0</td><td class="pos"><b>+204.2</b></td><td class="l">零成本，均价即毛利</td></tr>
+    <tr><td class="l">光伏</td><td>175.00</td><td>0</td><td>0</td><td>0</td><td class="pos"><b>+175.0</b></td><td class="l">午间负价集中拖拽</td></tr>
+  </table>
+  <p class="foot">关键洞察：① 火电"亏在现货段、赚在四轨托底"——固定成本经容量电价回收，边际上只要实时价&gt;燃料变动成本就愿发（且供热机组无法停机），这正是现货频现负价火电仍在发的根源。② 风光零成本对均价高度敏感，全面深负时若无中长期保价则单位收益转负。③ 中长期(≥70%锁价)是分水岭。</p>
+</div>
+
+<script>
+const data = [
+  {grp:"火电", comps:[{k:"现货收入",v:204.18,c:"#2563eb"},{k:"燃料成本",v:-280,c:"#d64545"},{k:"容量",v:36.7,c:"#9b59b6"},{k:"调峰",v:45,c:"#2e9e5b"}]},
+  {grp:"风电", comps:[{k:"现货收入",v:204.18,c:"#2563eb"},{k:"燃料成本",v:0,c:"#d64545"},{k:"容量",v:0,c:"#9b59b6"},{k:"调峰",v:0,c:"#2e9e5b"}]},
+  {grp:"光伏", comps:[{k:"现货收入",v:175,c:"#2563eb"},{k:"燃料成本",v:0,c:"#d64545"},{k:"容量",v:0,c:"#9b59b6"},{k:"调峰",v:0,c:"#2e9e5b"}]},
+];
+const W=900,H=420, ml=46,mr=20,mt=30,mb=60;
+const plotW=W-ml-mr, plotH=H-mt-mb;
+const maxV=320, minV=-300;
+const y=v=> mt + plotH*(1-(v-minV)/(maxV-minV));
+const zeroY=y(0);
+let svg=`<line class="axis" x1="${ml}" y1="${zeroY}" x2="${W-mr}" y2="${zeroY}"/>`;
+// y grid
+[300,200,100,0,-100,-200,-300].forEach(v=>{
+  const yy=y(v);
+  svg+=`<line x1="${ml}" y1="${yy}" x2="${W-mr}" y2="${yy}" stroke="#eef0f4"/>`;
+  svg+=`<text class="axislabel" x="${ml-6}" y="${yy+3}" text-anchor="end">${v}</text>`;
+});
+const n=data.length, inner=plotW/n, bw=46, step=bw+14;
+data.forEach((d,i)=>{
+  const gx=ml+inner*i+(inner-step*4)/2;
+  svg+=`<text class="grp" x="${gx+step*1.5}" y="${H-mb+18}" text-anchor="middle">${d.grp}</text>`;
+  d.comps.forEach((c,j)=>{
+    const x=gx+step*j, yy=y(c.v), top=c.v>=0?yy:zeroY, h=Math.abs(yy-zeroY);
+    if(h<0.5) return;
+    svg+=`<rect x="${x}" y="${top}" width="${bw}" height="${h}" rx="2" fill="${c.c}"><title>${d.grp} ${c.k}: ${c.v}</title></rect>`;
+    const capY=c.v>=0? yy-5 : yy+13;
+    svg+=`<text class="barcap" x="${x+bw/2}" y="${capY}" text-anchor="middle" font-size="10">${c.v>0?'+':''}${c.v}</text>`;
+  });
+  // 综合收益标记
+  const cx=gx+step*4, cy=y(0);
+  const net=d.comps.reduce((s,c)=>s+c.v,0);
+  const ny=y(net);
+  svg+=`<rect x="${cx}" y="${net>=0?ny:zeroY}" width="${bw}" height="${Math.abs(ny-zeroY)}" rx="2" fill="#f0a500"><title>${d.grp} 综合: ${net.toFixed(1)}</title></rect>`;
+  svg+=`<text class="barcap" x="${cx+bw/2}" y="${net>=0?ny-5:ny+13}" text-anchor="middle" fill="#9a4a00">${net>0?'+':''}${net.toFixed(1)}</text>`;
+});
+svg+=`<text class="axislabel" x="${ml-30}" y="${mt-12}">元/MWh</text>`;
+document.getElementById("svg").innerHTML=svg;
+</script>
+</body>
+</html>

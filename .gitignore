@@ -1,0 +1,8 @@
+# WorkBuddy 本地缓存，不入库
+.workbuddy/
+
+# 系统垃圾
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store

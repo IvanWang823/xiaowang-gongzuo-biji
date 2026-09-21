@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>辽宁电价市场机制机理图</title>
+<style>
+  :root{ --bg:#f7f8fa; --card:#ffffff; --ink:#1f2329; --sub:#5a6472; --line:#e3e7ee; --acc:#2563eb; --warn:#d97706; }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);padding:28px;max-width:980px;margin:0 auto;}
+  h1{font-size:22px;margin:0 0 4px;}
+  .lead{color:var(--sub);font-size:13px;margin:0 0 24px;}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:22px;}
+  .panel h2{font-size:16px;margin:0 0 14px;display:flex;align-items:center;gap:8px;}
+  .tag{font-size:11px;background:#eef2ff;color:var(--acc);padding:2px 8px;border-radius:99px;font-weight:600;}
+  .matrix{display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;}
+  .mh{background:#eef2ff;color:var(--acc);font-weight:600;font-size:13px;border-radius:8px;padding:10px;text-align:center;}
+  .mrh{background:#eff6ff;color:var(--acc);font-weight:600;font-size:13px;border-radius:8px;padding:10px;text-align:center;display:flex;align-items:center;justify-content:center;}
+  .cell{border:1px solid var(--line);border-radius:8px;padding:12px;font-size:13px;line-height:1.5;}
+  .cell small{color:var(--sub);}
+  .hl{background:#fff7ed;border-color:#fed7aa;}
+  .hl .badge{display:inline-block;background:var(--warn);color:#fff;font-size:10px;padding:1px 6px;border-radius:99px;margin-bottom:4px;}
+  .layer{border-radius:10px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--line);}
+  .l1{background:#f0fdf4;border-color:#bbf7d0;}
+  .l2{background:#eff6ff;border-color:#bfdbfe;}
+  .l3{background:#fef9c3;border-color:#fde68a;}
+  .layer .lt{font-weight:700;font-size:14px;margin-bottom:8px;}
+  .sub{display:flex;gap:8px;flex-wrap:wrap;}
+  .box{flex:1;min-width:150px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px;font-size:12px;line-height:1.45;}
+  .box b{color:var(--acc);}
+  .note{font-size:12px;color:var(--sub);margin-top:6px;line-height:1.6;}
+  .arrow{text-align:center;color:var(--sub);font-size:12px;margin:2px 0;}
+</style>
+</head>
+<body>
+<h1>辽宁电价市场机制机理图</h1>
+<p class="lead">配套《辽宁2026年7月上网侧电价分析 · 完整复盘与实操转化》第十六 / 十七 / 十八节 · 机理示意，非数据图表</p>
+
+<div class="panel">
+  <h2>一、市场结构 2×2 矩阵 <span class="tag">集中式/分散式 × 单边/双边</span></h2>
+  <div class="matrix">
+    <div class="mh"></div>
+    <div class="mh">单边（仅发电侧报价）</div>
+    <div class="mh">双边（供需双侧报价）</div>
+    <div class="mrh">集中式<br>（统一出清）</div>
+    <div class="cell hl"><span class="badge">本文坐标</span><br>辽宁现货 · 山东/山西试点<br><small>高负价 · 信号纯净 · 偏差考核暴露</small></div>
+    <div class="cell">美国 PJM/ERCOT · 北欧 Nord Pool<br><small>需求侧参与 · 负价较少 · 尖峰受抑</small></div>
+    <div class="mrh">分散式<br>（双边协商）</div>
+    <div class="cell">理论组合（罕见）<br><small>无统一出清 + 需求刚性</small></div>
+    <div class="cell">德国 PPA · 绿电交易 · 微网<br><small>负价被合约吸收 · 价格碎片化</small></div>
+  </div>
+  <p class="note">两个维度正交：纵轴＝价格怎么形成，横轴＝谁参与报价。辽宁＝集中式＋单边（左上），故频现负价、信号最"纯"。向双边过渡（需求响应/虚拟电厂）才能从根上削负价。</p>
+</div>
+
+<div class="panel">
+  <h2>二、价格形成三层咬合 <span class="tag">能量 / 辅助 / 容量</span></h2>
+  <div class="layer l3">
+    <div class="lt">③ 容量市场 — 保证"关键时刻有装机可用"</div>
+    <div class="sub"><div class="box">容量电价 <b>165 元/kW·年</b><br>（辽发改价格字〔2026〕2号）<br>折算度电 ≈ 36.7 元/MWh</div></div>
+  </div>
+  <div class="arrow">▲ 固定成本回收后，边际报价可更低 → 压低现货价、抬高综合收益</div>
+  <div class="layer l2">
+    <div class="lt">② 辅助服务市场 — 保证"频率稳、峰谷能平"</div>
+    <div class="sub">
+      <div class="box"><b>一次调频</b><br>调速器秒级自动<br>考核义务 · 隐性成本<br>牺牲满发 headroom</div>
+      <div class="box"><b>二次调频(AGC)</b><br>分钟级跟调度<br>独立现金轨<br>新能源↑ → 调频价↑</div>
+      <div class="box"><b>调峰 · 深度调峰</b><br>小时级压低负荷<br>≈ 0.30 元/kWh 补偿<br>与现货替代（过渡并存）</div>
+    </div>
+  </div>
+  <div class="arrow">▲ 调峰补偿让火电"亏能量、赚调峰" → 负价时段不关机</div>
+  <div class="layer l1">
+    <div class="lt">① 能量市场（现货）— 决定"每度电多少钱" ← 本文主分析层</div>
+    <div class="sub"><div class="box">96 点/15min · 月均实时 <b>204.18</b> 元/MWh<br>实时负价 <b>31/31</b> 天 · 触底 342 次<br>风速↔实时价 r = <b>−0.553</b></div></div>
+  </div>
+  <p class="note">三层咬合结论：火电"能量亏、辅助＋容量托底"＝负电价能持续存在的机制根源（呼应 §14.2 / §14.3 / §18）。具体补偿价以东北区域/辽宁电网辅助服务细则红头为准。</p>
+</div>
+</body>
+</html>

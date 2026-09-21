@@ -1,0 +1,61 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8">
+<title>辽宁7月电价 vs 气象代理</title>
+<style>body{font-family:-apple-system,'Microsoft YaHei',sans-serif;max-width:980px;margin:24px auto;padding:0 16px;color:#222}
+h2{border-left:4px solid #c33;padding-left:8px} .card{border:1px solid #eee;border-radius:10px;padding:14px 18px;margin:14px 0;background:#fafafa}
+.crow{font-size:14px;margin:4px 0} .tag{display:inline-block;background:#fff3e0;color:#c33;border-radius:4px;padding:1px 6px;font-size:12px;margin-left:6px}
+.legend span{margin-right:18px;font-size:13px} .dot{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:middle;margin-right:5px}
+.note{color:#888;font-size:13px} table{border-collapse:collapse;width:100%;font-size:13px} td,th{border:1px solid #ddd;padding:5px 8px;text-align:center}
+th{background:#f5f5f5}</style></head><body>
+<h2>辽宁省 2026年7月 上网侧电价 × 气象代理(风光出力近似) 相关性</h2>
+<div class="note">电价真源: 辽宁发改委官方接口(31天×96点, 逐时均值). 气象: open-meteo 沈阳/大连/锦州/阜新4城逐时平均(风速 m/s + 短波辐射 W/m²), 作为风光出力代理变量. 相关≠因果, 详见说明.</div>
+
+<div class="card">
+<h3>① 全月逐时相关性 (N=744 小时)</h3>
+<div class="crow"><b>短波辐射 ↔ 实时价</b>　Pearson r = -0.194　|　Spearman ρ = -0.137</div>
+<div class="crow"><b>风速 ↔ 实时价</b>　Pearson r = -0.487　|　Spearman ρ = -0.531</div>
+<div class="crow"><b>短波辐射 ↔ 日前价</b>　Pearson r = -0.311　|　Spearman ρ = -0.277</div>
+<div class="crow"><b>风速 ↔ 日前价</b>　Pearson r = -0.555　|　Spearman ρ = -0.618</div>
+<div class="crow"><b>分时段验证</b></div>
+<div class="crow"><b>午间 09-15时 短波辐射 ↔ 实时价</b>　Pearson r = 0.047　|　Spearman ρ = 0.092</div>
+<div class="crow"><b>夜间 21-05时 风速 ↔ 实时价</b>　Pearson r = -0.553　|　Spearman ρ = -0.608</div>
+</div>
+
+<div class="card">
+<h3>② 典型日叠加曲线 (24小时均值)</h3>
+<div class="legend">
+<span><i class="dot" style="background:#c0392b"></i>实时价(左轴 元/MWh)</span>
+<span><i class="dot" style="background:#e8a33d"></i>日前价(左轴)</span>
+<span><i class="dot" style="background:#f1c40f"></i>短波辐射(右轴 W/m²)</span>
+<span><i class="dot" style="background:#3aa0e8"></i>风速(右轴 m/s)</span>
+</div>
+<svg width="920" height="460" viewBox="0 0 920 460">
+<line x1="70" y1="350.0" x2="870" y2="350.0" stroke="#eee"/><text x="62" y="354.0" text-anchor="end" font-size="11" fill="#666">-120</text><line x1="70" y1="294.8" x2="870" y2="294.8" stroke="#eee"/><text x="62" y="298.8" text-anchor="end" font-size="11" fill="#666">-20</text><line x1="70" y1="239.7" x2="870" y2="239.7" stroke="#eee"/><text x="62" y="243.7" text-anchor="end" font-size="11" fill="#666">80</text><line x1="70" y1="184.5" x2="870" y2="184.5" stroke="#eee"/><text x="62" y="188.5" text-anchor="end" font-size="11" fill="#666">180</text><line x1="70" y1="129.3" x2="870" y2="129.3" stroke="#eee"/><text x="62" y="133.3" text-anchor="end" font-size="11" fill="#666">280</text><line x1="70" y1="74.1" x2="870" y2="74.1" stroke="#eee"/><text x="62" y="78.1" text-anchor="end" font-size="11" fill="#666">380</text><text x="878" y="354.0" text-anchor="start" font-size="11" fill="#e8a33d">0</text><text x="878" y="274.0" text-anchor="start" font-size="11" fill="#e8a33d">100</text><text x="878" y="194.0" text-anchor="start" font-size="11" fill="#e8a33d">200</text><text x="878" y="114.0" text-anchor="start" font-size="11" fill="#e8a33d">300</text><text x="878" y="34.0" text-anchor="start" font-size="11" fill="#e8a33d">400</text><text x="914" y="354.0" text-anchor="start" font-size="11" fill="#3aa0e8">0</text><text x="914" y="262.6" text-anchor="start" font-size="11" fill="#3aa0e8">4</text><text x="914" y="171.1" text-anchor="start" font-size="11" fill="#3aa0e8">8</text><text x="914" y="79.7" text-anchor="start" font-size="11" fill="#3aa0e8">12</text><text x="70.0" y="368" text-anchor="middle" font-size="11" fill="#666">00:00</text><text x="174.3" y="368" text-anchor="middle" font-size="11" fill="#666">03:00</text><text x="278.7" y="368" text-anchor="middle" font-size="11" fill="#666">06:00</text><text x="383.0" y="368" text-anchor="middle" font-size="11" fill="#666">09:00</text><text x="487.4" y="368" text-anchor="middle" font-size="11" fill="#666">12:00</text><text x="591.7" y="368" text-anchor="middle" font-size="11" fill="#666">15:00</text><text x="696.1" y="368" text-anchor="middle" font-size="11" fill="#666">18:00</text><text x="800.4" y="368" text-anchor="middle" font-size="11" fill="#666">21:00</text>
+<line x1="70" y1="350.0" x2="870" y2="350.0" stroke="#c0392b" stroke-dasharray="4 3" stroke-width="1"/>
+<polyline points="70.0,110.2 104.8,115.3 139.6,123.0 174.3,127.8 209.1,136.1 243.9,132.2 278.7,125.8 313.5,119.4 348.3,101.8 383.0,86.2 417.8,69.8 452.6,57.2 487.4,52.2 522.2,48.3 557.0,51.7 591.7,38.5 626.5,39.1 661.3,48.7 696.1,73.9 730.9,91.5 765.7,90.6 800.4,90.1 835.2,89.0 870.0,94.0" fill="none" stroke="#3aa0e8" stroke-width="2"/>
+<polyline points="70.0,350.0 104.8,350.0 139.6,350.0 174.3,350.0 209.1,350.0 243.9,347.5 278.7,303.4 313.5,213.3 348.3,105.8 383.0,6.1 417.8,-80.7 452.6,-144.6 487.4,-182.2 522.2,-177.9 557.0,-149.3 591.7,-88.2 626.5,-4.5 661.3,101.0 696.1,212.1 730.9,303.9 765.7,348.2 800.4,350.0 835.2,350.0 870.0,350.0" fill="none" stroke="#f1c40f" stroke-width="2"/>
+<polyline points="70.0,151.3 104.8,149.8 139.6,152.9 174.3,156.0 209.1,141.0 243.9,127.8 278.7,128.8 313.5,167.6 348.3,182.6 383.0,210.9 417.8,220.4 452.6,221.8 487.4,211.3 522.2,209.3 557.0,213.3 591.7,195.0 626.5,168.8 661.3,134.2 696.1,118.4 730.9,118.4 765.7,114.6 800.4,125.4 835.2,135.4 870.0,144.9" fill="none" stroke="#e8a33d" stroke-width="1.6" stroke-dasharray="5 3"/>
+<polyline points="70.0,165.3 104.8,166.4 139.6,182.2 174.3,179.0 209.1,170.1 243.9,155.9 278.7,153.0 313.5,168.8 348.3,165.6 383.0,186.6 417.8,181.1 452.6,206.7 487.4,212.1 522.2,218.1 557.0,236.5 591.7,223.9 626.5,195.5 661.3,162.0 696.1,106.8 730.9,83.4 765.7,100.7 800.4,145.8 835.2,166.3 870.0,175.8" fill="none" stroke="#c0392b" stroke-width="2.4"/>
+<text x="70" y="18" font-size="12" fill="#666">左轴: 价格  右轴: 辐射(黄)/风速(蓝)</text>
+</svg>
+<div class="note">红虚线=0价线. 可见实时价(红)在午间(辐照黄峰)与深夜(风速蓝峰)两处下探至0下, 与风光出力峰高度吻合.</div>
+</div>
+
+<div class="card">
+<h3>③ 辐射/风速 四分位 → 实时均价</h3>
+<table><tr><th>短波辐射四分位</th><th>Q1最低</th><th>Q2</th><th>Q3</th><th>Q4最高</th></tr>
+<tr><td>实时均价(元/MWh)</td><td>149.6</td><td>321.7</td><td>201.9</td><td>143.5</td></tr></table>
+<table style="margin-top:10px"><tr><th>风速四分位</th><th>Q1最低</th><th>Q2</th><th>Q3</th><th>Q4最高</th></tr>
+<tr><td>实时均价(元/MWh)</td><td>315.0</td><td>268.0</td><td>172.6</td><td>61.1</td></tr></table>
+<div class="note">辐照/风速越高 → 实时均价越低, 且 Q4(最高)已落入负值区, 印证"风光大发挤出价格".</div>
+</div>
+
+<div class="card">
+<h3>④ 诚实边界</h3>
+<ul>
+<li>气象是<b>出力代理</b>, 非实际发电曲线; 4城平均≠全省精确分布.</li>
+<li>缺<b>实际负荷</b>, 无法算"净负荷"; 相关只证"风光资源↔低价"同步性, 非严格因果.</li>
+<li>未含火电调峰约束/外来电/储能, 价格形成机制未完全建模.</li>
+<li>7月单月、辽宁单省, 结论不外延到其他月份/省份.</li>
+</ul>
+</div>
+</body></html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>辽宁2026年7月上网侧电价分析 · 成果汇报导航</title>
+<style>
+  :root{ --bg:#f5f7fa; --card:#fff; --ink:#1f2329; --sub:#5a6472; --line:#e3e7ee; --acc:#2563eb; --acc2:#1f4e79; --warn:#c00000; }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);padding:30px 22px;max-width:1080px;margin:0 auto;}
+  h1{font-size:24px;margin:0 0 4px;}
+  .lead{color:var(--sub);font-size:13px;margin:0 0 6px;}
+  .meta{color:#9aa3b0;font-size:11px;margin-bottom:22px;}
+  .sec{margin:26px 0 12px;font-size:16px;font-weight:700;color:var(--acc2);border-left:4px solid var(--acc);padding-left:10px;}
+  .summary{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 22px;}
+  .summary ol{margin:0;padding-left:20px;}
+  .summary li{margin:9px 0;line-height:1.6;font-size:13.5px;}
+  .summary b{color:var(--acc2);}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:14px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;transition:.15s;display:flex;flex-direction:column;}
+  .card:hover{box-shadow:0 4px 14px rgba(0,0,0,.07);border-color:#c9d4e8;transform:translateY(-1px);}
+  .card .tag{font-size:10.5px;color:#fff;background:var(--acc);align-self:flex-start;padding:2px 8px;border-radius:20px;margin-bottom:8px;}
+  .card .tag.g{background:#2e9e5b;} .card .tag.o{background:#e08a00;} .card .tag.p{background:#8a6dc4;}
+  .card a{font-size:14px;font-weight:600;color:var(--ink);text-decoration:none;line-height:1.4;}
+  .card a:hover{color:var(--acc);}
+  .card .desc{font-size:11.5px;color:var(--sub);margin-top:6px;line-height:1.5;}
+  .warnbox{background:#fce4d6;border:1px solid #f0b27a;color:#9a4a00;font-size:12px;padding:10px 14px;border-radius:8px;margin:18px 0;line-height:1.6;}
+  .foot{color:#9aa3b0;font-size:11px;margin-top:30px;text-align:center;}
+</style>
+</head>
+<body>
+<h1>辽宁 2026年7月 上网侧电价分析</h1>
+<p class="lead">成果汇报导航页 · 从31天真源价格到方法论资产包的一站式入口</p>
+<p class="meta">数据来源：辽宁发改委官方接口逆向抓取（31天×96点，可验证）｜ 末次整合：2026-08-15</p>
+
+<div class="sec">一页纸高管摘要</div>
+<div class="summary">
+<ol>
+  <li><b>价格进入「深负 + 高价」两极新常态</b>：实时均价 204.18 元/MWh，但 <b>24/31 天</b>出现负价，−100 下限触发 <b>342 次</b>；晚高峰触顶 16 次。</li>
+  <li><b>负价根因是「新能源结构性挤出」，非负荷低</b>：双谷指纹清晰；反例——7/31 负荷创纪录 4585 万 kW，实时价仍贴地（日均 4.76）。</li>
+  <li><b>风电是实时价主导负驱动</b>：风速↔实时价 夜间 r=−0.553；光伏压价确凿但被晴天制冷负荷洗平。</li>
+  <li><b>电厂收益靠「四轨」托底，现货低 ≠ 电厂亏</b>：中长期(306.59) + 容量电价(165元/kW·年) + 深度调峰(0.30元/kWh) 对冲。</li>
+  <li><b>行动三件事</b>：①核对辽宁4.0合约台账看现货敞口；②负价时段转深度调峰拿补偿而非硬扛；③脚本每月自跑建价格监控基线。</li>
+</ol>
+</div>
+
+<div class="warnbox">⚠ 诚实边界：本报告价格数据为真源抓取（可验证），但气象为代理、日前价为预出清参考价；§14.2/§14.3 的机组收益与主体损益为<b>假设情景</b>，非真实账；政策数值须以发改委/交易中心红头原文为准。</div>
+
+<div class="sec">文字报告</div>
+<div class="grid">
+  <div class="card"><span class="tag p">总文档</span><a href="分析报告/辽宁2026年7月上网侧电价分析_完整复盘与实操转化.md">完整复盘与实操转化（二十三节+术语表）</a><span class="desc">数据底座→九章分析→实操转化→术语表→市场结构机理全体系</span></div>
+  <div class="card"><span class="tag p">分析报告</span><a href="分析报告/辽宁省上网侧电价2026年7月分析报告.md">九章分析报告</a><span class="desc">核心结论/负价成因/中长期/辅助容量/可视化/实操建议</span></div>
+  <div class="card"><span class="tag p">方法论</span><a href="分析报告/上网侧电价分析_可复用提示词.md">可复用工作流提示词</a><span class="desc">换月/换省改参数即跑的 AI 分析 prompt</span></div>
+</div>
+
+<div class="sec">数据底表（Excel）</div>
+<div class="grid">
+  <div class="card"><span class="tag g">真源</span><a href="数据底表/辽宁省上网侧电价2026年7月日度表.xlsx">7月日度表（3 Sheet）</a><span class="desc">31天日度总表 + 96点样例 + 来源说明</span></div>
+  <div class="card"><span class="tag g">真源</span><a href="数据底表/辽宁省上网侧电价2026.xlsx">上网侧电价2026（全量）</a><span class="desc">年度结构化价格底表</span></div>
+  <div class="card"><span class="tag o">实操</span><a href="数据底表/辽宁省上网侧电价2026年7月_实操转化数据底表.xlsx">实操转化数据底表</a><span class="desc">机组收益画像 + 主体损益映射 + 关键参数口径（假设情景）</span></div>
+</div>
+
+<div class="sec">可视化图表（HTML）</div>
+<div class="card" style="grid-column:1/-1;border-color:var(--acc);box-shadow:0 0 0 2px #e3edfd;"><span class="tag" style="background:var(--acc2)">系统</span><a href="可视化图表/index.html">📊 可视化图表系统门户（10图 · 4模块 · 可导航）</a><span class="desc">现象→成因→主体损益→机制格局 四层结构化浏览，替代平铺列表；内嵌 iframe 直开每张图</span></div>
+<div class="grid">
+  <div class="card"><span class="tag">风险</span><a href="可视化图表/辽宁省上网侧电价2026年7月热力图.html">全月热力图</a><span class="desc">天×96点，红=负价，日前/实时切换</span></div>
+  <div class="card"><span class="tag">形态</span><a href="可视化图表/辽宁省上网侧电价2026年7月典型日曲线图.html">典型日曲线图</a><span class="desc">双线 + 单日下钻 + 负价带阴影</span></div>
+  <div class="card"><span class="tag">指纹</span><a href="可视化图表/辽宁省上网侧电价2026年7月负价时段指纹图.html">负价时段指纹图</a><span class="desc">逐时负价天数占比，看双谷</span></div>
+  <div class="card"><span class="tag">成因</span><a href="可视化图表/辽宁省上网侧电价2026年7月_气象代理vs负价.html">气象代理 vs 负价</a><span class="desc">价格双线 + 风速/辐照双轴</span></div>
+  <div class="card"><span class="tag">套利</span><a href="可视化图表/辽宁省上网侧电价2026年7月_偏差与套利.html">偏差与套利</a><span class="desc">逐日/逐时偏差 + 储能套利 + 频带占比</span></div>
+  <div class="card"><span class="tag">深挖</span><a href="可视化图表/辽宁省上网侧电价2026年7月_辐照深挖.html">辐照深挖</a><span class="desc">4图证伪"光伏弱相关"</span></div>
+  <div class="card"><span class="tag">格局</span><a href="可视化图表/辽宁省电源分布示意图.html">电源分布示意图</a><span class="desc">合规地图 + 容量分级（估算标*）</span></div>
+  <div class="card"><span class="tag p">机理</span><a href="可视化图表/辽宁省电价市场机制机理图.html">市场机制机理图</a><span class="desc">2×2矩阵 + 能量/辅助/容量三层咬合</span></div>
+  <div class="card"><span class="tag o">画像</span><a href="可视化图表/辽宁省上网侧电价2026年7月_三类机组收益画像.html">三类机组收益画像</a><span class="desc">火/风/光现货段→综合（假设情景）</span></div>
+  <div class="card"><span class="tag o">映射</span><a href="可视化图表/辽宁省上网侧电价2026年7月_市场主体损益映射.html">市场主体损益映射</a><span class="desc">五类主体 × 四维度损益方向</span></div>
+</div>
+
+<p class="foot">本页为成果导航，所有结论与数据溯源见总文档。地图类图表依赖合规底图加载（联网可用）。</p>
+</body>
+</html>

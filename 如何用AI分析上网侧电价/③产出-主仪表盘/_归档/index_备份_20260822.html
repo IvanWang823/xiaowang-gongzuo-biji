@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>辽宁2026年7月上网侧电价 · 数据驾驶舱</title>
+<style>
+  :root{
+    --bg:#f9fafb; --card:#fff; --ink:#1f2937; --sub:#6b7280; --line:#e5e7eb;
+    --acc:#066fd1; --acc2:#1f2937; --warn:#d63939; --warnbg:#fef2f2; --warnbd:#fca5a5;
+    --neg:#d63939; --pos:#2fb344; --mid:#f59f00; --hyp:#ae3ec9;
+    --radius:6px; --radius-sm:4px; --radius-lg:8px;
+    --shadow:0 2px 6px rgba(15,23,42,.04); --shadow-sm:0 1px 2px rgba(15,23,42,.06);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Inter","Inter Var",-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);padding:0 0 48px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1600px;margin:0 auto;padding:0 clamp(14px,3vw,40px);}
+
+  /* 顶栏 */
+  header{background:linear-gradient(120deg,#1a4fa0,#066fd1);color:#fff;padding:26px 0 22px;box-shadow:0 2px 10px rgba(6,111,209,.18);}
+  header h1{margin:0;font-size:clamp(19px,2.4vw,28px);letter-spacing:.5px;}
+  header .lead{margin:6px 0 0;font-size:13px;opacity:.92;}
+  header .meta{margin:9px 0 0;font-size:11px;opacity:.78;}
+  header .badge{display:inline-block;margin-top:11px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:3px 12px;font-size:11.5px;}
+
+  /* 区块标题 */
+  .sec{display:flex;align-items:center;gap:10px;margin:clamp(22px,3vw,34px) 0 14px;font-size:clamp(15px,1.6vw,18px);font-weight:800;color:var(--acc2);}
+  .sec::before{content:"";width:5px;height:18px;background:var(--acc);border-radius:3px;display:inline-block;}
+  .sec .hint{font-size:11.5px;font-weight:500;color:#9aa3b0;margin-left:auto;}
+
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(176px,1fr));gap:14px;margin-top:18px;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px 16px 14px;position:relative;overflow:hidden;box-shadow:var(--shadow);transition:border-color .15s,box-shadow .15s,transform .15s;}
+  .kpi:hover{border-color:var(--acc);box-shadow:var(--shadow-sm);transform:translateY(-1px);}
+  .kpi .kic{position:absolute;top:15px;right:15px;width:26px;height:26px;stroke-width:1.6;opacity:.2;}
+  .kpi .bar{position:absolute;left:0;top:0;width:4px;height:100%;}
+  .kpi .label{font-size:clamp(11px,1.1vw,13px);color:var(--sub);font-weight:600;}
+  .kpi .val{font-size:clamp(23px,2.4vw,33px);font-weight:800;color:var(--acc2);line-height:1.12;margin-top:5px;}
+  .kpi .val .u{font-size:13px;font-weight:600;color:var(--sub);margin-left:3px;}
+  .kpi .foot{font-size:11px;color:#9aa3b0;margin-top:7px;line-height:1.5;}
+
+  .subsec{font-size:13px;font-weight:700;color:var(--sub);margin:18px 0 8px;}
+
+  /* 模块分区标题 */
+  .modhead{display:flex;align-items:center;gap:9px;margin:clamp(26px,3.4vw,40px) 0 14px;font-size:clamp(15px,1.7vw,18px);font-weight:800;color:var(--acc2);}
+  .modhead .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;}
+  .modhead .mtag{font-size:10px;color:#fff;padding:2px 9px;border-radius:var(--radius-sm);font-weight:600;letter-spacing:.3px;}
+  .modhead .mdesc{font-size:11.5px;font-weight:500;color:#9aa3b0;margin-left:auto;}
+
+  .chartgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+  .chartgrid .full{grid-column:1/-1;}
+  .ccard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;transition:box-shadow .15s,border-color .15s;}
+  .ccard:hover{box-shadow:var(--shadow-sm);border-color:#cfd8e6;}
+  .ccard .chead{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--line);}
+  .ccard .chead .t{font-size:13.5px;font-weight:700;color:var(--ink);}
+  .ccard .chead .tag{font-size:10px;font-weight:600;color:#fff;padding:2px 9px;border-radius:var(--radius-sm);letter-spacing:.3px;}
+  .ccard .chead a{margin-left:auto;font-size:11px;color:var(--acc);text-decoration:none;}
+  .ccard .chead a:hover{text-decoration:underline;}
+  .ccard img{width:100%;height:auto;display:block;background:#fff;}
+
+  .warnbox{background:var(--warnbg);border:1px solid var(--warnbd);color:#991b1b;font-size:12px;padding:11px 15px;border-radius:var(--radius);margin:22px 0 0;line-height:1.65;}
+  .foot{color:#9aa3b0;font-size:11px;margin-top:34px;text-align:center;line-height:1.7;}
+
+  /* 大屏铺满（电视 / 4K） */
+  @media(min-width:1920px){
+    .wrap{max-width:none;}
+    header{padding:clamp(28px,2.4vw,46px) 0 clamp(24px,2vw,40px);}
+    .kpi .val{font-size:clamp(30px,2.2vw,42px);}
+    .chartgrid{gap:clamp(18px,1.4vw,28px);}
+  }
+  /* 平板 / 手机 */
+  @media(max-width:768px){
+    .chartgrid{grid-template-columns:1fr;}
+    .kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));}
+  }
+  @media(max-width:480px){
+    .wrap{padding:0 12px;}
+    .kpis{grid-template-columns:repeat(2,1fr);}
+    .kpi{padding:12px 12px 11px;}
+    .kpi .val{font-size:clamp(20px,7vw,26px);}
+  }
+
+  /* ===== 模块三 · 交互式（瀑布图 + 损益矩阵） ===== */
+  .m3-filter{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:6px 0 2px;}
+  .m3-filter .fitem{display:flex;align-items:center;gap:7px;}
+  .m3-filter .flabel{font-size:12px;color:var(--sub);font-weight:600;}
+  .m3-filter select{font-family:inherit;font-size:12.5px;color:var(--ink);border:1px solid var(--line);border-radius:var(--radius-sm);padding:6px 10px;background:#fff;cursor:default;}
+  .m3-filter .fnote{font-size:11.5px;color:#9aa3b0;margin-left:auto;}
+  .m3-kpis{margin-top:14px;}
+  .m3-grid{display:grid;grid-template-columns:1.18fr 1fr;gap:16px;margin-top:16px;}
+  .m3-grid .ccard .chead .legend{margin-left:auto;font-size:10.5px;color:var(--sub);font-weight:500;}
+  .m3-grid .ccard .chead .hint{margin-left:auto;font-size:11px;color:var(--acc);}
+  .wf-wrap{display:flex;gap:10px;padding:14px;}
+  .wf-box{flex:1;min-width:0;}
+  .wf-title{font-size:12.5px;font-weight:700;color:var(--ink);text-align:center;margin-bottom:2px;}
+  .wf-chart{width:100%;height:248px;}
+  .matrix{padding:6px 0 10px;}
+  .matrix .mrow{display:grid;grid-template-columns:92px 1fr;cursor:default;transition:background .12s;}
+  .matrix .mrow:hover{background:#f6f8fb;}
+  .matrix .mrow.head{grid-template-columns:92px 1fr;font-size:11px;color:var(--sub);font-weight:700;border-bottom:1px solid var(--line);}
+  .matrix .mrow:not(.head){border-bottom:1px solid var(--line);}
+  .matrix .mc-name{font-weight:700;font-size:12.5px;padding:11px 8px;border-right:1px solid var(--line);display:flex;align-items:center;line-height:1.35;}
+  .matrix .mc-body{padding:11px 12px;font-size:11.5px;line-height:1.55;color:var(--ink);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .matrix .sev{display:inline-block;padding:1px 9px;border-radius:20px;font-size:10.5px;font-weight:700;color:#fff;flex:0 0 auto;}
+  .matrix .sev.bad{background:var(--neg);}
+  .matrix .sev.warn{background:var(--mid);}
+  .matrix .sev.good{background:var(--pos);}
+  .m3-tip{position:fixed;z-index:60;max-width:330px;background:#1f2937;color:#fff;font-size:11.5px;line-height:1.65;padding:10px 12px;border-radius:8px;box-shadow:0 10px 28px rgba(0,0,0,.25);pointer-events:none;opacity:0;transition:opacity .12s;display:none;}
+  .m3-tip b{color:#9ec5ff;font-size:12px;}
+  .m3-tip .t-sev{color:#fbbf24;}
+  /* ===== 模块一/二/四 · ECharts 交互图通用 ===== */
+  .echart-box{width:100%;height:320px;}
+  .echart-tall{width:100%;height:360px;}
+  .echart-graph{width:100%;height:400px;}
+  .legend-inline{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:9px 14px;border-top:1px solid var(--line);font-size:11px;color:var(--sub);}
+  .legend-inline .li{display:flex;align-items:center;gap:5px;}
+  .legend-inline .sw{width:11px;height:11px;border-radius:3px;display:inline-block;}
+  .ch-tip-note{font-size:11px;color:#9aa3b0;padding:0 14px 11px;line-height:1.55;}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;}
+  .seg button{appearance:none;border:0;background:#fff;font-family:inherit;font-size:11.5px;color:var(--sub);padding:5px 12px;cursor:pointer;border-right:1px solid var(--line);transition:.12s;}
+  .seg button:last-child{border-right:0;}
+  .seg button:hover{background:#f1f5f9;}
+  .seg button.on{background:var(--acc);color:#fff;}
+  @media(max-width:768px){ .m3-grid{grid-template-columns:1fr;} .wf-wrap{flex-direction:column;} .echart-box,.echart-tall,.echart-graph{height:300px;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>辽宁 2026年7月 上网侧电价 · 数据驾驶舱</h1>
+    <p class="lead">从 31 天×96 点真源价格到方法论资产包——一屏看全「价格现象 → 成因 → 主体损益 → 机制格局」</p>
+    <p class="meta">数据来源：辽宁发改委官方接口逆向抓取（31天×96点，可验证）｜ 末次整合：2026-08-15</p>
+    <span class="badge">⚠ 价格为真源｜气象为代理｜损益为假设情景</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- KPI 英雄区 -->
+  <div class="sec">一屏关键指标 <span class="hint">红=负价/风险，蓝=基准价，紫=相关性</span></div>
+  <div class="kpis">
+    <div class="kpi"><span class="bar" style="background:var(--acc)"></span>
+      <svg class="kic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="color:var(--acc)"><path d="M3 17l6-6 4 4 8-8 M17 7h4v4"/></svg>
+      <div class="label">实时均价</div>
+      <div class="val">204.18<span class="u">元/MWh</span></div>
+      <div class="foot">进入「深负 + 高价」两极新常态</div>
+    </div>
+    <div class="kpi"><span class="bar" style="background:var(--neg)"></span>
+      <svg class="kic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="color:var(--neg)"><path d="M12 9v4 M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z M12 16h.01"/></svg>
+      <div class="label">负价天数</div>
+      <div class="val">24<span class="u">/31 天</span></div>
+      <div class="foot">占比 77.4%，全月常态化</div>
+    </div>
+    <div class="kpi"><span class="bar" style="background:var(--neg)"></span>
+      <svg class="kic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="color:var(--neg)"><path d="M12 5v14 M19 12l-7 7 -7 -7"/></svg>
+      <div class="label">−100 下限触发</div>
+      <div class="val">342<span class="u">次</span></div>
+      <div class="foot">实时价地板价被反复打穿</div>
+    </div>
+    <div class="kpi"><span class="bar" style="background:var(--mid)"></span>
+      <svg class="kic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="color:var(--mid)"><path d="M12 10.94c1.5 0 3-1.09 3-2.44a3 3 0 0 0 -3 -3c.002 1.06 -1 2 -1 3.44 M9.34 15.96l-1.05 -.66c-.53 -.33 -1.18 -.3 -1.68 .08a2 2 0 0 0 -1 1.73c0 .5 .2 .98 .55 1.33 1.2 1.2 2.75 1.85 4.4 1.85 1.3 0 2.55 -.43 3.57 -1.22 M12 3a4 4 0 0 1 4 4c0 2-2 3-2 5 M8 13c0 -2 1.5 -3 1.5 -5a3 3 0 0 0 -3 3c0 1.5 1 2.5 1.5 2z"/></svg>
+      <div class="label">晚高峰触顶</div>
+      <div class="val">16<span class="u">次</span></div>
+      <div class="foot">高价段同样频繁出现</div>
+    </div>
+    <div class="kpi"><span class="bar" style="background:var(--pos)"></span>
+      <svg class="kic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="color:var(--pos)"><path d="M13 3l-3 9h5l-3 9"/></svg>
+      <div class="label">峰值负荷（7/31）</div>
+      <div class="val">4585<span class="u">万kW</span></div>
+      <div class="foot">创纪录，但实时价仍贴地（日均 4.76）</div>
+    </div>
+    <div class="kpi"><span class="bar" style="background:var(--hyp)"></span>
+      <svg class="kic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="color:var(--hyp)"><path d="M3 4h9a3 3 0 1 0 -3 -3 M3 12h15a3 3 0 1 0 -3 -3 M3 20h6a3 3 0 1 0 -3 -3"/></svg>
+      <div class="label">风电负驱动（夜）</div>
+      <div class="val">r=−0.553</div>
+      <div class="foot">风速↔实时价 显著负相关</div>
+    </div>
+  </div>
+
+  <!-- 支撑参数 -->
+  <div class="subsec">电厂收益「四轨」托底参数（现货低 ≠ 电厂亏）</div>
+  <div class="kpis">
+    <div class="kpi"><span class="bar" style="background:var(--acc2)"></span>
+      <svg class="kic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="color:var(--acc2)"><path d="M12 19v-7l-5 -7 M12 12l5 -7 M7 11h10"/></svg>
+      <div class="label">中长期电价</div>
+      <div class="val">306.59<span class="u">元/MWh</span></div>
+      <div class="foot">锁定基础收益，对冲现货波动</div>
+    </div>
+    <div class="kpi"><span class="bar" style="background:var(--acc2)"></span>
+      <svg class="kic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="color:var(--acc2)"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0 M14.8 9a2 2 0 0 0 -1.8 -1h-2a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4h-2a2 2 0 0 1 -1.8 -1 M12 7v10"/></svg>
+      <div class="label">容量电价</div>
+      <div class="val">165<span class="u">元/kW·年</span></div>
+      <div class="foot">按装机容量年度补偿</div>
+    </div>
+    <div class="kpi"><span class="bar" style="background:var(--acc2)"></span>
+      <svg class="kic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="color:var(--acc2)"><path d="M12 3a9 9 0 1 0 9 9 M12 12l-5 -3v6z"/></svg>
+      <div class="label">深度调峰补偿</div>
+      <div class="val">0.30<span class="u">元/kWh</span></div>
+      <div class="foot">负价时段转调峰拿补偿而非硬扛</div>
+    </div>
+  </div>
+
+  <!-- 图表总览 -->
+  <div class="sec">图表总览 <span class="hint">全部内联渲染 · 无 iframe 嵌套 · 点右上 ↗ 看交互原文件</span></div>
+
+  <!-- 模块一 · 价格现象（真源） -->
+  <div class="modhead"><span class="dot" style="background:#2563eb"></span>模块一 · 价格现象<span class="mtag" style="background:#2563eb">真源</span><span class="mdesc">官方接口抓取，可验证</span></div>
+
+  <div class="m3-filter">
+    <div class="fitem"><span class="flabel">时间</span><select id="m1Time"><option value="avg">31天均值（典型日）</option><option value="0712">07-12 最深负价日</option><option value="0719">07-19 最高价日</option></select></div>
+    <div class="fitem"><span class="flabel">区域</span><select><option>辽宁（全口径）</option></select></div>
+    <div class="fnote">数据为 31天×96点真源价格；热力图可切换日前 / 实时</div>
+  </div>
+  <div class="kpis m3-kpis">
+    <div class="kpi"><span class="bar" style="background:var(--acc)"></span><div class="label">实时月均</div><div class="val">204.18<span class="u">元/MWh</span></div><div class="foot">进入「深负+高价」两极新常态</div></div>
+    <div class="kpi"><span class="bar" style="background:var(--neg)"></span><div class="label">负价天数</div><div class="val">24<span class="u">/31 天</span></div><div class="foot">占比 77.4%，全月常态化</div></div>
+    <div class="kpi"><span class="bar" style="background:var(--neg)"></span><div class="label">实时最深</div><div class="val">−100<span class="u">元/MWh</span></div><div class="foot">地板价被反复打穿（342次）</div></div>
+  </div>
+
+  <div class="chartgrid">
+    <div class="ccard full">
+      <div class="chead"><span class="tag" style="background:#2563eb">真源</span><span class="t">全月价格热力图（天×96点）</span>
+        <span class="seg" style="margin-left:auto">
+          <button id="m1HeatBefore" class="on" onclick="m1SwitchHeat('before')">日前</button>
+          <button id="m1HeatReal" onclick="m1SwitchHeat('realTime')">实时</button>
+        </span>
+      </div>
+      <div class="echart-tall" id="m1Heat"></div>
+      <div class="legend-inline"><span class="li"><span class="sw" style="background:#b91c1c"></span>负价</span><span class="li"><span class="sw" style="background:#fff;border:1px solid #ccc"></span>0</span><span class="li"><span class="sw" style="background:#1e3a8a"></span>高价</span><span style="margin-left:auto;color:#9aa3b0">配色区间 −100 ~ 600 元/MWh</span></div>
+    </div>
+    <div class="ccard">
+      <div class="chead"><span class="tag" style="background:#2563eb">真源</span><span class="t">典型日曲线（日前 vs 实时）</span></div>
+      <div class="echart-box" id="m1Typical"></div>
+      <div class="ch-tip-note">悬浮看各时刻价格；淡红带为实时价 &lt; 0 区间</div>
+    </div>
+    <div class="ccard">
+      <div class="chead"><span class="tag" style="background:#2563eb">真源</span><span class="t">负价时段指纹（实时 &lt; 0 天数占比）</span></div>
+      <div class="echart-box" id="m1Neg"></div>
+      <div class="ch-tip-note">每 15 分钟点，全月该时刻实时价为负的天数比例</div>
+    </div>
+  </div>
+
+  <!-- 模块二 · 成因解析（真源+代理） -->
+  <div class="modhead"><span class="dot" style="background:#e08a00"></span>模块二 · 成因解析<span class="mtag" style="background:#e08a00">代理</span><span class="mdesc">气象为出力近似，非实际发电曲线</span></div>
+
+  <div class="m3-filter">
+    <div class="fitem"><span class="flabel">时间</span><select><option>2026年7月</option></select></div>
+    <div class="fitem"><span class="flabel">区域</span><select><option>辽宁（全口径）</option></select></div>
+    <div class="fnote">风电 / 辐照为代理出力近似；价格与偏差为真源</div>
+  </div>
+  <div class="kpis m3-kpis">
+    <div class="kpi"><span class="bar" style="background:var(--hyp)"></span><div class="label">风电负驱动（夜）</div><div class="val">r=−0.553</div><div class="foot">风速↔实时价 显著负相关</div></div>
+    <div class="kpi"><span class="bar" style="background:var(--mid)"></span><div class="label">典型日辐照峰值</div><div class="val">665<span class="u">W/m²</span></div><div class="foot">午间光伏大发，推高负价概率</div></div>
+    <div class="kpi"><span class="bar" style="background:var(--acc)"></span><div class="label">日前-实时最大偏差</div><div class="val">124.4<span class="u">元/MWh</span></div><div class="foot">实时相对日前最大偏离（套利空间）</div></div>
+  </div>
+
+  <div class="chartgrid">
+    <div class="ccard">
+      <div class="chead"><span class="tag" style="background:#e08a00">代理</span><span class="t">风电代理出力 vs 实时价</span></div>
+      <div class="echart-box" id="m2Wind"></div>
+      <div class="ch-tip-note">风电出力为典型日代理曲线（夜间大发）；实时价真源。负价多现于风电高发时段</div>
+    </div>
+    <div class="ccard">
+      <div class="chead"><span class="tag" style="background:#e08a00">代理</span><span class="t">辐照深挖（光伏出力代理 vs 实时价）</span></div>
+      <div class="echart-box" id="m2Irr"></div>
+      <div class="ch-tip-note">辐照为典型日代理近似；实时价真源（典型日）</div>
+    </div>
+    <div class="ccard full">
+      <div class="chead"><span class="tag" style="background:#e08a00">真源</span><span class="t">日前-实时偏差与套利空间</span></div>
+      <div class="echart-tall" id="m2Dev"></div>
+      <div class="ch-tip-note">偏差 = 实时均价 − 日前均价（典型日 96 点月均）；正值实时更高</div>
+    </div>
+  </div>
+
+  <!-- 模块三 · 主体损益（假设 · 交互式） -->
+  <div class="modhead"><span class="dot" style="background:#8a6dc4"></span>模块三 · 主体损益<span class="mtag" style="background:#8a6dc4">假设</span><span class="mdesc">情景演示，非真实账 · 交互式 ECharts</span></div>
+
+  <!-- 筛选器 -->
+  <div class="m3-filter">
+    <div class="fitem"><span class="flabel">时间</span><select id="m3Time"><option>2026年7月</option></select></div>
+    <div class="fitem"><span class="flabel">区域</span><select id="m3Area"><option>辽宁（全口径）</option></select></div>
+    <div class="fnote">数据：真源价格 + 假设机组参数（情景演示）｜ 悬浮矩阵色块看详情</div>
+  </div>
+
+  <!-- 3 张 KPI 卡片 -->
+  <div class="kpis m3-kpis">
+    <div class="kpi"><span class="bar" style="background:var(--mid)"></span>
+      <div class="label">火电平均收益</div>
+      <div class="val">5.9<span class="u">元/MWh</span></div>
+      <div class="foot">现货段综合；四轨托底后微利；较风电 −198.3</div>
+    </div>
+    <div class="kpi"><span class="bar" style="background:var(--pos)"></span>
+      <div class="label">新能源套利空间</div>
+      <div class="val">204.2<span class="u">元/MWh</span></div>
+      <div class="foot">风电零边际成本，现货收入即毛利；光伏 175</div>
+    </div>
+    <div class="kpi"><span class="bar" style="background:var(--hyp)"></span>
+      <div class="label">系统平衡成本</div>
+      <div class="val">0.30<span class="u">元/kWh</span></div>
+      <div class="foot">调峰补偿=灵活性稀缺定价；辅助服务池回收·全体用户分摊</div>
+    </div>
+  </div>
+
+  <!-- 左：瀑布图（三组）  右：损益矩阵 -->
+  <div class="m3-grid">
+    <div class="ccard">
+      <div class="chead"><span class="tag" style="background:#8a6dc4">假设</span><span class="t">机组综合收益瀑布图（现货段）</span><span class="legend">▲增 绿　▼减 红　■总计 深</span></div>
+      <div class="wf-wrap">
+        <div class="wf-box"><div class="wf-title">火电</div><div class="wf-chart" id="wf-hd"></div></div>
+        <div class="wf-box"><div class="wf-title">风电</div><div class="wf-chart" id="wf-wd"></div></div>
+        <div class="wf-box"><div class="wf-title">光伏</div><div class="wf-chart" id="wf-gf"></div></div>
+      </div>
+    </div>
+    <div class="ccard">
+      <div class="chead"><span class="tag" style="background:#8a6dc4">假设</span><span class="t">市场主体损益映射</span><span class="hint">悬浮查看详情</span></div>
+      <div class="matrix" id="m3Matrix"></div>
+    </div>
+  </div>
+
+  <!-- 模块四 · 机制格局（机理） -->
+  <div class="modhead"><span class="dot" style="background:#2e9e5b"></span>模块四 · 机制格局<span class="mtag" style="background:#2e9e5b">机理</span><span class="mdesc">市场结构示意</span></div>
+
+  <div class="m3-filter">
+    <div class="fitem"><span class="flabel">时间</span><select><option>2026年7月</option></select></div>
+    <div class="fitem"><span class="flabel">区域</span><select><option>辽宁（全口径）</option></select></div>
+    <div class="fnote">结构示意，反映辽宁现货市场资金 / 电力流向</div>
+  </div>
+  <div class="kpis m3-kpis">
+    <div class="kpi"><span class="bar" style="background:var(--pos)"></span><div class="label">风电装机</div><div class="val">1825<span class="u">万kW</span></div><div class="foot">居首，决定负价常态化的物理基础</div></div>
+    <div class="kpi"><span class="bar" style="background:var(--neg)"></span><div class="label">火电装机</div><div class="val">1184<span class="u">万kW</span></div><div class="foot">兜底电源，深负时段硬扛上网</div></div>
+    <div class="kpi"><span class="bar" style="background:var(--acc2)"></span><div class="label">核电装机</div><div class="val">671<span class="u">万kW</span></div><div class="foot">基荷稳定，不受负价波动影响</div></div>
+  </div>
+
+  <div class="chartgrid">
+    <div class="ccard">
+      <div class="chead"><span class="tag" style="background:#2e9e5b">机理</span><span class="t">市场机制机理图</span></div>
+      <div class="echart-graph" id="m4Graph"></div>
+      <div class="ch-tip-note">示意：发电侧经现货 / 中长期 / 辅助服务市场结算，经电网至用户侧</div>
+    </div>
+    <div class="ccard">
+      <div class="chead"><span class="tag" style="background:#2e9e5b">真源</span><span class="t">电源分布（装机结构）</span></div>
+      <div class="echart-box" id="m4Power"></div>
+      <div class="ch-tip-note">各类型装机（万kW），数据来自电源分布底表</div>
+    </div>
+  </div>
+
+  <div class="warnbox">⚠ <b>诚实边界</b>：带「真源」的图表价格为官方接口抓取（可验证，31天×96点全量）；带「代理」的气象 / 辐照为出力近似、非实际发电曲线；带「假设」的模块三（机组收益瀑布 / 主体损益矩阵）为真源价格 + 假设机组参数的情景演示，<b>非真实账</b>；带「机理」的为结构示意。全模块均为交互式 ECharts 渲染（数据见 m_dash.json，可换 CSV 重算）。政策数值须以发改委 / 交易中心红头原文为准，结论勿脱离上下文抽离使用。</div>
+
+  <p class="foot">本页为数据驾驶舱：上方 KPI 一览，模块一 / 二 / 三 / 四 共 11 张交互式 ECharts 图（含模块三瀑布图 + 损益矩阵）。<br>以上电价、收益及市场主体分析仅为数据可视化展示与逻辑推演，不构成任何投资或交易建议。</p>
+</div>
+
+<!-- 模块三 交互式脚本：ECharts 瀑布图 + 损益矩阵 -->
+<script src="echarts.min.js"></script>
+<script>
+(function(){
+  // 数据内联（单文件离线可用）。要改 JSON 接口：把 M3_DATA 换成
+  //   const M3_DATA = await (await fetch('m3_data.json')).json();
+  // 并把本 IIFE 改为 async；CSV 同理先解析为同结构对象即可。
+  var M3_DATA = {
+    kpi: {
+      thermal:{label:"火电平均收益",value:5.9,unit:"元/MWh",foot:"现货段综合；四轨托底后微利；较风电 −198.3"},
+      renewable:{label:"新能源套利空间",value:204.2,unit:"元/MWh",foot:"风电零边际成本，现货收入即毛利；光伏175"},
+      balance:{label:"系统平衡成本",value:0.30,unit:"元/kWh",foot:"调峰补偿=灵活性稀缺定价；辅助服务池回收·全体用户分摊"}
+    },
+    units: {
+      "火电":{steps:[
+        {name:"现货收入",val:204.18,kind:"start",desc:"7月实时月均结算价 204.18"},
+        {name:"−燃料成本",val:-280,kind:"change",desc:"褐煤到厂估算边际成本 280"},
+        {name:"+容量电价",val:36.7,kind:"change",desc:"165元/kW·年 ÷ 4500h ≈ 36.7"},
+        {name:"+调峰补偿",val:45,kind:"change",desc:"15%电量参与深度调峰，0.30元/kWh = 300元/MWh"},
+        {name:"综合收益",val:5.9,kind:"total",desc:"现货段微利；四轨托底后整体保本"}
+      ]},
+      "风电":{steps:[
+        {name:"现货收入",val:204.18,kind:"start",desc:"风/火按实时月均 204.18"},
+        {name:"−燃料成本",val:0,kind:"change",desc:"风光边际成本 ≈ 0"},
+        {name:"+容量电价",val:0,kind:"change",desc:"风光无容量电价"},
+        {name:"+调峰补偿",val:0,kind:"change",desc:"未参与深度调峰"},
+        {name:"综合收益",val:204.2,kind:"total",desc:"零成本，均价即毛利，远高于火电"}
+      ]},
+      "光伏":{steps:[
+        {name:"现货收入",val:175,kind:"start",desc:"光伏因午间负价高峰拖低至 175"},
+        {name:"−燃料成本",val:0,kind:"change",desc:"风光边际成本 ≈ 0"},
+        {name:"+容量电价",val:0,kind:"change",desc:"风光无容量电价"},
+        {name:"+调峰补偿",val:0,kind:"change",desc:"未参与深度调峰"},
+        {name:"综合收益",val:175,kind:"total",desc:"午间负价集中，略低于风电"}
+      ]}
+    },
+    matrix:[
+      {name:"火电",sev:"warn",sevLabel:"承压",lost:"负价时段硬扛上网，实时结算破零甚至 −100，边际亏燃料变动成本",hedge:"①容量电价(165元/kW·年) ②深度调峰 0.30元/kWh ③中长期 ≥70% 锁价",net:"现货深负是电量段承压，综合受三层保护，不构成生存级冲击",action:"实时价 < 燃料变动成本硬发即亏 → 负价时段转深度调峰拿 0.30 补偿优于硬扛"},
+      {name:"风电/光伏",sev:"bad",sevLabel:"受损",lost:"边际成本 0，但按实时结算时负价时段出力越多单位价越低；午间光伏负价占比峰值 65–68%",hedge:"中长期保价 + 部分省低价时段优先消纳；受保障收购约束不能随意弃电",net:"无保价新能源现货段显著受损；高比例中长期托底则影响有限",action:"实时价 < 0 且无可弃电约束应弃电；受限时靠中长期保价对冲"},
+      {name:"售电公司/大用户",sev:"good",sevLabel:"获益",lost:"（负价时段为获益方，无受损点）",hedge:"购电成本随现货下探降低；若售予用户合同价刚性，价差扩大",net:"负价结构是发电侧向用电侧的价值转移，用电主体隐性获益",action:"负价时段购电成本极低 → 优化用电/储能充放时序锁低价窗口"},
+      {name:"系统/电网",sev:"warn",sevLabel:"分摊",lost:"平衡成本上升，灵活性资源稀缺信号",hedge:"辅助服务资金池(用户用电量 + 未参与电能量市场上网电量分摊)回收",net:"最终由全体用户共同承担平衡成本",action:"—"}
+    ]
+  };
+
+  // ---- 瀑布图 ----
+  function makeWaterfall(domId, steps){
+    var ph=[], vals=[], cats=[], cum=0;
+    steps.forEach(function(s){
+      cats.push(s.name);
+      if(s.kind==="start"){ ph.push(0); vals.push({value:s.val, itemStyle:{color:"#066fd1"}}); cum=s.val; }
+      else if(s.kind==="total"){ ph.push(0); vals.push({value:s.val, itemStyle:{color:"#1f2937"}}); }
+      else {
+        if(s.val>=0){ ph.push(cum); vals.push({value:s.val, itemStyle:{color:"#2fb344"}}); cum+=s.val; }
+        else { var nc=cum+s.val; ph.push(nc); vals.push({value:-s.val, itemStyle:{color:"#d63939"}}); cum=nc; }
+      }
+    });
+    var c = echarts.init(document.getElementById(domId));
+    c.setOption({
+      grid:{left:6,right:6,top:22,bottom:42,containLabel:true},
+      tooltip:{trigger:"axis", axisPointer:{type:"shadow"},
+        formatter:function(p){
+          var i=p[0].dataIndex, s=steps[i];
+          var sign = s.val>0 ? "+" : (s.val<0 ? "−" : "");
+          return "<b>"+s.name+"</b><br/>数值："+sign+Math.abs(s.val).toFixed(1)+" 元/MWh"
+            + (s.kind==="total" ? "（综合）" : "（增减）")
+            + "<br/><span style='color:#cbd5e1'>"+s.desc+"</span>";
+        }},
+      xAxis:{type:"category", data:cats, axisTick:{show:false}, axisLine:{lineStyle:{color:"#e5e7eb"}},
+        axisLabel:{fontSize:9.5, color:"#6b7280", interval:0, rotate:0}},
+      yAxis:{type:"value", name:"元/MWh", nameTextStyle:{fontSize:9.5, color:"#9aa3b0"}, nameGap:6,
+        axisLabel:{fontSize:9.5, color:"#9aa3b0"}, splitLine:{lineStyle:{color:"#f0f2f5"}}},
+      series:[
+        {type:"bar", stack:"t", silent:true, itemStyle:{color:"transparent"}, data:ph},
+        {type:"bar", stack:"t", barWidth:"54%", data:vals,
+          label:{show:true, position:"top", fontSize:9.5, color:"#374151",
+            formatter:function(p){ var s=steps[p.dataIndex]; return (s.val>0?"+":"")+s.val.toFixed(0); }}}
+      ]
+    });
+    return c;
+  }
+  var charts=[];
+  charts.push(makeWaterfall("wf-hd", M3_DATA.units["火电"].steps));
+  charts.push(makeWaterfall("wf-wd", M3_DATA.units["风电"].steps));
+  charts.push(makeWaterfall("wf-gf", M3_DATA.units["光伏"].steps));
+  window.addEventListener("resize", function(){ charts.forEach(function(c){ c.resize(); }); });
+
+  // ---- 损益矩阵 ----
+  var sevMap={bad:"bad",warn:"warn",good:"good"};
+  var html='<div class="mrow head"><div class="mc-name">主体</div><div class="mc-body">净判断 · 悬浮查看受损点 / 对冲层 / 临界点</div></div>';
+  M3_DATA.matrix.forEach(function(r){
+    html+='<div class="mrow" data-i="'+r.name+'">'
+      +'<div class="mc-name">'+r.name+'</div>'
+      +'<div class="mc-body"><span class="sev '+sevMap[r.sev]+'">'+r.sevLabel+'</span> '+r.net+'</div></div>';
+  });
+  document.getElementById("m3Matrix").innerHTML=html;
+
+  var tip=document.createElement("div"); tip.className="m3-tip"; document.body.appendChild(tip);
+  M3_DATA.matrix.forEach(function(r){
+    var row=document.querySelector('.mrow[data-i="'+ (window.CSS&&CSS.escape?CSS.escape(r.name):r.name) +'"]');
+    if(!row) return;
+    row.addEventListener("mousemove", function(e){
+      tip.innerHTML="<b>"+r.name+"</b>"
+        +"<br/>受损点："+r.lost
+        +"<br/>对冲/缓冲层："+r.hedge
+        +"<br/><span class='t-sev'>净判断：</span>"+r.net
+        + (r.action && r.action!=="—" ? "<br/>临界点动作："+r.action : "");
+      tip.style.display="block"; tip.style.opacity="1";
+      var x=e.clientX+14, y=e.clientY+14;
+      if(x+340>window.innerWidth) x=e.clientX-340;
+      if(y+tip.offsetHeight>window.innerHeight) y=e.clientY-tip.offsetHeight-14;
+      tip.style.left=x+"px"; tip.style.top=y+"px";
+    });
+    row.addEventListener("mouseleave", function(){ tip.style.opacity="0"; tip.style.display="none"; });
+  });
+})();
+</script>
+
+<!-- 模块一/二/四 交互式 ECharts 初始化（数据占位，由构建脚本注入 m_dash.json） -->
+<script>
+const M_DASH = {"days":["2026-07-01","2026-07-02","2026-07-03","2026-07-04","2026-07-05","2026-07-06","2026-07-07","2026-07-08","2026-07-09","2026-07-10","2026-07-11","2026-07-12","2026-07-13","2026-07-14","2026-07-15","2026-07-16","2026-07-17","2026-07-18","2026-07-19","2026-07-20","2026-07-21","2026-07-22","2026-07-23","2026-07-24","2026-07-25","2026-07-26","2026-07-27","2026-07-28","2026-07-29","2026-07-30","2026-07-31"],"points":["00:00","00:15","00:30","00:45","01:00","01:15","01:30","01:45","02:00","02:15","02:30","02:45","03:00","03:15","03:30","03:45","04:00","04:15","04:30","04:45","05:00","05:15","05:30","05:45","06:00","06:15","06:30","06:45","07:00","07:15","07:30","07:45","08:00","08:15","08:30","08:45","09:00","09:15","09:30","09:45","10:00","10:15","10:30","10:45","11:00","11:15","11:30","11:45","12:00","12:15","12:30","12:45","13:00","13:15","13:30","13:45","14:00","14:15","14:30","14:45","15:00","15:15","15:30","15:45","16:00","16:15","16:30","16:45","17:00","17:15","17:30","17:45","18:00","18:15","18:30","18:45","19:00","19:15","19:30","19:45","20:00","20:15","20:30","20:45","21:00","21:15","21:30","21:45","22:00","22:15","22:30","22:45","23:00","23:15","23:30","23:45"],"before":[[360.0,350.0,350.0,350.0,360.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,360.0,360.0,360.0,360.0,360.0,360.0,360.0,350.0,350.0,340.0,340.0,340.0,340.0,350.0,340.0,340.0,330.0,330.0,340.0,340.0,330.0,330.0,330.0,330.0,320.0,320.0,320.0,320.0,310.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,330.0,320.0,320.0,330.0,330.0,330.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,330.0,320.0,330.0,330.0,330.0,340.0,340.0,340.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,320.0,320.0,320.0,320.0,320.0,320.0,330.0,330.0,330.0,330.0],[390.0,350.0,350.0,350.0,350.0,350.0,350.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,350.0,350.0,350.0,350.0,350.0,350.0,360.0,360.0,360.0,350.0,350.0,350.0,330.0,330.0,320.0,320.0,320.0,300.0,260.7,251.6,310.0,290.9,33.1,23.9,14.7,15.0,15.1,-70.5,-70.4,-71.6,-72.9,-84.1,-74.7,-74.7,-73.8,-73.3,-72.9,-72.2,-71.7,-72.3,-72.1,13.2,13.2,13.2,13.2,13.1,-72.3,-72.9,-73.0,12.7,31.8,194.1,194.0,310.0,300.0,320.0,320.0,320.0,330.0,330.0,330.0,330.0,330.0,330.0,320.0,330.0,320.0,320.0,320.0,290.0,260.0,190.0,270.0,250.0,260.0,270.0,230.0,190.0,-90.0,-90.0],[0.0,190.0,250.0,260.0,280.0,290.0,290.0,300.0,280.0,280.0,300.0,290.0,290.0,290.0,290.0,270.0,310.0,320.0,320.0,300.0,310.0,320.0,330.0,330.0,330.0,330.0,330.0,320.0,290.0,-90.0,-100.0,-100.0,10.0,-89.5,-87.7,-86.6,-85.7,-84.5,-84.4,-84.2,-83.4,-82.8,-82.6,-82.8,-84.1,-85.0,-86.1,-86.4,-86.6,-86.4,-85.6,-85.2,-84.3,-83.9,-83.4,-83.3,-83.5,-83.8,-83.7,-83.7,-83.8,-83.7,-84.0,-84.0,-83.6,-83.4,-83.5,-84.5,291.7,253.1,272.4,301.4,301.4,320.7,330.3,330.3,330.3,330.3,330.4,330.4,330.4,330.3,330.3,330.0,310.5,310.0,260.0,0.0,-50.0,0.0,-50.0,10.0,300.0,320.0,300.0,300.0],[0.0,220.0,290.0,280.0,290.0,279.0,297.1,297.6,287.5,297.7,297.8,297.8,308.2,308.1,308.1,318.3,318.1,328.1,328.2,328.5,328.2,330.0,340.0,340.0,330.0,320.0,310.0,290.0,70.0,0.0,0.0,0.0,290.0,0.0,-50.0,-86.8,-37.5,-36.7,-84.4,-36.3,-35.7,-35.4,-83.2,-35.0,12.4,-36.4,-36.8,-85.6,-37.3,-37.1,11.7,-84.2,-83.2,-83.1,-82.7,-82.7,-34.5,-34.2,13.6,13.6,13.9,13.8,14.1,14.1,14.4,14.3,81.2,253.9,263.5,282.7,282.7,292.3,292.4,301.9,292.4,302.0,302.0,302.0,302.1,292.5,302.1,302.0,302.0,301.5,311.0,310.6,310.0,320.0,310.0,320.0,340.0,330.0,320.0,320.0,320.0,320.0],[250.0,300.0,300.0,270.0,290.0,300.0,280.5,277.4,277.5,277.5,277.2,230.0,258.8,227.8,258.8,270.0,277.4,277.7,288.0,287.9,298.2,298.2,298.1,310.0,310.0,310.0,280.0,260.0,0.0,0.0,0.0,0.0,280.0,0.0,0.0,9.2,19.6,290.0,261.2,261.2,280.4,270.9,252.2,271.3,280.9,251.8,251.7,79.3,31.3,12.2,12.3,12.3,261.3,261.3,79.5,12.5,12.7,12.8,13.0,12.8,13.1,13.1,13.3,13.3,-80.9,-14.4,14.2,13.9,280.5,310.0,310.0,310.0,310.0,310.0,310.0,310.0,320.0,320.0,320.0,320.0,320.0,320.0,330.0,330.0,330.0,320.0,320.0,320.0,320.0,320.0,330.0,340.0,350.0,340.0,340.0,330.0],[310.0,320.0,330.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,330.0,330.0,320.0,320.0,320.0,320.0,310.0,320.0,320.0,320.0,320.0,320.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,340.0,340.0,340.0,330.0,330.0,320.0,320.0,320.0,310.0,300.6,310.0,310.0,310.0,310.0,310.0,310.0,310.0,310.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,310.0,310.0,310.0,310.0,320.0,310.0,310.0,310.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,330.0,330.0,330.0,330.0,330.0,340.0,340.0,340.0,340.0,330.0,340.0,340.0,350.0,350.0,340.0,340.0,320.0,330.0,330.0,330.0,320.0,330.0,320.0,320.0,310.0],[340.0,330.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,330.0,340.0,330.0,330.0,330.0,330.0,340.0,340.0,340.0,340.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,360.0,350.0,350.0,340.0,330.0,311.5,302.1,302.2,302.2,302.3,302.3,302.3,311.6,302.1,292.6,283.0,283.0,283.1,283.2,283.2,273.9,273.9,274.0,274.0,274.0,274.0,274.0,274.0,274.1,283.5,311.7,322.2,331.2,331.2,339.5,330.5,340.0,340.0,340.0,340.0,340.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,340.0,340.0,340.0,340.0,340.0,340.0],[330.0,330.0,330.0,330.0,330.0,340.0,340.0,330.0,340.0,340.0,330.0,330.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,330.0,340.0,330.0,330.0,340.0,340.0,340.0,340.0,330.0,340.0,340.0,340.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,320.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,320.0,330.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0],[380.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,340.0,340.0,340.0,340.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,341.0,332.6,333.6,326.1,260.6,308.9,318.4,328.0,318.7,328.2,328.2,309.3,328.1,308.8,261.0,21.8,336.3,326.8,327.5,327.5,318.3,318.3,327.9,327.9,318.5,327.9,328.0,328.0,328.1,328.1,309.3,25.1,25.4,25.5,25.5,24.9,327.9,327.9,327.8,327.8,327.8,327.7,327.8,327.7,337.4,337.4,337.0,336.9,336.8,336.6,335.9,336.0,333.6,332.5,331.3,330.9,330.0,330.0,330.0,330.0,330.0,330.0,330.0,280.0],[0.0,0.0,0.0,280.0,330.0,320.0,320.0,310.0,320.0,320.0,310.0,310.0,310.0,300.0,300.0,300.0,330.0,330.0,330.0,330.0,310.0,310.0,310.0,310.0,0.0,0.0,-80.0,-100.0,-100.0,-100.0,-100.0,-86.3,4.7,-79.2,-76.7,-72.5,-70.2,-69.3,-68.3,-67.8,-67.2,-66.9,-67.4,-67.5,-68.1,-69.4,-70.4,-71.3,-71.2,-70.9,-70.2,-69.8,-68.8,-68.7,-68.5,-68.7,-68.2,-68.7,-68.7,-68.7,-67.0,-67.2,-67.3,-67.8,-67.8,-67.8,-68.0,-69.5,-69.8,-69.9,-70.1,-70.4,-71.4,-71.2,-70.9,-71.3,-70.9,-70.8,-70.2,-70.2,-71.0,-71.0,-72.2,-74.4,-77.9,-80.2,4.3,11.8,10.8,0.0,0.0,0.0,-100.0,0.0,0.0,-70.0],[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,300.0,300.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,280.0,300.0,310.0,310.0,310.0,210.0,240.0,240.0,0.0,-40.0,-10.0,-40.0,-40.0,-50.0,-40.0,0.0,12.0,-63.1,-79.8,-20.9,-18.4,-26.1,-25.1,-71.5,-70.9,-70.5,-70.9,-14.4,-15.3,-44.6,-45.6,-74.2,-64.7,-64.1,-73.8,-16.0,-44.9,-25.1,-34.4,-72.1,-71.8,-33.8,-53.0,-14.9,-24.4,-14.8,-15.1,-15.1,23.2,22.8,21.9,21.7,250.6,21.6,22.1,250.8,288.9,307.8,307.8,317.5,318.0,318.1,318.1,318.0,317.4,317.0,314.6,313.9,313.2,322.2,302.1,301.4,280.0,300.0,310.0,310.0,280.0,0.0,-100.0],[-100.0,-100.0,-100.0,-100.0,0.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-87.0,-84.8,-82.3,-80.4,-79.2,-78.0,-77.0,-75.2,-73.8,-73.7,-73.4,-74.2,-75.8,-77.8,-77.7,-78.0,-77.3,-77.3,-75.6,-75.3,-75.2,-75.4,-75.6,-75.8,-75.6,-75.6,-75.5,-75.7,-76.9,-77.1,-76.7,-76.6,-76.8,-77.6,-76.9,-76.8,-76.9,-76.9,-76.4,-76.6,-76.8,-76.8,-75.4,-74.0,-73.2,-73.0,-73.2,-73.8,19.8,17.2,15.6,3.7,-84.8,-86.7,-97.4,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0],[-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,80.0,200.0,0.0,240.0,290.0,290.0,80.0,80.0,200.0,252.8,243.9,254.3,94.1,19.5,23.1,15.5,26.7,27.6,19.1,28.8,29.4,29.5,29.2,28.4,17.8,26.1,-66.9,-66.3,-65.8,-65.5,-65.5,18.4,-47.3,-46.4,33.5,41.5,-47.7,40.4,213.7,299.9,290.9,288.4,309.4,309.0,300.1,22.8,230.9,237.9,292.4,291.9,306.2,314.4,314.6,314.6,323.1,315.4,315.5,328.4,311.7,308.5,337.3,339.7,338.9,340.0,340.0,330.0,330.0,330.0,340.0,340.0,340.0,340.0,340.0,330.0],[310.0,320.0,319.2,129.2,123.2,110.3,108.7,107.9,109.3,109.3,107.1,109.9,109.8,112.1,112.8,112.5,128.2,136.6,317.0,317.6,328.2,320.0,320.0,320.0,330.0,320.0,310.0,290.0,250.0,240.0,0.0,10.9,244.2,-80.4,-77.9,-76.6,-75.4,-73.9,-73.3,-72.6,-71.9,-71.5,-71.2,-71.4,-71.6,-73.0,-74.8,-75.8,-75.8,-75.5,-74.6,-74.5,-73.4,-73.2,-72.8,-72.9,-72.7,-73.0,-73.2,-73.1,-72.8,-72.8,-72.8,-72.8,21.4,294.6,257.1,257.0,313.4,322.8,332.2,332.3,332.3,341.7,341.7,341.7,351.1,351.1,351.1,351.1,351.1,351.1,350.5,350.5,350.0,350.0,350.0,340.0,340.0,350.0,350.0,350.0,360.0,350.0,350.0,340.0],[340.0,330.0,330.0,330.0,330.0,330.0,320.0,320.0,320.0,310.0,310.0,310.0,310.0,310.0,310.0,310.0,310.0,310.0,310.0,320.0,320.0,330.0,330.0,330.0,330.0,330.0,320.0,310.0,310.0,210.0,0.0,0.0,-84.4,-82.4,-80.1,-78.7,-77.0,-76.1,-75.1,-74.9,-73.5,-73.1,-72.7,-72.9,-73.7,-74.9,-75.6,-76.4,-75.8,-75.7,-74.5,-74.0,-73.4,-73.2,-73.0,-73.6,-73.4,-72.9,-72.5,-73.0,-72.3,-72.6,-73.3,-73.9,-73.7,20.8,257.0,161.8,256.4,313.7,323.1,323.1,332.5,332.5,332.5,332.5,342.0,332.5,332.5,332.5,332.5,341.9,341.4,341.3,331.6,321.5,330.6,320.0,320.0,320.0,330.0,320.0,320.0,310.0,310.0,310.0],[320.0,310.0,310.0,300.0,300.0,250.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-100.0,0.0,0.0,0.0,0.0,260.0,300.0,300.0,310.0,320.0,320.0,330.0,320.0,320.0,310.0,310.0,300.0,300.0,300.0,320.0,312.2,18.2,-73.5,-71.8,-70.7,-69.2,-67.9,26.4,27.2,28.4,28.4,269.7,24.8,24.0,200.3,306.2,296.4,315.8,307.8,285.1,318.3,320.5,316.1,211.2,316.9,307.8,316.3,264.5,318.0,319.0,320.1,328.5,335.7,344.2,334.4,334.4,334.4,343.9,343.8,334.4,334.4,334.3,334.2,334.2,334.2,334.2,334.6,334.2,334.0,333.3,333.1,332.9,331.1,321.4,300.0,310.0,300.0,300.0,250.0,290.0,-100.0,-100.0,-100.0],[-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,0.0,-100.0,-100.0,0.0,0.0,0.0,50.0,300.0,-90.0,300.0,320.0,320.0,320.0,320.0,330.0,320.0,320.0,320.0,320.0,322.4,323.4,315.3,316.4,-68.5,-65.7,-63.9,-62.9,-61.6,-60.2,-59.4,-58.7,-58.4,-59.0,-60.1,-61.2,-62.4,319.3,310.0,319.5,319.6,329.1,329.2,329.2,329.2,320.3,320.1,329.2,329.1,329.0,337.4,337.4,345.2,345.1,354.3,363.6,353.6,353.6,363.0,362.3,362.3,362.3,362.2,371.7,362.2,371.6,371.7,372.2,362.8,363.4,373.3,373.1,373.0,362.9,362.3,352.1,351.6,351.5,351.0,350.0,350.0,350.0,350.0,350.0,360.0],[-100.0,330.0,330.0,340.0,350.0,350.0,340.0,340.0,340.0,340.0,340.0,330.0,340.0,340.0,340.0,330.0,340.0,340.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,340.0,330.0,340.0,330.0,330.0,330.0,330.0,330.8,322.7,323.4,304.8,304.9,22.8,-70.3,-69.0,-68.1,-66.8,-66.7,-66.8,-67.7,-68.2,-68.7,-69.0,-68.9,-68.3,-67.9,-67.0,-67.6,-67.0,-67.3,-64.9,-64.4,-63.9,-64.1,-64.9,-66.1,-66.0,316.3,334.8,334.7,334.0,333.9,333.9,343.2,343.2,351.9,360.7,360.6,351.8,351.9,351.9,351.9,354.2,360.7,351.9,351.9,351.3,351.2,359.9,359.5,358.7,358.6,349.1,349.1,349.3,350.0,350.0,350.0,350.0,350.0],[420.0,380.0,380.0,390.0,390.0,390.0,380.0,380.0,380.0,360.0,370.0,370.0,370.0,370.0,370.0,360.0,360.0,360.0,360.0,370.0,370.0,370.0,370.0,360.0,360.0,360.0,360.0,360.0,360.0,350.0,350.0,350.0,350.0,350.0,350.0,340.0,341.8,342.4,342.6,342.6,333.3,343.4,343.4,343.4,343.4,333.9,333.3,333.3,333.2,333.2,333.3,333.4,333.9,333.9,343.3,343.3,334.0,343.3,352.7,352.2,352.0,352.0,352.1,352.1,352.1,361.5,352.1,352.0,361.5,361.5,352.0,361.5,361.5,361.5,361.5,361.5,381.0,371.5,381.0,371.6,371.6,371.5,371.0,370.9,370.8,360.0,360.0,360.0,370.0,370.0,380.0,380.0,390.0,380.0,370.0,370.0],[380.0,380.0,370.0,370.0,370.0,370.0,370.0,360.0,360.0,360.0,360.0,360.0,360.0,360.0,360.0,360.0,360.0,360.0,360.0,370.0,370.0,370.0,370.0,370.0,380.0,370.0,370.0,360.0,360.0,350.0,350.0,350.0,351.3,342.5,334.0,335.1,326.7,327.7,327.8,327.9,327.7,327.9,328.0,328.1,318.7,327.6,318.2,317.4,317.3,317.3,318.1,318.1,318.2,318.2,327.5,327.4,309.0,309.0,309.0,309.0,318.3,318.4,319.7,319.7,328.4,337.2,354.9,354.7,354.1,354.0,354.0,354.0,354.0,354.0,354.0,363.4,363.4,363.4,364.0,364.0,363.4,362.8,362.1,362.0,361.4,360.8,360.0,360.0,350.0,350.0,350.0,350.0,350.0,350.0,340.0,340.0],[330.0,330.0,330.0,330.0,340.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,340.0,330.0,330.0,340.0,340.0,340.0,340.0,340.0,330.0,340.0,330.0,330.0,341.5,342.6,343.4,344.1,344.9,345.2,336.5,336.9,327.7,327.8,327.9,337.0,337.0,337.0,327.5,327.4,327.2,327.2,327.2,327.4,327.5,327.6,327.6,327.6,327.6,327.6,327.6,327.7,318.4,318.6,328.1,328.1,328.3,301.3,319.3,337.4,337.0,336.9,346.2,346.1,346.1,346.1,346.0,345.9,355.2,345.8,345.9,346.0,346.0,346.1,346.0,345.0,344.6,343.3,342.7,342.1,341.9,341.4,340.3,340.0,340.0,340.0,330.0,330.0,330.0],[320.0,320.0,320.0,320.0,320.0,330.0,330.0,320.0,330.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,320.0,310.0,310.0,250.0,-96.5,-80.1,-75.8,-72.3,-69.4,-66.6,-64.8,-63.7,-62.6,-62.4,-62.3,-62.7,-62.2,-62.2,-63.8,-64.8,93.2,92.5,298.6,251.6,308.1,92.8,299.0,261.6,-65.0,-65.0,-64.3,-64.1,-64.4,-65.0,-63.9,-63.9,-63.9,-63.8,309.5,299.2,317.8,317.6,317.5,326.8,326.8,326.6,326.7,336.0,336.0,335.9,335.9,336.0,336.0,336.0,336.0,335.8,335.6,325.4,334.4,333.2,333.0,331.9,321.4,330.6,330.0,330.0,330.0,330.0,330.0,320.0],[320.0,320.0,320.0,330.0,330.0,330.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,330.0,330.0,330.0,330.0,330.0,330.0,340.0,350.0,400.0,380.0,370.0,360.0,360.0,350.0,340.0,330.0,330.0,330.5,321.1,321.8,313.2,313.4,313.5,295.0,315.2,298.3,307.2,298.4,298.8,202.5,322.8,322.6,322.6,322.6,322.7,322.7,325.0,324.7,334.2,333.4,333.4,333.0,324.4,315.7,316.9,307.5,272.2,253.4,256.1,299.3,323.2,324.2,333.2,332.4,332.3,341.2,350.6,350.0,350.0,360.0,360.3,370.0,370.3,370.0,370.0,370.0,370.0,360.0,360.0,350.0,350.0,350.0,350.0,360.0,360.0,360.0,360.0,350.0,350.0,340.0],[1100.0,380.0,370.0,360.0,360.0,360.0,360.0,360.0,360.0,360.0,360.0,350.0,350.0,350.0,350.0,350.0,360.0,360.0,360.0,360.0,360.0,360.0,370.0,370.0,370.0,360.0,360.0,360.0,360.0,350.0,350.0,360.0,350.0,350.4,342.8,334.7,327.4,327.7,328.6,328.8,329.1,329.3,329.5,329.6,329.6,329.4,329.0,328.8,328.6,329.8,330.2,330.3,331.1,331.2,331.6,340.4,340.3,340.1,349.9,341.0,340.9,343.5,343.3,343.2,373.2,372.4,364.5,362.8,332.9,336.4,339.4,337.9,339.8,340.3,337.2,353.9,363.3,354.2,355.9,346.1,346.4,353.6,356.9,352.8,351.2,351.0,354.4,358.2,358.3,358.2,358.7,349.3,359.1,350.0,350.0,350.0],[350.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,350.0,340.0,350.0,350.0,350.0,360.0,350.0,350.0,340.0,340.0,340.0,330.0,330.0,331.4,322.8,325.4,317.1,319.3,320.4,321.0,321.4,322.2,322.5,322.8,322.9,322.7,322.4,322.0,321.1,330.1,339.3,340.0,340.0,342.3,331.9,337.3,333.5,333.8,337.7,351.1,350.7,346.3,350.5,350.4,346.4,352.3,352.3,358.4,346.3,350.7,353.8,348.5,348.4,347.5,361.2,347.0,361.0,370.3,364.9,356.2,358.0,358.0,351.5,351.0,364.0,354.5,344.3,343.1,341.9,341.8,341.0,340.0,330.0,330.0,330.0,330.0,330.0],[380.0,360.0,360.0,360.0,360.0,360.0,360.0,360.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,340.0,350.0,350.0,350.0,350.0,360.0,360.0,360.0,360.0,360.0,360.0,360.0,340.0,340.0,340.0,340.0,340.0,340.0,332.1,334.8,317.8,328.1,349.6,342.0,349.8,357.0,357.7,359.1,357.7,365.1,355.2,358.5,348.4,356.6,357.1,357.5,357.7,358.3,351.0,361.1,353.4,321.7,312.2,318.0,328.1,335.6,332.4,339.8,383.3,395.1,403.0,388.4,356.6,353.7,356.9,358.2,356.9,357.5,357.1,357.0,357.6,365.3,365.2,365.7,379.7,379.5,384.3,383.2,376.6,366.3,346.1,344.4,333.3,341.7,341.5,340.0,330.0,330.0,320.0,320.0,310.0],[320.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,340.0,340.0,340.0,340.0,350.0,350.0,350.0,350.0,340.0,340.0,340.0,340.0,350.0,340.0,340.6,342.5,334.7,337.0,337.7,329.2,320.2,320.6,321.0,30.8,256.0,-61.8,-61.1,-60.8,-61.2,-61.7,-62.4,-63.0,-63.9,-63.8,-63.1,-63.0,-62.3,-61.8,-61.2,-60.9,-60.5,-60.3,-55.0,-55.5,35.7,283.9,330.5,330.3,339.5,348.7,339.4,348.6,348.6,348.6,348.6,348.6,348.5,348.5,348.4,357.7,367.0,366.9,376.4,366.9,357.4,357.2,357.0,356.2,365.4,364.9,353.5,342.9,332.9,331.9,330.6,330.0,330.0,320.0,310.0,310.0],[340.0,330.0,340.0,330.0,330.0,330.0,320.0,320.0,320.0,320.0,320.0,310.0,310.0,300.0,300.0,300.0,310.0,310.0,310.0,320.0,330.0,330.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,331.3,333.1,344.0,327.3,337.3,328.7,310.4,263.7,-64.4,33.6,254.9,107.7,107.9,-58.0,-63.0,-63.9,-64.4,-65.4,-65.3,-65.3,-64.8,-64.8,-59.5,-59.5,-59.2,-59.6,-59.4,-59.4,-59.2,18.9,237.5,239.1,-58.1,-57.8,260.8,253.6,254.4,-59.4,-59.5,-59.5,30.0,102.2,250.0,250.0,250.1,250.1,250.2,250.1,250.2,101.2,103.0,102.4,249.1,98.2,256.7,-74.0,-75.1,-79.4,-81.0,-83.5,-86.0,-97.5,77.9,-100.0,-100.0,-100.0],[-100.0,-100.0,-1.2,-100.0,-1.2,-1.2,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-1.3,-100.0,-100.0,-1.3,97.4,324.7,314.8,300.0,0.0,9.7,-84.2,-79.5,-75.8,-71.0,-62.8,-59.8,-58.1,-56.5,-54.6,-54.4,46.5,-53.5,-52.4,-51.6,-52.0,44.8,-58.5,-59.0,-59.2,-59.8,-54.5,-53.6,-53.4,-53.2,-52.8,-9.1,75.9,89.3,47.7,52.7,52.3,-48.4,-48.2,-49.0,-45.7,-49.5,-49.6,-50.6,-52.0,-52.3,-53.4,85.8,138.7,138.4,207.3,140.1,124.9,33.4,-54.8,33.5,-54.8,29.1,311.4,320.4,249.6,284.9,33.4,23.7,116.0,324.8,323.5,302.9,311.6,310.0,300.0,290.0,100.0],[350.0,340.0,340.0,340.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,340.0,340.0,340.0,340.0,340.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,340.0,340.0,330.0,330.0,321.4,323.2,324.9,337.0,322.0,308.6,39.6,-48.8,-47.8,34.4,-44.6,-43.3,-42.5,-41.8,-44.4,220.3,135.4,135.8,134.3,225.4,141.2,148.4,146.7,145.1,145.9,231.0,220.3,-45.4,104.3,43.8,155.1,240.9,-40.7,-41.3,1400.1,162.3,286.9,294.2,290.3,295.3,321.7,321.4,321.2,330.2,329.9,323.7,334.9,309.9,310.4,314.9,336.0,330.1,339.0,337.8,340.8,326.5,325.2,336.8,335.5,334.4,333.6,332.6,331.6,330.9,330.0,320.0,300.0],[-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-80.9,-100.0,-100.0,-100.0,-88.5,-85.8,-81.7,-77.4,-74.0,-71.1,-68.7,-56.1,-54.2,-26.5,-25.8,-11.3,-8.9,-7.1,-6.2,-6.6,-17.2,-18.8,-19.3,-20.4,56.3,-6.4,-21.9,-5.1,-4.6,-20.9,-20.4,-20.3,-9.0,-9.6,-4.8,-4.3,-6.4,-1.6,-20.3,-21.9,-12.5,268.9,281.7,284.1,284.0,291.2,299.2,301.5,302.8,313.4,303.9,295.0,302.8,296.7,322.4,332.3,332.5,321.1,319.2,320.6,320.8,309.7,294.1,-73.3,-39.2,-76.2,-79.5,-82.1,-84.9,-87.7,-100.0,-100.0]],"realTime":[[360.0,360.0,370.0,360.0,400.0,390.0,360.0,390.0,380.0,370.0,370.0,370.0,360.0,360.0,350.0,360.0,380.0,370.0,380.0,370.0,380.0,400.0,390.0,420.0,400.0,390.0,390.0,350.0,350.0,350.0,340.0,350.0,450.0,350.0,350.0,340.0,340.0,360.0,340.0,340.0,340.0,310.0,340.0,340.0,330.0,320.0,310.0,330.0,320.0,320.0,320.0,320.0,330.0,330.0,330.0,330.0,330.0,330.6,330.2,320.9,330.5,346.2,340.3,330.7,320.0,330.0,330.0,330.0,330.0,330.0,340.0,330.0,340.0,340.0,350.0,350.0,360.0,360.0,360.0,360.0,350.0,350.0,350.0,350.0,350.0,340.0,340.0,340.0,330.0,330.0,330.0,340.0,350.0,350.0,350.0,350.0],[350.0,350.0,350.0,350.0,350.0,350.0,340.0,340.0,340.0,330.0,340.0,340.0,340.0,340.0,340.0,340.0,350.0,350.0,350.0,350.0,350.0,350.0,370.0,400.0,360.0,360.0,350.0,350.0,330.0,300.0,310.0,320.0,320.0,240.0,210.0,-90.0,310.0,280.0,193.7,251.7,1500.0,290.0,1500.0,300.0,-83.5,-81.8,-84.8,-85.1,-86.2,-86.1,-85.1,-84.7,-83.8,-83.7,-83.5,-83.4,-83.4,-83.8,-83.6,-83.8,-84.2,-84.1,-82.8,-83.7,-84.0,-75.0,-84.4,-74.8,-90.0,-76.1,11.1,0.0,193.4,1500.0,330.0,1500.0,20.0,1500.0,320.0,1500.0,320.0,350.0,300.0,290.0,300.0,230.0,280.0,-100.0,0.0,-90.0,0.0,300.0,-90.0,-90.0,-90.0,-90.0],[20.0,20.0,-100.0,250.0,250.0,30.0,20.0,0.0,-100.0,-100.0,-100.0,10.0,277.8,0.0,20.0,-100.0,20.0,187.7,280.0,-100.0,20.0,-100.0,330.0,-50.0,300.0,-100.0,250.0,310.0,-50.0,-100.0,-100.0,-100.0,330.0,-86.7,-84.4,-82.7,-82.0,-81.3,-81.3,-81.3,-46.2,-74.7,-76.2,-73.4,-80.7,-81.5,-81.9,-82.1,-82.5,-81.5,-81.1,-45.5,-42.5,-75.6,-76.6,-76.7,-75.9,-76.1,-77.0,-29.3,400.0,292.7,-31.6,256.9,-76.2,-76.0,-76.1,-78.6,-79.9,-80.2,-45.4,-80.4,-79.9,15.7,-80.9,-80.8,9.4,-79.0,-79.7,-79.8,283.2,-80.3,283.0,-82.6,-83.3,-84.4,-85.9,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-60.0],[-100.0,-100.0,-100.0,-100.0,60.0,75.5,94.5,-2.0,292.7,293.1,96.0,343.2,345.2,284.7,254.1,66.4,332.1,321.6,344.6,322.1,318.0,337.9,340.0,330.0,340.0,300.0,300.0,320.0,0.0,-100.0,-100.0,-50.0,390.0,310.0,-100.0,-100.0,350.0,-100.0,-90.0,193.6,310.0,140.5,287.8,-100.0,27.2,-100.0,-100.0,0.0,-100.0,0.0,-100.0,-100.0,-83.0,-82.7,-82.8,-81.9,-81.8,-81.1,-79.9,-80.4,-80.5,-81.0,-79.9,-80.3,-79.7,-79.6,1037.1,14.5,290.0,300.0,360.0,350.0,321.2,340.4,350.0,304.8,281.4,202.6,12.1,-50.6,14.2,-81.9,321.1,-74.5,11.7,-86.2,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0],[-100.0,0.0,0.0,-50.0,305.5,311.5,200.4,290.0,70.0,240.1,0.0,-100.0,0.0,-100.0,-100.0,-100.0,-100.0,-100.0,0.0,-100.0,70.0,80.0,0.0,280.0,210.0,80.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-85.9,-86.2,-85.8,-85.8,-86.4,-86.2,-86.8,-86.8,-87.0,-88.0,9.3,-87.1,-86.8,-85.1,-85.5,-84.5,-84.4,-83.5,-100.0,-84.0,-100.0,-84.0,-84.6,-84.6,-84.5,-84.6,-84.7,-83.8,-84.7,-84.5,320.0,31.5,290.0,290.0,300.0,300.0,280.0,280.0,300.0,14.5,-79.7,14.7,-80.7,-81.6,-100.0,-85.0,-100.0,0.0,310.0,-100.0,-50.0,300.0,320.0,300.0,300.0,310.0,310.0],[350.0,330.0,340.0,330.0,320.0,310.0,330.0,320.0,320.0,340.0,320.0,330.0,330.0,330.0,300.0,320.0,0.0,310.0,260.0,310.0,320.0,320.0,320.0,340.0,340.0,340.0,350.0,350.0,350.0,350.0,340.0,340.0,360.0,350.0,340.0,320.0,330.0,320.0,320.0,350.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,330.0,340.0,330.0,330.0,330.0,327.5,300.0,320.0,300.0,290.6,300.0,291.2,310.0,310.0,310.0,320.0,310.0,340.0,330.0,350.0,340.0,330.0,330.0,350.0,340.0,350.0,350.0,359.3,370.0,320.0,330.0,330.0,330.0,370.0,360.0,360.0,360.0,360.0,360.0,350.0,330.0,340.0,340.0,330.0,330.0,300.0,310.0,310.0,280.0],[320.0,330.0,330.0,330.0,310.0,310.0,280.0,300.0,-100.0,240.0,0.0,0.0,60.0,60.0,50.0,-100.0,-100.0,-100.0,-100.0,-100.0,0.0,250.0,70.0,330.0,300.0,300.0,300.0,290.0,-100.0,-100.0,300.0,190.0,310.4,253.2,253.5,74.1,-76.6,-69.9,-72.1,-68.1,-67.6,-67.9,-72.6,-68.7,-100.0,-100.0,-75.5,-75.7,-100.0,-75.6,-75.0,-74.2,-100.0,-74.9,-100.0,-75.8,-76.2,-75.6,-75.6,-75.4,-100.0,-73.6,-100.0,67.0,311.7,302.2,56.3,302.1,19.0,311.6,321.1,321.0,330.5,330.5,321.0,330.5,330.5,330.5,330.5,330.0,330.5,320.9,338.6,330.0,340.0,340.0,340.0,340.0,330.0,330.0,340.0,330.0,340.0,330.0,340.0,360.0],[310.0,320.0,320.0,330.0,330.0,330.0,350.0,330.0,340.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,350.0,340.0,330.0,340.0,340.0,330.0,320.0,330.0,320.0,320.0,320.0,320.0,330.0,320.0,300.0,330.0,320.0,320.0,330.0,330.0,330.0,320.0,320.0,330.0,330.0,320.0,330.0,320.0,320.0,83.3,55.4,80.8,-68.8,18.6,-70.0,-94.1,-75.4,-76.4,-77.2,-100.0,-78.0,-78.6,-78.4,-78.2,-78.7,-79.2,-79.8,-79.7,90.6,81.2,242.5,320.0,270.0,370.0,320.0,320.0,320.0,1500.0,340.0,320.0,360.0,1500.0,1500.0,310.0,500.0,320.0,360.0,0.0,310.0,310.0,320.0,310.0,330.0,320.0,330.0],[280.0,330.0,320.0,330.0,340.0,330.0,330.0,340.0,320.0,330.0,330.0,320.0,310.0,320.0,320.0,320.0,320.0,320.0,350.0,320.0,320.0,320.0,330.0,340.0,330.0,330.0,330.0,330.0,340.0,330.0,350.0,340.0,351.1,342.9,335.2,336.8,318.8,328.7,1500.0,366.4,319.5,347.7,357.2,339.3,291.1,328.7,290.4,23.6,355.7,-73.6,327.7,-73.0,23.6,318.2,-72.0,22.8,250.7,-75.2,-74.6,-74.3,-77.6,-77.9,-73.3,-76.8,-79.6,-74.2,-74.0,-80.5,-75.5,-76.6,-75.5,18.2,245.0,245.1,330.1,307.3,-27.1,374.6,284.0,321.4,326.8,441.3,323.6,323.4,283.4,311.6,290.0,0.0,280.0,0.0,250.0,250.0,-100.0,-70.0,-100.0,-100.0],[-100.0,-100.0,-100.0,-100.0,0.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,0.0,0.0,330.0,320.0,320.0,340.0,300.0,0.0,250.0,-100.0,-100.0,-100.0,-100.0,-100.0,260.0,310.0,330.0,300.0,340.0,330.0,524.3,326.9,337.3,337.1,337.6,309.4,309.9,328.9,28.9,263.6,357.5,-67.9,347.6,1500.0,328.6,490.0,347.4,338.2,347.9,338.4,310.1,319.4,253.8,310.1,329.5,310.0,310.0,308.1,-67.8,336.7,347.7,355.4,334.7,25.8,337.4,337.9,347.5,338.0,262.4,338.0,309.6,35.4,319.2,24.9,323.7,323.5,314.5,323.8,332.1,317.6,345.8,333.4,312.7,-100.0,341.0,0.0,340.0,340.0,320.0,330.0,320.0,340.0],[340.0,380.0,350.0,350.0,350.0,340.0,350.0,350.0,380.0,360.0,340.0,340.0,360.0,360.0,350.0,350.0,350.0,350.0,350.0,360.0,360.0,360.0,350.0,350.0,360.0,350.0,0.0,340.0,340.0,330.0,350.0,300.0,330.0,330.0,300.0,-82.7,-70.5,17.5,16.0,-76.0,20.9,-74.2,-73.3,-74.1,316.9,17.4,18.6,285.8,247.4,256.9,-51.3,16.9,315.7,259.7,307.4,20.8,251.3,-73.0,-72.5,-72.5,-55.1,-45.6,-75.0,-74.6,-75.2,-46.6,19.7,314.5,333.1,342.7,333.6,333.6,343.1,335.8,343.3,332.4,325.2,319.5,310.3,335.1,333.8,355.1,342.8,323.3,332.4,341.5,250.0,340.0,320.0,340.0,320.0,330.0,330.0,300.0,0.0,-80.0],[0.0,-100.0,0.0,0.0,0.0,-100.0,-100.0,-100.0,-100.0,0.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,240.0,0.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,276.8,-100.0,-100.0,-100.0,26.7,-81.6,-79.3,-79.1,-75.9,-80.3,1350.3,-78.5,-74.9,-74.7,-79.1,-79.3,-76.9,-76.4,-75.6,-74.1,-72.8,-77.1,-71.8,-75.9,-75.1,-70.5,-70.8,-71.3,-75.5,-79.2,-74.0,-74.6,-73.5,-73.9,-73.3,-73.4,-73.7,-74.3,-73.6,-73.0,-79.0,-72.3,-79.0,-72.9,-73.1,-72.5,-71.5,-71.3,-71.4,-72.8,21.2,-79.2,14.7,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0],[-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-84.8,-81.5,-77.5,-75.5,-73.5,-67.7,-65.5,-63.6,-59.1,-67.9,-57.7,-92.5,-56.3,-66.3,-66.2,-63.2,-62.6,-93.0,-62.4,-67.3,-66.6,-100.0,-66.5,-68.3,-67.0,-67.6,-68.1,-67.3,-67.3,-67.6,-67.9,-67.7,-68.7,-70.6,-71.8,-71.0,-69.5,-72.3,-93.9,-74.4,-73.6,-73.2,340.0,1500.0,320.0,1500.0,321.7,327.2,1500.0,350.0,-76.7,340.0,13.9,310.0,-100.0,-100.0,0.0,-100.0,-100.0,-100.0,-100.0,290.0,-100.0,-100.0,-100.0],[-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,240.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,300.0,330.0,0.0,310.0,-100.0,-100.0,-100.0,1500.0,-100.0,310.0,-82.7,330.9,311.9,-76.5,-75.3,-74.5,-73.1,-72.5,-68.7,-71.8,-71.6,-72.0,-73.0,-74.3,-74.7,-77.5,-75.4,-76.8,370.0,255.6,-76.0,-76.4,-74.2,-73.3,-71.8,-73.2,-73.4,-71.5,-67.8,-74.5,-72.8,-67.7,-72.0,1080.0,21.3,0.0,20.5,322.9,20.7,304.0,257.0,322.3,341.7,400.0,351.1,400.0,360.0,350.5,360.0,1050.0,350.0,1050.0,360.0,360.0,350.0,350.0,360.0,360.0,360.0,350.0,350.0,350.0,340.0],[370.0,350.0,350.0,340.0,340.0,330.0,320.0,330.0,330.0,320.0,330.0,330.0,330.0,330.0,320.0,330.0,330.0,330.0,330.0,330.0,330.0,350.0,340.0,350.0,350.0,350.0,350.0,340.0,340.0,330.0,350.0,330.0,340.8,351.3,332.6,332.7,379.1,333.1,420.0,1100.0,336.4,315.8,260.4,346.1,1500.0,28.5,-61.0,-58.6,-58.4,-9.0,-56.3,-56.6,-55.8,-4.1,-57.2,-57.7,-56.2,-54.8,-55.9,-54.5,-54.9,-55.3,-56.2,-100.0,-59.9,-62.4,-62.2,-63.4,314.9,342.7,-66.0,333.2,351.8,342.5,342.5,342.4,342.5,324.4,314.4,600.0,-70.7,333.6,323.4,332.7,20.6,303.6,-77.6,322.2,-78.8,-81.2,-100.0,0.0,250.0,-100.0,-100.0,300.0],[310.0,-100.0,250.0,0.0,0.0,-100.0,0.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,0.0,-100.0,-100.0,312.3,-72.9,368.6,-64.8,389.3,-50.5,-57.0,-54.8,-53.8,-51.9,-53.2,-50.7,-55.8,-100.0,-53.4,-56.5,-59.6,-54.8,-53.7,-55.9,-52.9,-0.4,310.0,312.1,-100.0,-59.7,-58.8,-100.0,-54.4,-54.5,-54.3,-56.9,-57.9,-55.9,-53.6,-100.0,-100.0,-63.0,29.4,-100.0,-100.0,-66.6,-62.2,-65.4,96.0,-68.0,27.9,-67.0,-67.7,-68.3,-71.5,-73.4,-74.6,-76.9,-78.4,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0],[320.0,0.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,0.0,50.0,330.0,320.0,330.0,320.0,320.0,350.0,320.0,0.0,332.4,332.8,325.2,336.1,325.9,317.9,327.6,328.0,28.1,318.1,318.1,-64.2,29.7,-64.1,-67.0,328.2,-65.6,-67.7,-69.0,-66.9,-66.6,-64.8,-66.0,-67.2,-65.7,-67.1,26.3,26.2,-67.5,-66.1,325.8,334.1,-69.6,316.1,334.1,334.0,324.6,342.8,340.0,350.0,350.0,360.0,370.0,380.0,370.0,400.0,400.0,420.0,460.0,450.0,450.0,450.0,430.0,400.0,400.0,380.0,400.0,360.0,380.0,380.0,360.0,360.0,350.0,360.0,360.0],[350.0,350.0,350.0,360.0,350.0,350.0,350.0,350.0,350.0,340.0,350.0,350.0,350.0,350.0,350.0,340.0,350.0,360.0,360.0,360.0,370.0,370.0,370.0,370.0,370.0,370.0,360.0,360.0,350.0,350.0,350.0,350.0,340.0,350.0,341.7,332.2,333.0,334.2,334.5,335.0,343.9,338.7,338.7,338.8,344.4,340.6,333.8,334.6,325.5,325.8,334.9,330.8,339.0,324.4,343.0,331.5,332.2,335.7,328.2,334.7,326.8,324.6,326.7,335.3,343.9,345.1,353.6,362.1,363.1,370.5,387.5,397.0,424.4,434.5,435.4,396.6,415.6,425.0,444.3,434.7,434.6,425.3,396.7,387.0,396.0,414.2,395.5,358.1,342.8,376.7,358.2,359.2,350.0,350.0,360.0,360.0],[380.0,380.0,370.0,390.0,400.0,390.0,390.0,380.0,380.0,360.0,360.0,360.0,360.0,370.0,370.0,370.0,380.0,370.0,370.0,370.0,380.0,380.0,380.0,380.0,360.0,370.0,370.0,360.0,360.0,340.0,340.0,350.0,340.0,340.0,340.0,340.0,0.0,320.0,310.0,310.0,310.0,333.3,314.4,324.1,305.3,285.6,313.8,-100.0,0.0,305.0,315.2,305.2,23.7,22.9,-70.7,-68.9,-68.0,-69.0,-69.5,-70.9,323.9,323.1,314.4,323.9,342.7,333.2,333.4,333.4,342.8,333.3,342.7,342.7,352.1,352.1,352.1,352.1,352.1,352.1,352.1,352.7,362.1,362.1,361.5,361.0,340.0,340.0,350.0,340.0,390.0,370.0,370.0,370.0,370.0,360.0,360.0,350.0],[360.0,360.0,360.0,360.0,360.0,360.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,360.0,360.0,360.0,360.0,360.0,360.0,360.0,360.0,350.0,350.0,350.0,340.0,340.0,340.0,340.0,342.1,334.2,335.2,337.0,328.2,328.3,328.5,329.2,339.4,330.4,339.1,355.8,330.2,365.8,327.8,327.6,327.6,337.0,337.0,329.5,336.2,364.9,330.3,316.1,343.5,307.8,307.9,342.6,79.2,311.3,330.0,361.7,346.5,382.0,354.8,364.1,363.9,363.9,363.9,382.8,382.2,380.0,360.0,370.3,380.0,390.0,381.1,381.1,381.1,380.0,380.0,400.0,400.0,400.0,400.0,390.0,390.0,380.0,380.0,360.0,350.0,350.0,340.0],[340.0,340.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,320.0,320.0,320.0,320.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,340.0,340.0,340.0,340.0,340.0,340.0,340.0,350.0,360.4,352.3,354.0,354.3,355.1,355.5,346.5,346.8,346.7,346.9,346.9,346.9,346.8,337.6,337.5,337.3,346.3,337.0,337.1,337.3,337.5,337.5,337.3,337.4,328.2,328.1,337.5,328.2,328.2,328.3,328.3,328.5,31.2,309.7,337.3,336.9,336.8,336.8,346.0,346.0,346.0,345.8,345.7,345.8,345.7,355.3,354.1,345.7,345.9,336.4,335.5,344.5,343.3,343.1,342.5,332.4,332.2,340.3,340.0,340.0,330.0,330.0,330.0,330.0],[320.0,320.0,320.0,320.0,320.0,320.0,320.0,320.0,310.0,310.0,300.0,300.0,310.0,320.0,310.0,310.0,320.0,320.0,320.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,300.0,290.0,-100.0,-100.0,-100.0,-75.6,-71.1,-69.0,-66.2,-63.7,-61.9,-60.6,-60.6,-61.0,-61.9,-62.0,-60.5,-61.4,-62.3,-60.0,-62.6,-64.0,-65.0,-65.3,-66.0,327.3,327.4,318.1,253.2,299.6,253.0,253.0,327.4,-62.6,309.2,253.7,327.8,327.7,336.8,336.8,336.6,336.2,345.7,345.7,345.5,345.4,345.3,354.7,354.6,354.8,354.8,354.9,354.8,336.2,336.1,335.6,334.7,344.1,333.2,332.1,330.0,330.0,340.0,340.0,340.0,330.0,340.0,340.0,330.0],[330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,330.0,340.0,340.0,340.0,330.0,340.0,330.0,340.0,340.0,350.0,350.0,350.0,350.0,350.0,350.0,340.0,330.0,330.0,330.6,321.2,312.7,295.1,249.7,-64.8,41.3,300.5,-46.6,312.4,302.4,318.7,317.2,353.7,353.6,362.4,352.8,352.8,363.1,407.1,407.7,401.9,375.1,382.1,388.7,375.2,348.6,331.2,352.1,337.6,321.9,394.0,353.0,354.3,359.1,355.6,350.3,354.1,365.4,391.8,418.1,414.5,394.2,494.6,1037.7,1069.1,1079.7,1056.3,1063.5,1043.5,997.3,460.0,450.0,450.0,400.0,440.0,480.0,990.0,480.0,480.0,440.0,480.0,390.0],[1060.0,900.0,500.0,400.0,400.0,420.0,430.0,400.0,380.0,380.0,380.0,370.0,380.0,370.0,370.0,370.0,380.0,370.0,370.0,370.0,370.0,370.0,370.0,370.0,380.0,380.0,380.0,380.0,400.0,390.0,400.0,400.0,440.0,400.0,374.4,356.7,356.9,357.3,349.2,348.6,348.3,340.7,332.0,341.1,341.5,340.7,349.4,339.3,357.4,348.1,357.6,356.4,366.6,358.0,367.1,367.8,385.7,384.8,375.6,361.4,369.4,365.7,366.0,366.5,348.8,357.9,347.3,339.5,347.6,370.5,349.7,360.1,368.4,368.4,368.7,369.7,385.8,429.5,866.8,449.6,439.6,452.1,384.2,398.2,398.0,400.9,452.8,453.3,491.6,480.0,400.0,396.9,396.4,359.3,380.0,400.0],[370.0,360.0,360.0,360.0,360.0,360.0,390.0,380.0,360.0,360.0,360.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,350.0,360.0,370.0,360.0,380.0,380.0,360.0,350.0,340.0,340.0,340.0,340.0,330.0,330.0,335.2,338.2,329.4,330.7,321.8,322.0,331.8,334.1,337.9,328.9,332.0,332.7,340.7,331.3,340.4,340.3,345.5,357.6,358.6,354.7,350.1,361.9,360.2,360.6,351.8,341.3,360.5,385.3,375.0,369.4,369.2,363.7,370.9,360.3,349.6,366.6,446.3,475.4,480.1,403.6,421.6,393.5,402.1,402.1,393.3,392.8,383.5,377.7,385.0,381.9,575.1,414.7,405.8,396.8,377.8,359.0,349.4,350.0,340.0,350.0,350.0,350.0],[380.0,370.0,370.0,380.0,380.0,390.0,380.0,380.0,370.0,370.0,360.0,360.0,360.0,350.0,360.0,350.0,360.0,370.0,370.0,380.0,390.0,400.0,410.0,420.0,390.0,390.0,380.0,360.0,350.0,340.0,340.0,340.0,340.0,335.8,337.0,344.8,345.1,345.0,346.5,340.0,361.2,370.3,352.0,360.6,369.4,377.8,378.0,368.6,378.5,371.1,378.4,393.9,379.8,376.2,392.6,384.3,390.4,352.5,352.4,325.9,358.7,340.2,354.1,388.4,391.9,402.4,425.6,379.3,404.0,402.9,409.7,407.8,409.0,406.3,398.9,375.6,384.5,399.4,398.7,398.0,400.1,385.9,390.6,379.6,366.6,359.8,357.8,326.0,317.7,315.8,312.9,310.0,300.0,290.0,260.0,-100.0],[-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,240.0,0.0,300.0,250.0,240.0,240.0,320.0,310.0,300.0,310.0,340.0,340.0,340.0,330.0,330.0,320.0,330.0,320.0,320.0,320.0,310.0,325.1,261.1,251.8,-65.7,-63.5,-60.8,-57.1,-56.9,-55.0,-53.9,-51.8,-53.3,-21.8,-22.3,-53.7,-54.2,-54.3,332.6,258.0,-24.0,-9.8,-54.1,-9.2,-9.4,-6.1,-3.2,-4.9,-2.5,-4.2,-20.9,69.4,333.1,259.9,350.0,341.0,341.2,331.9,358.9,349.5,349.8,350.1,350.1,359.6,359.5,358.9,406.1,396.1,406.1,396.0,387.2,387.1,386.2,386.1,353.9,340.0,350.0,360.0,350.0,350.0,360.0,360.0,360.0,340.0,340.0,340.0],[340.0,350.0,350.0,350.0,350.0,340.0,340.0,330.0,320.0,320.0,310.0,320.0,320.0,250.0,250.0,310.0,310.0,320.0,330.0,330.0,340.0,330.0,340.0,340.0,340.0,350.0,350.0,350.0,350.0,350.0,340.8,345.7,346.6,319.8,264.5,32.6,-58.1,-55.1,-22.2,-4.4,-4.0,-1.9,-0.1,2.3,-3.2,-6.2,-6.4,-9.3,-11.3,-10.3,-8.4,-9.3,-8.3,-7.3,-7.8,-7.9,-5.9,-6.3,-4.1,-5.5,8.9,7.9,-8.3,-8.6,-11.5,-18.5,-19.5,-27.0,-27.1,-27.4,61.5,350.9,350.8,360.1,360.7,332.2,383.9,378.4,351.1,350.2,260.0,331.9,330.8,330.5,329.4,24.6,-67.4,-69.4,-70.8,-73.5,-100.0,-100.0,229.7,-100.0,-100.0,-100.0],[-3.1,229.4,229.4,248.7,297.1,238.9,229.2,229.1,-3.2,-3.2,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,240.0,-100.0,-100.0,-100.0,0.0,330.0,240.0,0.0,0.0,-100.0,-82.0,-74.8,-70.7,25.8,-65.4,-62.6,-59.9,32.6,-57.9,-28.6,-26.0,-26.0,-16.5,74.9,-13.9,-14.9,73.2,-25.0,194.5,349.9,134.8,358.8,341.4,367.3,358.1,278.6,70.2,-11.1,-25.3,-23.8,-25.2,-9.7,-7.8,-8.3,-8.2,293.6,64.2,343.4,251.0,376.5,389.6,361.7,360.4,364.0,361.8,361.9,361.9,403.4,390.0,375.7,375.1,355.1,350.6,358.0,345.7,345.8,344.4,344.0,352.8,341.8,337.3,337.0,317.4,317.1,316.9,340.0,330.0],[350.0,350.0,360.0,360.0,360.0,360.0,360.0,360.0,340.0,340.0,340.0,315.8,325.6,325.7,330.0,330.0,340.0,340.0,340.0,340.0,350.0,350.0,340.0,350.0,330.0,0.0,-100.0,-100.0,240.0,292.8,248.6,346.5,338.0,329.8,330.4,256.3,331.4,326.7,329.0,115.7,5.9,194.8,213.3,213.0,-6.4,379.4,319.8,-26.7,357.2,294.0,133.1,-28.3,-26.1,-26.8,-26.7,-27.5,-13.7,68.6,-26.8,-27.1,-11.7,-12.2,-12.1,-13.3,-58.3,-58.3,-58.1,-58.6,328.2,301.6,303.6,311.5,319.8,344.9,366.1,356.1,357.9,357.0,364.4,367.5,327.9,347.9,347.1,323.0,253.3,312.5,326.2,299.6,-68.8,305.9,308.2,294.2,294.3,263.1,-100.0,-100.0],[-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,0.0,-100.0,250.0,11.2,314.2,14.0,-55.5,-51.3,47.1,-6.6,-27.2,-46.9,345.5,363.4,363.3,-54.8,344.2,328.6,334.3,-64.9,-64.6,-64.4,-60.9,150.6,153.0,-64.3,-60.2,-64.2,-60.8,-64.4,-64.3,-63.5,-63.0,-63.1,-59.5,-63.7,-62.8,-60.8,-3.0,-3.3,-4.0,-6.6,-7.8,-11.9,-11.3,-12.3,-12.6,-13.7,196.8,-16.9,4.3,-30.6,191.8,22.9,150.6,182.1,80.5,193.8,299.3,315.6,337.4,8.8,-30.4,-30.3,-26.7,-69.2,-72.2,-74.5,-76.1,-78.5,-79.9,-62.7]],"typical":{"points":["00:00","00:15","00:30","00:45","01:00","01:15","01:30","01:45","02:00","02:15","02:30","02:45","03:00","03:15","03:30","03:45","04:00","04:15","04:30","04:45","05:00","05:15","05:30","05:45","06:00","06:15","06:30","06:45","07:00","07:15","07:30","07:45","08:00","08:15","08:30","08:45","09:00","09:15","09:30","09:45","10:00","10:15","10:30","10:45","11:00","11:15","11:30","11:45","12:00","12:15","12:30","12:45","13:00","13:15","13:30","13:45","14:00","14:15","14:30","14:45","15:00","15:15","15:30","15:45","16:00","16:15","16:30","16:45","17:00","17:15","17:30","17:45","18:00","18:15","18:30","18:45","19:00","19:15","19:30","19:45","20:00","20:15","20:30","20:45","21:00","21:15","21:30","21:45","22:00","22:15","22:30","22:45","23:00","23:15","23:30","23:45"],"beforeAvg":[236.8,236.8,244.5,242.9,253.6,248.3,235.4,234.0,243.4,242.4,233.0,229.9,235.1,227.4,231.0,233.3,239.2,249.1,266.2,281.1,266.0,279.3,288.6,297.0,291.1,286.6,281.0,265.2,240.7,214.6,191.2,196.1,229.1,191.9,171.6,141.3,140.6,150.2,122.6,114.8,128.0,113.8,112.6,105.3,128.6,106.9,112.1,101.4,136.6,130.0,134.5,124.4,140.6,141.2,129.5,129.1,118.2,128.8,127.9,135.9,151.7,155.3,143.3,193.8,179.9,214.1,226.7,212.7,255.5,271.9,274.7,282.1,295.4,302.0,299.7,301.5,302.4,298.4,302.8,295.4,296.5,306.7,315.4,307.9,312.6,289.1,284.7,262.2,269.7,269.1,269.0,268.2,281.4,261.0,240.3,224.5],"realAvg":[232.5,213.2,206.8,206.7,228.8,209.5,208.8,204.1,180.3,198.1,179.5,178.7,203.2,185.5,196.9,174.1,192.6,207.1,214.0,210.7,214.5,226.1,234.2,252.6,273.2,227.4,230.0,217.8,212.7,187.9,237.1,196.2,279.2,210.7,214.5,152.9,188.2,163.8,192.0,160.6,210.0,157.7,237.0,139.8,171.9,108.8,131.0,147.0,147.7,139.3,116.9,115.9,129.9,125.2,120.3,101.0,99.1,85.4,81.4,77.2,95.5,114.1,105.2,119.3,136.4,137.8,216.9,148.9,189.2,220.8,224.3,248.5,282.6,335.5,342.3,322.8,337.2,352.3,367.6,395.9,305.4,299.2,394.1,328.3,304.1,250.3,228.7,217.5,190.6,192.6,236.6,232.4,235.2,196.8,176.8,174.1],"d0712":{"before":[-100.0,-100.0,-100.0,-100.0,0.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-87.0,-84.8,-82.3,-80.4,-79.2,-78.0,-77.0,-75.2,-73.8,-73.7,-73.4,-74.2,-75.8,-77.8,-77.7,-78.0,-77.3,-77.3,-75.6,-75.3,-75.2,-75.4,-75.6,-75.8,-75.6,-75.6,-75.5,-75.7,-76.9,-77.1,-76.7,-76.6,-76.8,-77.6,-76.9,-76.8,-76.9,-76.9,-76.4,-76.6,-76.8,-76.8,-75.4,-74.0,-73.2,-73.0,-73.2,-73.8,19.8,17.2,15.6,3.7,-84.8,-86.7,-97.4,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0],"real":[0.0,-100.0,0.0,0.0,0.0,-100.0,-100.0,-100.0,-100.0,0.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,240.0,0.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,276.8,-100.0,-100.0,-100.0,26.7,-81.6,-79.3,-79.1,-75.9,-80.3,1350.3,-78.5,-74.9,-74.7,-79.1,-79.3,-76.9,-76.4,-75.6,-74.1,-72.8,-77.1,-71.8,-75.9,-75.1,-70.5,-70.8,-71.3,-75.5,-79.2,-74.0,-74.6,-73.5,-73.9,-73.3,-73.4,-73.7,-74.3,-73.6,-73.0,-79.0,-72.3,-79.0,-72.9,-73.1,-72.5,-71.5,-71.3,-71.4,-72.8,21.2,-79.2,14.7,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0,-100.0]},"d0719":{"before":[420.0,380.0,380.0,390.0,390.0,390.0,380.0,380.0,380.0,360.0,370.0,370.0,370.0,370.0,370.0,360.0,360.0,360.0,360.0,370.0,370.0,370.0,370.0,360.0,360.0,360.0,360.0,360.0,360.0,350.0,350.0,350.0,350.0,350.0,350.0,340.0,341.8,342.4,342.6,342.6,333.3,343.4,343.4,343.4,343.4,333.9,333.3,333.3,333.2,333.2,333.3,333.4,333.9,333.9,343.3,343.3,334.0,343.3,352.7,352.2,352.0,352.0,352.1,352.1,352.1,361.5,352.1,352.0,361.5,361.5,352.0,361.5,361.5,361.5,361.5,361.5,381.0,371.5,381.0,371.6,371.6,371.5,371.0,370.9,370.8,360.0,360.0,360.0,370.0,370.0,380.0,380.0,390.0,380.0,370.0,370.0],"real":[380.0,380.0,370.0,390.0,400.0,390.0,390.0,380.0,380.0,360.0,360.0,360.0,360.0,370.0,370.0,370.0,380.0,370.0,370.0,370.0,380.0,380.0,380.0,380.0,360.0,370.0,370.0,360.0,360.0,340.0,340.0,350.0,340.0,340.0,340.0,340.0,0.0,320.0,310.0,310.0,310.0,333.3,314.4,324.1,305.3,285.6,313.8,-100.0,0.0,305.0,315.2,305.2,23.7,22.9,-70.7,-68.9,-68.0,-69.0,-69.5,-70.9,323.9,323.1,314.4,323.9,342.7,333.2,333.4,333.4,342.8,333.3,342.7,342.7,352.1,352.1,352.1,352.1,352.1,352.1,352.1,352.7,362.1,362.1,361.5,361.0,340.0,340.0,350.0,340.0,390.0,370.0,370.0,370.0,370.0,360.0,360.0,350.0]}},"negFinger":{"points":["00:00","00:15","00:30","00:45","01:00","01:15","01:30","01:45","02:00","02:15","02:30","02:45","03:00","03:15","03:30","03:45","04:00","04:15","04:30","04:45","05:00","05:15","05:30","05:45","06:00","06:15","06:30","06:45","07:00","07:15","07:30","07:45","08:00","08:15","08:30","08:45","09:00","09:15","09:30","09:45","10:00","10:15","10:30","10:45","11:00","11:15","11:30","11:45","12:00","12:15","12:30","12:45","13:00","13:15","13:30","13:45","14:00","14:15","14:30","14:45","15:00","15:15","15:30","15:45","16:00","16:15","16:30","16:45","17:00","17:15","17:30","17:45","18:00","18:15","18:30","18:45","19:00","19:15","19:30","19:45","20:00","20:15","20:30","20:45","21:00","21:15","21:30","21:45","22:00","22:15","22:30","22:45","23:00","23:15","23:30","23:45"],"realRatio":[0.258,0.258,0.258,0.258,0.161,0.258,0.226,0.29,0.355,0.29,0.29,0.29,0.258,0.29,0.226,0.323,0.29,0.29,0.258,0.29,0.226,0.194,0.161,0.194,0.129,0.194,0.194,0.226,0.258,0.29,0.29,0.323,0.097,0.29,0.29,0.387,0.29,0.387,0.419,0.419,0.355,0.419,0.355,0.419,0.484,0.484,0.484,0.484,0.419,0.419,0.516,0.516,0.452,0.516,0.516,0.516,0.581,0.581,0.613,0.645,0.581,0.484,0.581,0.516,0.484,0.484,0.387,0.387,0.323,0.258,0.194,0.161,0.129,0.097,0.097,0.129,0.065,0.097,0.065,0.161,0.097,0.194,0.065,0.161,0.097,0.194,0.258,0.258,0.323,0.323,0.258,0.226,0.226,0.323,0.355,0.387],"beforeRatio":[0.194,0.161,0.161,0.161,0.129,0.161,0.161,0.161,0.161,0.161,0.161,0.161,0.129,0.194,0.161,0.129,0.129,0.129,0.129,0.129,0.161,0.129,0.097,0.065,0.065,0.065,0.129,0.129,0.129,0.194,0.226,0.226,0.161,0.258,0.323,0.387,0.419,0.419,0.419,0.419,0.419,0.452,0.452,0.516,0.419,0.484,0.452,0.452,0.419,0.452,0.419,0.452,0.452,0.419,0.484,0.452,0.452,0.387,0.387,0.323,0.323,0.355,0.419,0.355,0.29,0.161,0.129,0.161,0.129,0.129,0.065,0.065,0.065,0.065,0.065,0.065,0.065,0.097,0.065,0.097,0.065,0.065,0.032,0.032,0.032,0.065,0.065,0.097,0.129,0.097,0.129,0.097,0.097,0.129,0.161,0.226]},"deviation":{"points":["00:00","00:15","00:30","00:45","01:00","01:15","01:30","01:45","02:00","02:15","02:30","02:45","03:00","03:15","03:30","03:45","04:00","04:15","04:30","04:45","05:00","05:15","05:30","05:45","06:00","06:15","06:30","06:45","07:00","07:15","07:30","07:45","08:00","08:15","08:30","08:45","09:00","09:15","09:30","09:45","10:00","10:15","10:30","10:45","11:00","11:15","11:30","11:45","12:00","12:15","12:30","12:45","13:00","13:15","13:30","13:45","14:00","14:15","14:30","14:45","15:00","15:15","15:30","15:45","16:00","16:15","16:30","16:45","17:00","17:15","17:30","17:45","18:00","18:15","18:30","18:45","19:00","19:15","19:30","19:45","20:00","20:15","20:30","20:45","21:00","21:15","21:30","21:45","22:00","22:15","22:30","22:45","23:00","23:15","23:30","23:45"],"dev":[-4.3,-23.6,-37.7,-36.1,-24.8,-38.8,-26.5,-29.9,-63.1,-44.3,-53.4,-51.2,-31.9,-41.9,-34.1,-59.2,-46.5,-42.0,-52.2,-70.3,-51.5,-53.2,-54.4,-44.4,-17.9,-59.2,-51.0,-47.4,-28.0,-26.7,45.9,0.1,50.1,18.9,42.8,11.6,47.6,13.6,69.4,45.8,82.1,43.9,124.4,34.5,43.4,1.9,18.9,45.6,11.1,9.3,-17.5,-8.6,-10.7,-16.1,-9.1,-28.1,-19.1,-43.4,-46.5,-58.7,-56.2,-41.2,-38.0,-74.5,-43.5,-76.3,-9.8,-63.8,-66.3,-51.2,-50.4,-33.7,-12.8,33.5,42.5,21.2,34.8,53.9,64.8,100.4,9.0,-7.5,78.7,20.4,-8.4,-38.8,-56.0,-44.7,-79.1,-76.4,-32.4,-35.8,-46.2,-64.2,-63.5,-50.4]},"irradiance":{"points":["00:00","00:15","00:30","00:45","01:00","01:15","01:30","01:45","02:00","02:15","02:30","02:45","03:00","03:15","03:30","03:45","04:00","04:15","04:30","04:45","05:00","05:15","05:30","05:45","06:00","06:15","06:30","06:45","07:00","07:15","07:30","07:45","08:00","08:15","08:30","08:45","09:00","09:15","09:30","09:45","10:00","10:15","10:30","10:45","11:00","11:15","11:30","11:45","12:00","12:15","12:30","12:45","13:00","13:15","13:30","13:45","14:00","14:15","14:30","14:45","15:00","15:15","15:30","15:45","16:00","16:15","16:30","16:45","17:00","17:15","17:30","17:45","18:00","18:15","18:30","18:45","19:00","19:15","19:30","19:45","20:00","20:15","20:30","20:45","21:00","21:15","21:30","21:45","22:00","22:15","22:30","22:45","23:00","23:15","23:30","23:45"],"rad":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.8,1.6,2.3,3.1,16.9,30.7,44.4,58.2,86.4,114.6,142.7,170.9,204.5,238.1,271.6,305.2,336.4,367.5,398.7,429.9,457.0,484.1,511.3,538.4,558.3,578.3,598.2,618.2,630.0,641.7,653.5,665.2,663.9,662.5,661.2,659.9,650.9,642.0,633.1,624.1,605.0,586.0,566.9,547.8,521.6,495.4,469.3,443.1,410.2,377.2,344.2,311.3,276.6,241.9,207.1,172.4,143.7,115.0,86.3,57.6,43.8,29.9,16.1,2.2,1.7,1.1,0.6,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},"power":{"points":[{"city":"营口·鲅鱼圈","type":"火电","cap":184.0},{"city":"大连·大连湾","type":"火电","cap":200.0},{"city":"沈阳","type":"火电","cap":240.0},{"city":"阜新","type":"火电","cap":110.0},{"city":"朝阳","type":"火电","cap":120.0},{"city":"铁岭","type":"火电","cap":190.0},{"city":"抚顺","type":"火电","cap":70.0},{"city":"本溪","type":"火电","cap":70.0},{"city":"阜新","type":"风电","cap":600.0},{"city":"朝阳","type":"风电","cap":400.0},{"city":"铁岭","type":"风电","cap":200.0},{"city":"锦州","type":"风电","cap":90.0},{"city":"沈阳","type":"风电","cap":225.0},{"city":"大连·庄河","type":"风电","cap":150.0},{"city":"营口·盖州","type":"风电","cap":80.0},{"city":"葫芦岛·绥中","type":"风电","cap":80.0},{"city":"朝阳","type":"光伏","cap":195.0},{"city":"阜新","type":"光伏","cap":85.0},{"city":"大连·瓦房店","type":"核电","cap":671.0},{"city":"抚顺·本溪","type":"水电","cap":486.0}],"byType":[{"type":"风电","cap":1825.0},{"type":"火电","cap":1184.0},{"type":"核电","cap":671.0},{"type":"水电","cap":486.0},{"type":"光伏","cap":280.0}],"byCity":[{"city":"阜新","cap":795.0},{"city":"朝阳","cap":715.0},{"city":"大连·瓦房店","cap":671.0},{"city":"抚顺·本溪","cap":486.0},{"city":"沈阳","cap":465.0},{"city":"铁岭","cap":390.0},{"city":"大连·大连湾","cap":200.0},{"city":"营口·鲅鱼圈","cap":184.0},{"city":"大连·庄河","cap":150.0},{"city":"锦州","cap":90.0},{"city":"营口·盖州","cap":80.0},{"city":"葫芦岛·绥中","cap":80.0},{"city":"抚顺","cap":70.0},{"city":"本溪","cap":70.0}]}};
+(function(){
+  var D = M_DASH;
+  var P = D.points.length;
+  var interval = 11;
+
+  // ---------- 模块一 · 热力图 ----------
+  function m1HeatOption(series){
+    var mat = D[series], data=[];
+    for(var i=0;i<D.days.length;i++) for(var j=0;j<P;j++) data.push([j,i,mat[i][j]]);
+    return {
+      tooltip:{position:'top',formatter:function(p){return D.days[p.data[1]]+' '+D.points[p.data[0]]+'<br/>'+(series==='before'?'日前':'实时')+'：'+p.data[2].toFixed(1)+' 元/MWh';}},
+      grid:{left:48,right:14,top:8,bottom:56},
+      xAxis:{type:'category',data:D.points,axisLabel:{fontSize:9,color:'#9aa3b0',interval:interval},axisLine:{lineStyle:{color:'#e5e7eb'}}},
+      yAxis:{type:'category',data:D.days,axisLabel:{fontSize:9,color:'#9aa3b0',interval:1},axisLine:{lineStyle:{color:'#e5e7eb'}}},
+      visualMap:{min:-100,max:600,calculable:true,orient:'horizontal',left:'center',bottom:6,itemWidth:14,itemHeight:120,textStyle:{fontSize:9,color:'#9aa3b0'},
+        inRange:{color:['#b91c1c','#ef4444','#fecaca','#ffffff','#bfdbfe','#2563eb','#1e3a8a']}},
+      series:[{type:'heatmap',data:data,progressive:3000,emphasis:{itemStyle:{borderColor:'#1f2937',borderWidth:1}}}]
+    };
+  }
+  var m1Heat = echarts.init(document.getElementById('m1Heat'));
+  m1Heat.setOption(m1HeatOption('before'));
+  window.m1SwitchHeat = function(s){
+    m1Heat.setOption(m1HeatOption(s));
+    document.getElementById('m1HeatBefore').classList.toggle('on', s==='before');
+    document.getElementById('m1HeatReal').classList.toggle('on', s==='realTime');
+  };
+
+  // ---------- 模块一 · 典型日曲线 ----------
+  function m1TypicalOption(key){
+    var t=D.typical, s;
+    if(key==='0712') s=[t.d0712.before,t.d0712.real];
+    else if(key==='0719') s=[t.d0719.before,t.d0719.real];
+    else s=[t.beforeAvg,t.realAvg];
+    return {
+      tooltip:{trigger:'axis'},legend:{data:['日前','实时'],top:2,textStyle:{fontSize:11}},
+      grid:{left:44,right:14,top:32,bottom:42},
+      xAxis:{type:'category',data:D.points,axisLabel:{fontSize:9,color:'#9aa3b0',interval:interval},axisLine:{lineStyle:{color:'#e5e7eb'}}},
+      yAxis:{type:'value',name:'元/MWh',nameTextStyle:{fontSize:9,color:'#9aa3b0'},axisLabel:{fontSize:9,color:'#9aa3b0'},splitLine:{lineStyle:{color:'#f0f2f5'}}},
+      series:[
+        {name:'日前',type:'line',data:s[0],showSymbol:false,lineStyle:{width:1.6,color:'#066fd1'},itemStyle:{color:'#066fd1'}},
+        {name:'实时',type:'line',data:s[1],showSymbol:false,lineStyle:{width:1.6,color:'#d63939'},itemStyle:{color:'#d63939'},
+          markArea:{silent:true,itemStyle:{color:'rgba(214,57,57,0.07)'},data:[[{yAxis:-100},{yAxis:0}]]}}
+      ]
+    };
+  }
+  var m1Typ = echarts.init(document.getElementById('m1Typical'));
+  m1Typ.setOption(m1TypicalOption('avg'));
+  document.getElementById('m1Time').addEventListener('change',function(e){ m1Typ.setOption(m1TypicalOption(e.target.value),true); });
+
+  // ---------- 模块一 · 负价指纹 ----------
+  var m1Neg = echarts.init(document.getElementById('m1Neg'));
+  m1Neg.setOption({
+    tooltip:{trigger:'axis',formatter:function(p){return D.points[p[0].dataIndex]+'<br/>实时 &lt; 0 占比：'+p[0].value+'%';}},
+    grid:{left:40,right:14,top:14,bottom:42},
+    xAxis:{type:'category',data:D.points,axisLabel:{fontSize:9,color:'#9aa3b0',interval:interval},axisLine:{lineStyle:{color:'#e5e7eb'}}},
+    yAxis:{type:'value',name:'%',max:100,axisLabel:{fontSize:9,color:'#9aa3b0'},splitLine:{lineStyle:{color:'#f0f2f5'}}},
+    series:[{type:'bar',data:D.negFinger.realRatio.map(function(v){return Math.round(v*100);}),itemStyle:{color:'#d63939'},barWidth:'60%'}]
+  });
+
+  // ---------- 模块二 · 风电代理 vs 负价 ----------
+  var wind=[];
+  for(var t=0;t<P;t++){ var h=t/4; var w=72+28*Math.cos((h-3)/24*2*Math.PI); wind.push(Math.max(18,+w.toFixed(1))); }
+  var m2Wind = echarts.init(document.getElementById('m2Wind'));
+  m2Wind.setOption({
+    tooltip:{trigger:'axis'},legend:{data:['实时价(真源)','风电代理出力'],top:2,textStyle:{fontSize:11}},
+    grid:{left:46,right:48,top:32,bottom:42},
+    xAxis:{type:'category',data:D.points,axisLabel:{fontSize:9,color:'#9aa3b0',interval:interval},axisLine:{lineStyle:{color:'#e5e7eb'}}},
+    yAxis:[
+      {type:'value',name:'元/MWh',nameTextStyle:{fontSize:9,color:'#9aa3b0'},axisLabel:{fontSize:9,color:'#9aa3b0'},splitLine:{lineStyle:{color:'#f0f2f5'}}},
+      {type:'value',name:'代理%',max:100,axisLabel:{fontSize:9,color:'#9aa3b0'},splitLine:{show:false}}
+    ],
+    series:[
+      {name:'实时价(真源)',type:'line',data:D.typical.realAvg,showSymbol:false,lineStyle:{width:1.6,color:'#d63939'},itemStyle:{color:'#d63939'}},
+      {name:'风电代理出力',type:'line',yAxisIndex:1,data:wind,showSymbol:false,areaStyle:{color:'rgba(46,158,91,0.14)'},lineStyle:{width:1.6,color:'#2e9e5b'},itemStyle:{color:'#2e9e5b'}}
+    ]
+  });
+
+  // ---------- 模块二 · 辐照深挖 ----------
+  var m2Irr = echarts.init(document.getElementById('m2Irr'));
+  m2Irr.setOption({
+    tooltip:{trigger:'axis'},legend:{data:['实时价(真源)','辐照代理'],top:2,textStyle:{fontSize:11}},
+    grid:{left:46,right:48,top:32,bottom:42},
+    xAxis:{type:'category',data:D.points,axisLabel:{fontSize:9,color:'#9aa3b0',interval:interval},axisLine:{lineStyle:{color:'#e5e7eb'}}},
+    yAxis:[
+      {type:'value',name:'元/MWh',nameTextStyle:{fontSize:9,color:'#9aa3b0'},axisLabel:{fontSize:9,color:'#9aa3b0'},splitLine:{lineStyle:{color:'#f0f2f5'}}},
+      {type:'value',name:'W/m²',axisLabel:{fontSize:9,color:'#9aa3b0'},splitLine:{show:false}}
+    ],
+    series:[
+      {name:'实时价(真源)',type:'line',data:D.typical.realAvg,showSymbol:false,lineStyle:{width:1.6,color:'#d63939'},itemStyle:{color:'#d63939'}},
+      {name:'辐照代理',type:'line',yAxisIndex:1,data:D.irradiance.rad,showSymbol:false,areaStyle:{color:'rgba(245,159,0,0.14)'},lineStyle:{width:1.6,color:'#f59f00'},itemStyle:{color:'#f59f00'}}
+    ]
+  });
+
+  // ---------- 模块二 · 偏差与套利 ----------
+  var m2Dev = echarts.init(document.getElementById('m2Dev'));
+  m2Dev.setOption({
+    tooltip:{trigger:'axis',formatter:function(p){return D.points[p[0].dataIndex]+'<br/>偏差(实时−日前)：'+p[0].value+' 元/MWh';}},
+    grid:{left:46,right:14,top:14,bottom:42},
+    xAxis:{type:'category',data:D.points,axisLabel:{fontSize:9,color:'#9aa3b0',interval:interval},axisLine:{lineStyle:{color:'#e5e7eb'}}},
+    yAxis:{type:'value',name:'元/MWh',nameTextStyle:{fontSize:9,color:'#9aa3b0'},axisLabel:{fontSize:9,color:'#9aa3b0'},splitLine:{lineStyle:{color:'#f0f2f5'}}},
+    series:[{type:'line',data:D.deviation.dev,showSymbol:false,lineStyle:{width:1.6,color:'#066fd1'},itemStyle:{color:'#066fd1'},
+      areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(6,111,209,0.18)'},{offset:1,color:'rgba(6,111,209,0.02)'}])},
+      markLine:{silent:true,symbol:'none',lineStyle:{color:'#9aa3b0',type:'dashed'},data:[{yAxis:0}]}}]
+  });
+
+  // ---------- 模块四 · 机理图(graph) ----------
+  var cats=[{name:'发电侧'},{name:'市场'},{name:'电网'},{name:'用户侧'}];
+  var nodes=[
+    {name:'火电',category:0,value:1184},{name:'风电',category:0,value:1825},{name:'光伏',category:0,value:280},{name:'核电/水电',category:0,value:1157},
+    {name:'现货市场',category:1},{name:'中长期交易',category:1},{name:'辅助服务',category:1},
+    {name:'电网',category:2},
+    {name:'用户侧',category:3}
+  ];
+  var links=[
+    {source:'火电',target:'现货市场'},{source:'风电',target:'现货市场'},{source:'光伏',target:'现货市场'},{source:'核电/水电',target:'现货市场'},
+    {source:'中长期交易',target:'火电'},{source:'中长期交易',target:'风电'},{source:'辅助服务',target:'火电'},{source:'辅助服务',target:'风电'},
+    {source:'现货市场',target:'电网'},{source:'电网',target:'用户侧'},{source:'现货市场',target:'用户侧'}
+  ];
+  var m4Graph = echarts.init(document.getElementById('m4Graph'));
+  m4Graph.setOption({
+    tooltip:{formatter:function(p){ if(p.dataType==='node') return p.data.name+(p.data.value?('：'+p.data.value+' 万kW'):''); return p.data.source+' → '+p.data.target; }},
+    legend:{data:cats.map(function(c){return c.name;}),top:2,textStyle:{fontSize:11}},
+    series:[{
+      type:'graph',layout:'force',roam:true,categories:cats,
+      force:{repulsion:380,edgeLength:[60,140],gravity:0.08},
+      label:{show:true,fontSize:11,color:'#1f2937'},
+      lineStyle:{color:'#cbd5e1',curveness:0.08,width:1.2},
+      itemStyle:{borderColor:'#fff',borderWidth:1.5},
+      data:nodes,links:links,
+      color:['#d63939','#066fd1','#2e9e5b','#f59f00']
+    }]
+  });
+
+  // ---------- 模块四 · 电源分布 ----------
+  var bt=D.power.byType;
+  var typeColor={ '火电':'#d63939','风电':'#2e9e5b','核电':'#066fd1','水电':'#0891b2','光伏':'#f59f00','其他':'#9aa3b0' };
+  var m4Power = echarts.init(document.getElementById('m4Power'));
+  m4Power.setOption({
+    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:function(p){return p[0].name+'：'+p[0].value+' 万kW';}},
+    grid:{left:64,right:24,top:10,bottom:24},
+    xAxis:{type:'value',name:'万kW',nameTextStyle:{fontSize:9,color:'#9aa3b0'},axisLabel:{fontSize:10,color:'#6b7280'},splitLine:{lineStyle:{color:'#f0f2f5'}}},
+    yAxis:{type:'category',data:bt.map(function(x){return x.type;}),axisLabel:{fontSize:11,color:'#374151'}},
+    series:[{type:'bar',data:bt.map(function(x){return {value:x.cap,itemStyle:{color:typeColor[x.type]||'#9aa3b0'}};}),
+      label:{show:true,position:'right',fontSize:11,color:'#374151',formatter:'{c}'},barWidth:'55%'}]
+  });
+
+  // ---------- resize ----------
+  window.addEventListener('resize',function(){
+    [m1Heat,m1Typ,m1Neg,m2Wind,m2Irr,m2Dev,m4Graph,m4Power].forEach(function(c){c.resize();});
+  });
+})();
+</script>
+</body>
+</html>
