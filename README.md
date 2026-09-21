@@ -2,12 +2,12 @@
 
 🌐 English version: [README_EN.md](README_EN.md)
 
-> AI 数据分析案例集 · 电力新能源 / 煤炭 / 海运 / 理财 + AI 入门教程 + AIGC 创作实战
+> AI 数据分析案例集 · 电力新能源 / 煤炭 / 海运 / 理财 + AI 入门教程 + AI 编程教程 + AIGC 创作实战
 > 作者：抖音「小王工作笔记」（ID: 163277992）
 
 ## 简介
 
-本仓库是 AI 辅助数据分析的**方法 / 思路沉淀**，不含原始数据与最终产出图表，便于复用与分享。
+本仓库是 AI 辅助数据分析与编程的**方法 / 思路沉淀**，不含原始数据与最终产出图表，便于复用与分享。
 
 ## 目录结构
 
@@ -24,6 +24,8 @@ xiaowang-gongzuo-biji/
 ├── ai-getting-started/        # AI 入门内容
 │   ├── 01_教程文档/          # 如何用AI做数据分析
 │   └── AI写小说思路文字稿.md
+├── ai-programming-tutorials/  # AI 编程教程
+│   └── 01~06 课件（Markdown喂AI / 工作流 / SQL / 前端 / 后端 / 测试审查）
 └── aigc-getting-started/      # AIGC 创作实战
     └── 汽车视频/            # 汽车短视频分镜与素材
         ├── 汽车视频制作总表.xlsx   # 分镜总表（镜头编号 / 分镜图 / AI 提示词 / 时长 / 状态）
@@ -48,6 +50,19 @@ xiaowang-gongzuo-biji/
 - `01_教程文档/`：如何用 AI 做数据分析（教程文档）
 - `AI写小说思路文字稿.md`：用 AI 写小说的方法论文字稿
 
+### ai-programming-tutorials（AI 编程教程）
+
+AI 辅助编程系列课件（详见模块内 README）：
+
+| 课时 | 内容 |
+| --- | --- |
+| 01 | 为何用 Markdown 喂 AI |
+| 02 | 为何要创建 AI 工作流 |
+| 03 | AI 生成 SQL 脚本 |
+| 04 | AI 生成前端网页实战 |
+| 05 | AI 生成后端代码 |
+| 06 | 测试与审查 |
+
 ### aigc-getting-started（AIGC 创作实战）
 
 - `汽车视频/`：汽车短视频创作素材
@@ -57,5 +72,6 @@ xiaowang-gongzuo-biji/
 ## 说明
 
 - `ai-data-analysis/` 与 `ai-getting-started/` 仅保留分析思路 / 方法类内容，不含原始数据与最终产出图表。
+- `ai-programming-tutorials/` 为 AI 编程教程栏目，收纳「用 AI 做编程」系列课件（Markdown 喂 AI / AI 工作流 / SQL / 前端 / 后端 / 测试审查）。
 - `aigc-getting-started/` 为 AIGC 创作实战栏目，收纳创作素材（如汽车短视频分镜图与分镜总表），便于直接复用。
 - 库名 `xiaowang-gongzuo-biji` 对应作者的抖音账号「小王工作笔记」。

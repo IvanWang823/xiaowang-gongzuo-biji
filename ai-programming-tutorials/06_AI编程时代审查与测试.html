@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI编程时代 · 人类防线</title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        apple: {
+                            bg: '#F5F5F7',
+                            black: '#1D1D1F',
+                            blue: '#0071E3',
+                            gray: '#86868B',
+                            light: '#FFFFFF',
+                            border: '#D2D2D7'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"PingFang SC"', '"Microsoft YaHei"', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FBFBFD;
+            color: #1D1D1F;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.15);
+            border-radius: 20px;
+        }
+
+        /* 毛玻璃导航 */
+        .glass-nav {
+            background: rgba(251, 251, 253, 0.82);
+            backdrop-filter: saturate(180%) blur(24px);
+            -webkit-backdrop-filter: saturate(180%) blur(24px);
+            border-bottom: 1px solid rgba(209, 213, 219, 0.25);
+        }
+
+        /* 玻璃拟态卡片 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 24px -6px rgba(0, 0, 0, 0.04);
+            transition: all 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .glass-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.88);
+            box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.08);
+            border-color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* 极简表格 */
+        .clean-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .clean-table th {
+            text-align: left;
+            padding: 16px 20px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #86868B;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #E5E5E7;
+        }
+        .clean-table td {
+            padding: 18px 20px;
+            font-size: 15px;
+            color: #1D1D1F;
+            border-bottom: 1px solid #F0F0F2;
+            vertical-align: top;
+            line-height: 1.6;
+        }
+        .clean-table tr:last-child td {
+            border-bottom: none;
+        }
+        .clean-table .model-name {
+            font-weight: 650;
+            color: #1D1D1F;
+            white-space: nowrap;
+        }
+        .clean-table .tag-positive {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #0071E3;
+            background: rgba(0, 113, 227, 0.06);
+            padding: 2px 10px;
+            border-radius: 12px;
+            margin-right: 6px;
+            margin-bottom: 4px;
+        }
+        .clean-table .tag-negative {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #86868B;
+            background: rgba(134, 134, 139, 0.08);
+            padding: 2px 10px;
+            border-radius: 12px;
+            margin-right: 6px;
+            margin-bottom: 4px;
+        }
+
+        /* 滚动渐入动画 */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 背景光晕 */
+        .hero-glow {
+            position: absolute;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(0, 113, 227, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 选中文字样式 */
+        ::selection {
+            background: rgba(0, 113, 227, 0.2);
+            color: #1D1D1F;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- 顶部毛玻璃导航 -->
+    <nav class="fixed top-0 w-full z-50 glass-nav h-14 flex items-center">
+        <div class="max-w-6xl mx-auto px-6 w-full flex items-center justify-between">
+            <span class="font-semibold text-base tracking-tight text-apple-black">AI·人类防线</span>
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-apple-gray">
+                <a href="#hero" class="hover:text-apple-black transition-colors">概述</a>
+                <a href="#difference" class="hover:text-apple-black transition-colors">审查与测试</a>
+                <a href="#strategy" class="hover:text-apple-black transition-colors">策略升级</a>
+                <a href="#models" class="hover:text-apple-black transition-colors">工具解析</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-14">
+        
+        <!-- Hero 区块 -->
+        <section id="hero" class="min-h-screen flex items-center justify-center relative bg-white overflow-hidden">
+            <div class="hero-glow"></div>
+            <div class="max-w-4xl mx-auto px-6 text-center relative z-10 fade-in-section">
+                <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-apple-blue/8 text-apple-blue text-sm font-medium mb-8 border border-apple-blue/15">
+                    🚀 开发者必读
+                </div>
+                <h1 class="text-5xl md:text-7xl font-bold tracking-tight text-apple-black leading-[1.1] mb-6">
+                    AI编程时代<br>
+                    <span class="text-apple-blue">测试与审查</span>是最后的<br>“人类防线”
+                </h1>
+                <p class="text-xl md:text-2xl text-apple-gray max-w-2xl mx-auto leading-relaxed mb-10">
+                    当AI批量生成代码，开发者的核心战场正在转移。<br>
+                    <span class="text-apple-black font-medium">速度惊人，但逻辑与安全性充满不确定性。</span>
+                </p>
+                <a href="#difference" class="inline-flex items-center px-8 py-3.5 text-base font-medium text-white bg-apple-black rounded-full hover:bg-black/85 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                    探索两道防线
+                </a>
+            </div>
+        </section>
+
+        <!-- 审查与测试：核心差异 -->
+        <section id="difference" class="py-28 bg-apple-bg">
+            <div class="max-w-5xl mx-auto px-6">
+                <div class="text-center mb-16 fade-in-section">
+                    <h2 class="text-3xl md:text-5xl font-bold text-apple-black mb-4">审查与测试，分工截然不同</h2>
+                    <p class="text-lg text-apple-gray">静态防御与动态验证的双重奏</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                    <!-- 审查卡片 -->
+                    <div class="glass-card rounded-3xl p-10 relative overflow-hidden fade-in-section">
+                        <div class="absolute top-0 right-0 p-8 opacity-8">
+                            <svg class="w-20 h-20 text-apple-black/5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        </div>
+                        <span class="inline-block px-3 py-1 rounded-full bg-apple-black text-white text-xs font-semibold mb-6 uppercase tracking-wide">静态前置</span>
+                        <h3 class="text-2xl font-bold text-apple-black mb-4">代码审查 · 预防性检查</h3>
+                        <p class="text-apple-gray leading-relaxed">
+                            如同逐字审稿：在代码运行<strong class="text-apple-black">之前</strong>，依靠开发者经验主动排查安全漏洞、不合理设计、冗余逻辑。人脑主导，前置防控。
+                        </p>
+                    </div>
+                    <!-- 测试卡片 -->
+                    <div class="glass-card rounded-3xl p-10 relative overflow-hidden fade-in-section">
+                        <div class="absolute top-0 right-0 p-8 opacity-8">
+                            <svg class="w-20 h-20 text-apple-blue/10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        </div>
+                        <span class="inline-block px-3 py-1 rounded-full bg-apple-blue text-white text-xs font-semibold mb-6 uppercase tracking-wide">动态后置</span>
+                        <h3 class="text-2xl font-bold text-apple-black mb-4">测试 · 验证性校验</h3>
+                        <p class="text-apple-gray leading-relaxed">
+                            让代码<strong class="text-apple-black">真正运行起来</strong>，验证高并发、边界条件、多场景闭环。机器自动化执行为主，最终校验。
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-12 bg-white/60 backdrop-blur-sm rounded-3xl py-8 px-8 max-w-3xl mx-auto text-center fade-in-section border border-white/80">
+                    <p class="text-xl font-medium text-apple-black">
+                        “审查是静态读代码，揪出隐性问题；<br>测试是动态跑代码，验证实际对错。二者互补，缺一不可。”
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI代码短板 · 测试策略升级 -->
+        <section id="strategy" class="py-28 bg-white">
+            <div class="max-w-5xl mx-auto px-6">
+                <div class="mb-16 fade-in-section">
+                    <h2 class="text-3xl md:text-5xl font-bold text-apple-black mb-4">AI代码短板 · 测试策略升级</h2>
+                    <p class="text-xl text-apple-gray max-w-2xl">AI擅长拟合常规场景，却在边界条件、安全风控上极易翻车。</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="p-8 rounded-3xl bg-gray-50/80 border border-gray-100/80 hover:border-apple-blue/25 hover:shadow-md transition-all duration-300 fade-in-section group">
+                        <div class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">🧪</div>
+                        <h3 class="text-xl font-bold text-apple-black mb-3">测试先行</h3>
+                        <p class="text-apple-gray text-sm leading-relaxed">先写测试用例，再让AI生成代码。人工用例就是无偏差需求说明书。</p>
+                    </div>
+                    <div class="p-8 rounded-3xl bg-gray-50/80 border border-gray-100/80 hover:border-apple-blue/25 hover:shadow-md transition-all duration-300 fade-in-section group">
+                        <div class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">🛡️</div>
+                        <h3 class="text-xl font-bold text-apple-black mb-3">安全兜底</h3>
+                        <p class="text-apple-gray text-sm leading-relaxed">借助Bandit、ESLint插件拦截硬编码密钥、SQL注入等致命漏洞。</p>
+                    </div>
+                    <div class="p-8 rounded-3xl bg-gray-50/80 border border-gray-100/80 hover:border-apple-blue/25 hover:shadow-md transition-all duration-300 fade-in-section group">
+                        <div class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">🔗</div>
+                        <h3 class="text-xl font-bold text-apple-black mb-3">集成测试</h3>
+                        <p class="text-apple-gray text-sm leading-relaxed">拒绝盲目堆单元测试覆盖率，聚焦服务联动与全链路验证。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI审查工具能力边界（已修正DeepSeek版本号 + 标签颜色） -->
+        <section id="models" class="py-28 bg-apple-bg">
+            <div class="max-w-5xl mx-auto px-6">
+                <div class="text-center mb-14 fade-in-section">
+                    <h2 class="text-3xl md:text-5xl font-bold text-apple-black mb-4">AI审查工具能力边界</h2>
+                    <p class="text-lg text-apple-gray">四款主流模型深度解析 · 定位"效率放大器"，非决策替代者</p>
+                </div>
+
+                <!-- 极简表格卡片 -->
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden fade-in-section">
+                    <table class="clean-table">
+                        <thead>
+                            <tr>
+                                <th>模型</th>
+                                <th>核心能力</th>
+                                <th>关键短板</th>
+                                <th>适合场景</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="model-name">智谱 GLM-5.2</td>
+                                <td>
+                                    <span class="tag-positive">漏洞检测强</span>
+                                    <span class="tag-positive">效率高</span>
+                                    <span class="tag-positive">100万上下文</span>
+                                </td>
+                                <td>
+                                    <span class="tag-negative">不听话</span>
+                                    <span class="tag-negative">额度消耗快</span>
+                                </td>
+                                <td>预算有限，愿投入复核纠正</td>
+                            </tr>
+                            <tr>
+                                <td class="model-name">ChatGPT<br><span class="text-apple-gray font-normal text-sm">(GPT-5.6 Sol)</span></td>
+                                <td>
+                                    <span class="tag-positive">执行最细</span>
+                                    <span class="tag-positive">发现遗漏问题</span>
+                                    <span class="tag-positive">方案拆解全面</span>
+                                </td>
+                                <td>
+                                    <span class="tag-negative">核心缺陷敏感度低</span>
+                                    <span class="tag-negative">过度工程</span>
+                                </td>
+                                <td>人工审查后的查漏补缺、二次校验</td>
+                            </tr>
+                            <tr>
+                                <td class="model-name">DeepSeek<br><span class="text-apple-gray font-normal text-sm">(最新版本)</span></td>
+                                <td>
+                                    <span class="tag-positive">上下文长</span>
+                                    <span class="tag-positive">指令遵循度高</span>
+                                    <span class="tag-positive">审查细致</span>
+                                </td>
+                                <td>
+                                    <span class="tag-negative">速度略慢</span>
+                                    <span class="tag-negative">复杂推理待强化</span>
+                                </td>
+                                <td>中大型项目深度审查、对指令精度要求高的场景</td>
+                            </tr>
+                            <tr>
+                                <td class="model-name">Kimi K3</td>
+                                <td>
+                                    <span class="tag-positive">极致性价比</span>
+                                    <span class="tag-positive">架构直觉强</span>
+                                    <span class="tag-positive">Agent自主交付</span>
+                                </td>
+                                <td>
+                                    <span class="tag-negative">推理稍弱</span>
+                                    <span class="tag-negative">稳定性波动</span>
+                                </td>
+                                <td>大规模代码快速筛查、架构层面的初步审查</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <!-- 表格底部建议栏 -->
+                    <div class="px-6 py-5 bg-gray-50/70 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                        <span class="text-sm font-semibold text-apple-black whitespace-nowrap">💡 核心建议</span>
+                        <span class="text-sm text-apple-gray leading-relaxed">所有工具定位为<strong class="text-apple-black">高效初级审查员</strong>，快速过滤风格问题与显性漏洞。资深工程师人工终审，把关核心逻辑与架构。</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 核心结语 -->
+        <section class="py-32 bg-white text-center px-6">
+            <div class="max-w-4xl mx-auto fade-in-section">
+                <h2 class="text-4xl md:text-6xl font-bold text-apple-black mb-8 tracking-tight">人机协作，而非替代</h2>
+                <p class="text-xl text-apple-gray mb-6 leading-relaxed">
+                    工程师价值从未被替代，而是升级为
+                </p>
+                <p class="text-2xl md:text-3xl font-bold text-apple-black mb-12">
+                    质量把关者 · 业务决策者 · AI校准者
+                </p>
+                <div class="inline-flex items-center px-8 py-4 rounded-full bg-apple-black text-white font-medium text-base shadow-lg hover:bg-black/85 transition-all hover:-translate-y-0.5 cursor-pointer">
+                    善用AI，做代码的掌舵人
+                </div>
+                <p class="mt-10 text-apple-gray text-sm">
+                    欢迎在评论区分享你的AI测试与审查技巧 · 我们一起交流精进
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="py-10 bg-apple-bg border-t border-gray-200/60 text-center">
+        <p class="text-apple-gray text-xs">© 2026 AI编程时代 · 人类防线</p>
+    </footer>
+
+    <!-- 滚动动画 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" });
+
+            document.querySelectorAll('.fade-in-section').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

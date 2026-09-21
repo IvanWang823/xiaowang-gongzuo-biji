@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小白AI网页课 · 库存管理系统实战</title>
+    <style>
+        /* ===== 全局重置 & 基础样式 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f1f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .presentation-container {
+            width: 100%;
+            max-width: 1100px;
+            height: 90vh;
+            max-height: 750px;
+            background: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slides-wrapper {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: #fafcff;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 36px 48px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform: scale(0.96);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            scrollbar-width: thin;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 10;
+        }
+
+        .slide-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #0b1120;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .slide-subtitle {
+            font-size: 1rem;
+            color: #475569;
+            font-weight: 400;
+            margin-bottom: 1.2rem;
+            border-left: 4px solid #3b82f6;
+            padding-left: 16px;
+            background: #f8fafc;
+            border-radius: 0 8px 8px 0;
+            line-height: 1.5;
+            flex-shrink: 0;
+            padding: 6px 16px;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .content-card {
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 16px 20px;
+            border: 1px solid #e9edf2;
+        }
+
+        .content-card.primary {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .content-card.danger {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        .content-card.success {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .content-card.workbuddy {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-color: #7dd3fc;
+            border-width: 2px;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 3px 12px;
+            border-radius: 20px;
+            background: #3b82f6;
+            color: white;
+            letter-spacing: 0.3px;
+            margin-right: 6px;
+        }
+
+        .badge.orange {
+            background: #f97316;
+        }
+        .badge.red {
+            background: #ef4444;
+        }
+        .badge.green {
+            background: #22c55e;
+        }
+        .badge.purple {
+            background: #8b5cf6;
+        }
+        .badge.slate {
+            background: #64748b;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .grid-3col {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 6px 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        .list-icon {
+            font-size: 1.3rem;
+            min-width: 28px;
+            text-align: center;
+        }
+
+        .code-block {
+            background: #0b1120;
+            color: #e2e8f0;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+            border: 1px solid #1e293b;
+            margin: 2px 0;
+        }
+
+        .code-block.small {
+            max-height: 130px;
+            font-size: 0.75rem;
+            padding: 10px 14px;
+            overflow-y: auto;
+        }
+
+        .code-block-full {
+            max-height: none;
+            overflow: visible;
+        }
+
+        .highlight-gold {
+            background: #fef9c3;
+            color: #854d0e;
+            padding: 0 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e2e8f0;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .nav-bar {
+            background: #ffffff;
+            border-top: 1px solid #e9edf2;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .nav-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1e293b;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid transparent;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .nav-btn.primary {
+            background: #2563eb;
+            color: white;
+        }
+        .nav-btn.primary:hover:not(:disabled) {
+            background: #1d4ed8;
+        }
+
+        .dots-indicator {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .dot.active {
+            background: #2563eb;
+            width: 24px;
+            border-radius: 6px;
+        }
+
+        .slide-counter {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .presentation-container {
+                height: 95vh;
+                max-height: none;
+                border-radius: 18px;
+            }
+            .slide {
+                padding: 18px 16px;
+            }
+            .slide-title {
+                font-size: 1.5rem;
+            }
+            .grid-2col,
+            .grid-3col {
+                grid-template-columns: 1fr;
+            }
+            .nav-bar {
+                padding: 8px 12px;
+                flex-wrap: wrap;
+                gap: 6px;
+                justify-content: center;
+            }
+            .nav-btn {
+                padding: 5px 12px;
+                font-size: 0.8rem;
+            }
+            .code-block {
+                font-size: 0.7rem;
+                padding: 10px 12px;
+            }
+            .code-block.small {
+                max-height: 140px;
+            }
+        }
+
+        .slide::-webkit-scrollbar {
+            width: 4px;
+        }
+        .slide::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .slide::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        @media print {
+            .nav-bar {
+                display: none !important;
+            }
+            .slide {
+                position: relative !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                transform: none !important;
+                page-break-after: always;
+                height: 100vh;
+                max-height: none;
+                padding: 30px;
+            }
+            .presentation-container {
+                max-height: none;
+                height: auto;
+                box-shadow: none;
+                border-radius: 0;
+            }
+            body {
+                background: white;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container" role="main">
+        <div class="slides-wrapper" id="slidesWrapper">
+
+            <!-- ==================== SLIDE 1: 封面 ==================== -->
+            <div class="slide active" data-index="0">
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+                    <div style="font-size:3.8rem; margin-bottom:6px;">📦</div>
+                    <h1 style="font-size: clamp(2.4rem, 5vw, 3.6rem); font-weight:800; color:#0b1120; letter-spacing:-0.02em; line-height:1.2; margin:0 0 8px 0;">
+                        AI 编程第四课：网页开发实战
+                    </h1>
+                    <p style="font-size:1.5rem; color:#3b82f6; font-weight:600; margin-top:8px;">
+                        实战案例｜<span style="background:#e0f2fe; padding:0 16px; border-radius:30px;">基于Vue框架的库存管理后台系统</span>
+                    </p>
+                    <div style="margin-top:24px; padding:10px 28px; background:#f1f5f9; border-radius:40px; color:#475569; font-size:0.95rem;">
+                        🎤 会说话就能写代码：零基础从0到1完整实战
+                    </div>
+                    <div style="margin-top:10px; color:#94a3b8; font-size:0.85rem; letter-spacing:0.3px;">
+                        零代码基础也能独立开发，AI辅助一键生成完整后台管理系统
+                    </div>
+                    <div style="margin-top:32px; padding-top:16px; border-top:1px solid #e9edf2; width:70%; display:flex; flex-direction:column; align-items:center; gap:3px;">
+                        <div style="color:#64748b; font-size:0.85rem;">
+                            🛠️ 课程实操工具：<span style="font-weight:600; color:#0b1120;">WorkBuddy</span>
+                        </div>
+                        <div style="color:#94a3b8; font-size:0.8rem;">
+                            📄 本课件制作工具：DeepSeek（网页生成功能）
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SLIDE 2: 核心认知（原第二页痛点已删除） ==================== -->
+            <div class="slide" data-index="1">
+                <div class="slide-title">🧠 核心认知</div>
+                <div class="slide-subtitle">你负责提需求，AI负责写代码（产品经理+开发实习生分工模型）</div>
+                <div class="slide-content">
+                    <div class="grid-2col" style="flex:1;">
+                        <div class="content-card primary" style="display:flex; flex-direction:column; justify-content:center;">
+                            <div style="font-size:2rem;">🧑‍💼</div>
+                            <div style="font-weight:700; font-size:1.3rem; margin:6px 0;">你的工作</div>
+                            <ul style="list-style:none; padding:0; color:#1e293b; line-height:2;">
+                                <li>✅ 定义页面UI样式与布局</li>
+                                <li>✅ 梳理页面交互操作逻辑</li>
+                                <li>✅ 输出标准化前端需求文档</li>
+                            </ul>
+                        </div>
+                        <div class="content-card success" style="display:flex; flex-direction:column; justify-content:center;">
+                            <div style="font-size:2rem;">🤖</div>
+                            <div style="font-weight:700; font-size:1.3rem; margin:6px 0;">AI的工作</div>
+                            <ul style="list-style:none; padding:0; color:#1e293b; line-height:2;">
+                                <li>✅ 将需求转化为HTML/CSS/JS代码</li>
+                                <li>✅ 根据文档自动对接后端接口</li>
+                                <li>✅ 输出贴合业务流程的可运行代码</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div style="background:#0b1120; color:white; border-radius:14px; padding:12px 20px; text-align:center; font-size:1.1rem; font-weight:600;">
+                        ⭐ 无需掌握编程语法，但必须学会<span style="color:#facc15;">“梳理需求文档”</span>与<span style="color:#facc15;">“校验AI输出代码”</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SLIDE 3: Prompt第一式 ==================== -->
+            <div class="slide" data-index="2">
+                <div class="slide-title">🎨 Prompt第一式：定义页面UI样式</div>
+                <div class="slide-subtitle">（给“长相”）· 库存管理后台统一视觉规范</div>
+                <div class="slide-content">
+                    <div class="grid-2col">
+                        <div class="content-card danger">
+                            <div style="font-weight:700; color:#dc2626;">❌ 错误示范（模糊描述，AI输出效果不可控）</div>
+                            <div style="background:#fff; padding:10px; border-radius:8px; margin-top:6px; border-left:4px solid #dc2626;">“做个好看的后台”</div>
+                        </div>
+                        <div class="content-card success">
+                            <div style="font-weight:700; color:#16a34a;">✅ 正确示范（精准参数，AI输出符合预期）</div>
+                            <div style="background:#fff; padding:10px; border-radius:8px; margin-top:6px; border-left:4px solid #16a34a; font-size:0.9rem;">
+                                “左侧固定导航 + 顶部面包屑，<br>主色 <strong>#1677ff</strong>，表格行高亮，按钮圆角8px”
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-card workbuddy">
+                        <span class="badge">📌 统一设计标准</span> 
+                        主色：#1677ff；字体：Inter；基础间距：16px栅格；列表默认每页展示20条数据
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SLIDE 4: Prompt第二式 ==================== -->
+            <div class="slide" data-index="3">
+                <div class="slide-title">🧩 Prompt第二式：拆分页面模块</div>
+                <div class="slide-subtitle">（给“零件”）· 库存系统8大核心页面路由清单</div>
+                <div class="slide-content">
+                    <div style="background:#f1f5f9; border-radius:14px; padding:12px 16px; border:2px dashed #94a3b8;">
+                        <div style="font-weight:700; margin-bottom:6px; font-size:0.95rem;">📋 路由清单（可直接复制发给AI）</div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px 16px; font-size:0.85rem;">
+                            <div><span class="tag">/login</span> 登录页</div>
+                            <div><span class="tag">/dashboard</span> 数据看板</div>
+                            <div><span class="tag">/inventory</span> 库存列表</div>
+                            <div><span class="tag">/inbound</span> 入库管理</div>
+                            <div><span class="tag">/outbound</span> 出库管理</div>
+                            <div><span class="tag">/products</span> 商品管理</div>
+                            <div><span class="tag">/warehouse</span> 仓库与库位管理</div>
+                            <div><span class="tag">/alerts</span> 库存预警</div>
+                        </div>
+                    </div>
+                    <div style="background:#f0f9ff; border-radius:10px; padding:8px 14px; border-left:4px solid #0ea5e9; font-size:0.9rem;">
+                        💬 <strong>操作建议：</strong>直接复制清单发给AI，并补充指令：「根据以上8个页面，生成配套Vue路由配置代码」
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SLIDE 5: Prompt第三式 ==================== -->
+            <div class="slide" data-index="4">
+                <div class="slide-title">⚡ Prompt第三式：定义交互流程</div>
+                <div class="slide-subtitle">（给“动作”）· 库存系统完整入库业务流程</div>
+                <div class="slide-content">
+                    <div class="content-card primary">
+                        <div style="font-weight:700; font-size:1rem;">📦 入库流程（描述给AI）</div>
+                        <div style="background:white; border-radius:10px; padding:12px 16px; margin-top:8px; border:1px solid #e2e8f0; font-size:0.9rem; line-height:1.8;">
+                            1. 仓库员点击「新建入库单」<br>
+                            2. 选择SKU（商品编码）+ 数量 + 库位 → 提交 → 状态变为 <span class="tag">PENDING</span>（待审核）<br>
+                            3. 审核人审批 → 通过后状态变为 <span class="tag">APPROVED</span>（已审核） → 库存自动增加对应商品库存数量（<span class="highlight-gold">quantity</span>）
+                        </div>
+                    </div>
+                    <div style="background:#fefce8; border:1px solid #fde68a; border-radius:10px; padding:8px 14px; color:#854d0e; text-align:center; font-size:0.9rem;">
+                        📌 描述完整链路：点击新建单据 → 填写表单提交 → 管理员审核 → 审核通过自动增加库存
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SLIDE 6: Prompt第四式 ==================== -->
+            <div class="slide" data-index="5">
+                <div class="slide-title">🧰 Prompt第四式：指定项目技术栈</div>
+                <div class="slide-subtitle">（给“工具包”）· 库存管理系统技术选型标准</div>
+                <div class="slide-content">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div class="content-card" style="border-left:6px solid #8b5cf6;"><span class="badge purple">框架</span> <strong>Vue 3</strong> + Vite 构建工具，用于项目开发与打包</div>
+                        <div class="content-card" style="border-left:6px solid #06b6d4;"><span class="badge">UI库</span> <strong>Element Plus</strong> 组件库，提供表格、表单、弹窗等UI组件</div>
+                        <div class="content-card" style="border-left:6px solid #f59e0b;"><span class="badge orange">状态管理</span> <strong>Pinia</strong>，用于管理用户登录状态与库存数据</div>
+                        <div class="content-card" style="border-left:6px solid #ef4444;"><span class="badge red">网络请求</span> <strong>Axios</strong> HTTP客户端，统一拦截器处理Token认证</div>
+                    </div>
+                    <div style="background:#dcfce7; border-radius:10px; padding:8px 14px; color:#166534; text-align:center; font-weight:500; font-size:0.9rem;">
+                        ⭐ 复制指令给AI：基于Vue3 + Vite、Element Plus、Pinia、Axios技术栈开发前端页面
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SLIDE 7: 核心技巧 ==================== -->
+            <div class="slide" data-index="6">
+                <div class="slide-title">📄 核心技巧：交付完整前端需求文档</div>
+                <div class="slide-subtitle">标准化文档交付AI，大幅提升代码可用性</div>
+                <div class="slide-content">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.75rem;">
+                        <div class="content-card" style="padding:12px 14px;">
+                            <div style="font-weight:700; color:#2563eb;">📊 核心数据模型(数据库文档)</div>
+                            <div style="background:white; border-radius:6px; padding:6px 10px; margin-top:4px; font-family:monospace; font-size:0.7rem; line-height:1.6;">
+                                <strong>商品</strong>：skuId（商品编码），name（名称），category（分类），price（单价）<br>
+                                <strong>库存</strong>：skuId（商品编码），quantity（当前数量），lockedQty（锁定库存，已被订单锁定的数量）<br>
+                                <strong>出入库单</strong>：orderNo（单号），type（类型），status（状态）
+                            </div>
+                        </div>
+                        <div class="content-card" style="padding:12px 14px;">
+                            <div style="font-weight:700; color:#2563eb;">🔗 API 接口约定(接口文档)</div>
+                            <div style="background:white; border-radius:6px; padding:6px 10px; margin-top:4px; font-family:monospace; font-size:0.7rem; line-height:1.6;">
+                                GET  /api/inventory  （获取库存列表）<br>
+                                POST /api/inbound   （新建入库单）<br>
+                                POST /api/outbound  （新建出库单）<br>
+                                统一响应格式：{ code（状态码），data（数据），message（提示信息） }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="code-block small" style="max-height:110px;">
+📋 完整文档包含7大模块：项目概述 / 技术栈 / 页面路由 / 数据模型 / 交互流程 / API接口 / UI规范
+                    </div>
+                    <div style="background:#0b1120; color:#facc15; border-radius:12px; padding:8px 16px; text-align:center; font-weight:600; font-size:0.9rem;">
+                        🎯 交付全套标准化文档后，代码逻辑准确率可从40%提升至90%
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SLIDE 8: 终极高效用法 ==================== -->
+            <div class="slide" data-index="7">
+                <div class="slide-title">🔥 终极高效用法：完整文档 + 单行需求指令</div>
+                <div class="slide-subtitle">上传项目文件+全套文档，一句指令完成迭代</div>
+                <div class="slide-content">
+                    <div class="code-block code-block-full" style="font-size:0.85rem; padding:14px 18px;">
+<span style="color:#94a3b8;">// 你只需要发送这一句指令：</span>
+“根据我们提供的开发文档，在 <span style="color:#fcd34d;">/inventory</span>（库存列表）页面增加一列 <span style="color:#86efac;">‘库位编号’</span>，<br>并且同步更新导出Excel功能，包含该字段。”
+
+<span style="color:#94a3b8;">// AI 将自动完成以下工作：</span>
+✅ 定位到 inventory 对应的 Vue 页面文件
+✅ 在表格中插入“库位编号”列
+✅ 更新导出逻辑，确保新字段被包含
+✅ 匹配后端 API 中的 warehouseId（库位ID）字段进行数据对接
+                    </div>
+                    <div style="background:#eff6ff; border-radius:10px; padding:8px 16px; border-left:4px solid #3b82f6; font-size:0.9rem;">
+                        💡 <strong>无需记忆复杂代码文件路径</strong> —— AI通读完整文档后，可自主识别项目目录结构。
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SLIDE 9: 风险警示 ==================== -->
+            <div class="slide" data-index="8">
+                <div class="slide-title">⚠️ 风险警示：AI生成代码存在3类安全隐患</div>
+                <div class="slide-subtitle">AI优先实现功能，极易忽略项目安全与可用性问题</div>
+                <div class="slide-content">
+                    <div class="content-card danger">
+                        <div class="list-item"><span class="list-icon">💣</span> <strong>密码硬编码</strong> —— AI可能将账号密码直接写在代码中，浏览器F12即可查看源码导致泄露</div>
+                    </div>
+                    <div class="content-card danger">
+                        <div class="list-item"><span class="list-icon">💣</span> <strong>XSS跨站脚本攻击风险</strong> —— AI习惯使用 innerHTML 渲染动态内容，攻击者可注入恶意脚本窃取用户信息</div>
+                    </div>
+                    <div class="content-card danger">
+                        <div class="list-item"><span class="list-icon">💣</span> <strong>接口地址虚构</strong> —— AI会自行编造不存在的后端接口地址（如“/api/delete”），上线后功能全部报错</div>
+                    </div>
+                    <div style="background:#0b1120; color:#facc15; border-radius:14px; padding:12px 18px; text-align:center; font-weight:600;">
+                        🛡️ AI生成代码<span style="color:#ef4444; text-decoration:underline;">禁止直接部署上线</span>，<span style="color:white;">必须人工校验修复后才能投入使用</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SLIDE 10: 代码校验三步法 ==================== -->
+            <div class="slide" data-index="9">
+                <div class="slide-title">🔍 代码校验三步法（避坑自查）</div>
+                <div class="slide-subtitle">无需读懂源码，3个简易操作完成安全校验</div>
+                <div class="slide-content">
+                    <div class="grid-2col" style="flex:1;">
+                        <div class="content-card success">
+                            <div style="font-size:2rem; text-align:center;">👀</div>
+                            <div style="font-weight:700; text-align:center;">第一步：检查地址栏</div>
+                            <div style="background:white; border-radius:8px; padding:8px; text-align:center; margin-top:4px; font-size:0.85rem;">
+                                确认浏览器地址显示为 <code>http://localhost</code>（本地测试环境），方可安全预览
+                            </div>
+                        </div>
+                        <div class="content-card primary">
+                            <div style="font-size:2rem; text-align:center;">🔎</div>
+                            <div style="font-weight:700; text-align:center;">第二步：搜索敏感关键词</div>
+                            <div style="background:white; border-radius:8px; padding:8px; text-align:center; margin-top:4px; font-size:0.85rem;">
+                                按F12打开开发者工具，搜索 <code>password</code> 或 <code>key</code> 等关键词，若发现明文密码或密钥，立即删除并改用环境变量配置
+                            </div>
+                        </div>
+                        <div class="content-card" style="grid-column: 1 / -1; background:#fefce8; border-color:#fde68a;">
+                            <div style="font-size:2rem; text-align:center;">🧪</div>
+                            <div style="font-weight:700; text-align:center;">第三步：逐一点击测试全部按钮</div>
+                            <div style="background:white; border-radius:8px; padding:8px; text-align:center; margin-top:4px; font-size:0.85rem;">
+                                依次点击页面所有可交互元素，若控制台出现红色报错信息，<span class="highlight-gold">将完整的报错内容复制粘贴回AI对话框</span>，要求AI修复后重新验证
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SLIDE 11: 课程核心心法（单行公式） ==================== -->
+            <div class="slide" data-index="10">
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+                    <div style="font-size:3.5rem; margin-bottom:12px;">🧘</div>
+                    <div style="background:#0b1120; color:white; padding:28px 36px; border-radius:30px; max-width:90%;">
+                        <div style="font-size:1rem; color:#94a3b8; letter-spacing:2px;">课程核心心法（一句话总结）</div>
+                        <div style="font-size:1.5rem; font-weight:700; margin:12px 0; line-height:1.4; color:#facc15;">
+                            AI写项目 = 清晰的“长相描述” + 明确的“业务文档” + 仔细的“安全检查”
+                        </div>
+                    </div>
+                    <div style="margin-top:20px; color:#64748b; font-size:0.9rem;">📸 课堂总结 · 速记重点</div>
+                </div>
+            </div>
+
+            <!-- ==================== SLIDE 12: 结尾实战 ==================== -->
+            <div class="slide" data-index="11">
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+                    <div style="font-size:4rem;">🚀</div>
+                    <h2 style="font-size:2.2rem; font-weight:800; color:#0b1120; margin:12px 0;">现在就打开你的AI</h2>
+                    <p style="font-size:1.1rem; color:#475569; margin-bottom:16px;">复制这份《前端开发文档模板》发送给AI</p>
+                    <div style="background:#f1f5f9; border-radius:20px; padding:20px 28px; max-width:85%; border:2px dashed #3b82f6;">
+                        <div style="font-weight:600; color:#1e293b;">📝 实战任务</div>
+                        <div style="margin-top:8px; font-size:0.95rem; line-height:1.8;">
+                            将技术栈、路由、数据模型全部交付AI，发送指令：<br>
+                            <span class="highlight-gold">“依据这份开发文档，生成库存列表页面，严格对接定义好的后端API接口”</span>
+                        </div>
+                        <div style="margin-top:14px; background:#2563eb; color:white; padding:10px 22px; border-radius:40px; display:inline-block; font-weight:700; font-size:0.95rem;">
+                            ⏰ 仅需10分钟，即可得到具备完整增删改查功能的库存管理系统基础页面
+                        </div>
+                    </div>
+                    <div style="margin-top:30px; color:#94a3b8; font-size:0.9rem; border-top:1px solid #e9edf2; padding-top:16px; width:60%;">
+                        感谢观看，祝大家快速上手AI辅助前端开发 🎉
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== 底部导航 ===== -->
+        <div class="nav-bar">
+            <button class="nav-btn" id="prevBtn" disabled><span>←</span> 上一页</button>
+            <div style="display:flex; align-items:center; gap:16px;">
+                <div class="dots-indicator" id="dotsContainer"></div>
+                <span class="slide-counter" id="slideCounter">1 / 12</span>
+            </div>
+            <button class="nav-btn primary" id="nextBtn">下一页 <span>→</span></button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            var slides = document.querySelectorAll('.slide');
+            var totalSlides = slides.length;
+            var currentIndex = 0;
+
+            var prevBtn = document.getElementById('prevBtn');
+            var nextBtn = document.getElementById('nextBtn');
+            var dotsContainer = document.getElementById('dotsContainer');
+            var slideCounter = document.getElementById('slideCounter');
+
+            for (var i = 0; i < totalSlides; i++) {
+                var dot = document.createElement('button');
+                dot.classList.add('dot');
+                dot.setAttribute('data-index', i);
+                dot.setAttribute('aria-label', '跳转到第 ' + (i+1) + ' 页');
+                dot.addEventListener('click', (function(idx) {
+                    return function() { goToSlide(idx); };
+                })(i));
+                dotsContainer.appendChild(dot);
+            }
+            var dots = dotsContainer.querySelectorAll('.dot');
+
+            function goToSlide(index) {
+                if (index < 0) index = 0;
+                if (index >= totalSlides) index = totalSlides - 1;
+                if (index === currentIndex) return;
+
+                for (var i = 0; i < slides.length; i++) {
+                    slides[i].classList.remove('active');
+                }
+                for (var j = 0; j < dots.length; j++) {
+                    dots[j].classList.remove('active');
+                }
+
+                slides[index].classList.add('active');
+                dots[index].classList.add('active');
+                currentIndex = index;
+
+                prevBtn.disabled = (currentIndex === 0);
+                nextBtn.disabled = (currentIndex === totalSlides - 1);
+                slideCounter.textContent = (currentIndex + 1) + ' / ' + totalSlides;
+            }
+
+            function nextSlide() {
+                if (currentIndex < totalSlides - 1) goToSlide(currentIndex + 1);
+            }
+
+            function prevSlide() {
+                if (currentIndex > 0) goToSlide(currentIndex - 1);
+            }
+
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+                    e.preventDefault();
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    prevSlide();
+                }
+            });
+
+            var touchStartX = 0;
+            var container = document.querySelector('.presentation-container');
+            container.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+            container.addEventListener('touchend', function(e) {
+                var diff = touchStartX - e.changedTouches[0].screenX;
+                if (Math.abs(diff) > 40) {
+                    if (diff > 0) nextSlide();
+                    else prevSlide();
+                }
+            });
+
+            goToSlide(0);
+        })();
+    </script>
+</body>
+</html>
