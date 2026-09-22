@@ -14,6 +14,8 @@ This repository is a collection of **methodology / thinking notes** for AI-assis
 ```
 xiaowang-gongzuo-biji/
 ├── README.md / README_EN.md
+├── assets/                    # Shared assets
+│   └── donate/                # Donation QR code (Alipay)
 ├── ai-data-analysis/          # Data analysis case studies (methods)
 │   ├── 光伏风电出力预测 (Wind & Solar Output Forecast)
 │   ├── 如何用AI分析上网侧电价 (Feed-in Tariff Analysis)
@@ -43,6 +45,14 @@ xiaowang-gongzuo-biji/
 
 - `01_教程文档/`: How to do data analysis with AI (tutorial docs)
 - `AI写小说思路文字稿.md`: Methodology notes for writing novels with AI
+
+## Support the Author
+
+If this repository helps you, you're welcome to buy me a coffee ☕ Donations are entirely voluntary and never affect free access to any content.
+
+<img src="assets/donate/alipay.jpg" alt="Alipay donation QR code" width="240">
+
+---
 
 ## Notes
 
