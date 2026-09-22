@@ -85,3 +85,21 @@ AI 辅助编程系列课件（详见模块内 README）：
 - `ai-programming-tutorials/` 为 AI 编程教程栏目，收纳「用 AI 做编程」系列课件（Markdown 喂 AI / AI 工作流 / SQL / 前端 / 后端 / 测试审查）。
 - `aigc-getting-started/` 为 AIGC 创作实战栏目，收纳创作素材（如汽车短视频分镜图与分镜总表），便于直接复用。
 - 库名 `xiaowang-gongzuo-biji` 对应作者的抖音账号「小王工作笔记」。
+
+## 更新日志
+
+> 按更新日期倒序记录每次变动，便于追溯。
+
+### 2026-09-22
+- `ai-programming-tutorials/` 新增补充资料 `如何基于ima创建AI智能客服系统.html`
+- 新增「打赏支持」区块与支付宝打赏码 `assets/donate/alipay.jpg`
+- `ai-programming-tutorials/` 新增补充资料 `向量数据库.html`
+
+### 2026-09-21
+- 新增 `ai-programming-tutorials/` 模块（与 `ai-data-analysis` 平级），纳入 AI 编程第一~六课课件：
+  - 01 为何用 Markdown 喂 AI
+  - 02 为何要创建 AI 工作流
+  - 03 AI 生成 SQL 脚本
+  - 04 AI 生成前端网页实战
+  - 05 AI 生成后端代码
+  - 06 测试与审查
