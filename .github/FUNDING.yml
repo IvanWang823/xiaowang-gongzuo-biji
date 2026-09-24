@@ -1,0 +1,14 @@
+# 支持作者｜Support the author
+#
+# 说明：GitHub 原生赞助平台（Sponsors / Patreon / Ko-fi / Buy Me a Coffee 等）
+# 不支持支付宝与微信，因此收款码统一放在 custom 字段中（GitHub 上限 4 条）。
+# 下方两条依次为：① 支付宝   ② 微信
+# 生效位置：仓库页面右上角的 "Sponsor" 按钮。
+#
+# 注：图片走本仓库的 GitHub Pages 域名（国内比 raw.githubusercontent.com 更容易访问）。
+
+custom:
+  # ① 支付宝
+  - https://ivanwang823.github.io/xiaowang-gongzuo-biji/assets/donate/alipay.jpg
+  # ② 微信
+  - https://ivanwang823.github.io/xiaowang-gongzuo-biji/assets/donate/IMG_1534.JPG
