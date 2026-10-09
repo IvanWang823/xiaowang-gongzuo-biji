@@ -24,12 +24,17 @@ xiaowang-gongzuo-biji/
 │   ├── 弃风弃光率
 │   ├── 海运价格分析
 │   ├── 煤炭价格分析
+│   ├── 房产数据
 │   └── 理财分析
 ├── ai-getting-started/     # AI 应用入门学习资料
-│   ├── 01_教程文档/            # AI 赋能数据分析实操指南
-│   └── AI写小说思路文字稿.md
-├── ai-programming-tutorials/  # AI 辅助编程全套教程
-│   └── 01~06 课件（Markdown 向 AI 输入提示、AI 工作流、SQL、前端、后端、测试审查）
+│   └── 01_教程文档/            # AI 赋能数据分析 / AI 应用入门实操指南
+│       ├── 如何用AI做数据分析.md
+│       ├── 如何用AI做数据分析_海报_3x4.png
+│       ├── AI写小说思路文字稿.md
+│       ├── ChatGPT安装过程记录.md
+│       └── 概率校准与期望校准误差（ECE）.md
+├── ai-programming-tutorials/  # AI 辅助编程全套教程（01~08）
+│   └── 01~08 课件（Markdown 提示、AI 工作流、SQL、前端、后端、测试审查、向量数据库、ima 智能客服）
 ├── aigc-getting-started/   # AIGC 内容创作实战素材
 │   ├── 汽车运镜视频/          # 汽车短视频分镜方案与配套素材
 │   │   ├── 汽车视频制作总表.xlsx  # 分镜总表（镜头编号 / 分镜参考图 / AI 提示词 / 镜头时长 / 执行状态）
@@ -56,12 +61,17 @@ xiaowang-gongzuo-biji/
 | 弃风弃光率          | 弃风弃光率指标分析完整流程     |
 | 海运价格分析         | 海运市场价格分析思路框架      |
 | 煤炭价格分析         | 煤炭价格分析框架与实操手册     |
+| 房产数据           | 鲅鱼圈二手房成交数据整理分析（wps 源数据 / xlsx 报表 / 交互看板 / 工作流报告） |
 | 理财分析           | AI 辅助理财分析标准化工作流文档 |
 
 ### ai-getting-started ｜ AI 入门资料
 
-- `01_教程文档/`：手把手讲解如何借助 AI 开展数据分析工作
-- `AI写小说思路文字稿.md`：利用 AI 进行小说创作的方法论文档
+- `01_教程文档/`：AI 应用入门与数据分析实操指南，包含：
+  - `如何用AI做数据分析.md`：手把手讲解如何借助 AI 开展数据分析工作
+  - `AI写小说思路文字稿.md`：利用 AI 进行小说创作的方法论文档
+  - `ChatGPT安装过程记录.md`：本地部署 / 安装 ChatGPT 类工具的过程记录
+  - `概率校准与期望校准误差（ECE）.md`：模型概率校准与 ECE 指标方法论文档
+  - `如何用AI做数据分析_海报_3x4.png`：配套海报素材
 
 ### ai-programming-tutorials ｜ AI 编程教程
 
@@ -75,6 +85,8 @@ AI 辅助编程系列课程课件，详细内容可查阅模块内部 README 文
 | 04  | AI 生成前端网页项目实战               |
 | 05  | AI 辅助后端代码开发                 |
 | 06  | 代码的测试与合规审查                  |
+| 07  | 向量数据库原理与应用                  |
+| 08  | 如何基于 ima 搭建 AI 智能客服系统        |
 
 ### aigc-getting-started ｜ AIGC 创作实战
 
@@ -131,6 +143,16 @@ AI 辅助自媒体运营与开发环境搭建的自动化方案、流程文档�
 
 > 按时间倒序记录版本变更，方便追溯迭代历史
 
+### 2026-10-09
+
+- `ai-programming-tutorials/` 课件补齐为 **01~08**：原「补充资料」`向量数据库.html` 升格为正式课时 **07** 并规范化命名；全套课件齐备
+- `ai-getting-started/01_教程文档/` 新增 `概率校准与期望校准误差（ECE）.md`，并将 `AI写小说思路文字稿.md`、`ChatGPT安装过程记录.md` 归入该目录统一管理
+- `ai-data-analysis/` 新增 **房产数据** 案例：`房产数据/` 整理产出鲅鱼圈二手房成交数据的 xlsx 报表、交互看板（html）、工作流报告，并附 `.wps` 规则源文件与模块 README
+
+### 2026-09-25
+
+- `ai-getting-started/` 新增 `ChatGPT安装过程记录.md`（本地部署 / 安装过程记录）
+
 ### 2026-09-24
 
 - `aigc-getting-started/` 新增 **换装特效** 练习素材：含 `图片/`（5 张穿搭参考图）与 `文档/分镜提示词表.xlsx`
@@ -185,12 +207,17 @@ xiaowang-gongzuo-biji/
 │   ├── 弃风弃光率 (Curtailment Rate)
 │   ├── 海运价格分析 (Shipping Price)
 │   ├── 煤炭价格分析 (Coal Price)
+│   ├── 房产数据 (Real-Estate Data)
 │   └── 理财分析 (Personal Finance)
 ├── ai-getting-started/        # AI getting-started materials
-│   ├── 01_教程文档/           # How to do data analysis with AI
-│   └── AI写小说思路文字稿.md   (How to write novels with AI)
-├── ai-programming-tutorials/  # Full AI programming tutorial series
-│   └── Lessons 01~06 (Markdown prompting / AI workflows / SQL / frontend / backend / testing & review)
+│   └── 01_教程文档/           # How to do data analysis / AI getting-started
+│       ├── 如何用AI做数据分析.md         (How to do data analysis with AI)
+│       ├── 如何用AI做数据分析_海报_3x4.png (Poster)
+│       ├── AI写小说思路文字稿.md         (How to write novels with AI)
+│       ├── ChatGPT安装过程记录.md        (ChatGPT install notes)
+│       └── 概率校准与期望校准误差（ECE）.md (Probability calibration & ECE)
+├── ai-programming-tutorials/  # Full AI programming tutorial series (01~08)
+│   └── Lessons 01~08 (Markdown prompting / AI workflows / SQL / frontend / backend / testing & review / vector DB / ima customer service)
 ├── aigc-getting-started/      # AIGC content creation materials
 │   ├── 汽车运镜视频/          # Car short-video storyboard kit
 │   │   ├── 汽车视频制作总表.xlsx  (Master storyboard sheet)
@@ -217,12 +244,17 @@ xiaowang-gongzuo-biji/
 | 弃风弃光率 | Curtailment rate analysis workflow |
 | 海运价格分析 | Shipping price analysis approach |
 | 煤炭价格分析 | Coal price analysis framework & handbook |
+| 房产数据 | Bayuquan second-hand housing transaction analysis (wps source / xlsx report / interactive dashboard / workflow report) |
 | 理财分析 | Personal finance analysis workflow |
 
 ### ai-getting-started
 
-- `01_教程文档/`: How to do data analysis with AI (tutorial docs)
-- `AI写小说思路文字稿.md`: Methodology notes for writing novels with AI
+- `01_教程文档/`: AI getting-started & data-analysis tutorial docs, including:
+  - `如何用AI做数据分析.md`: How to do data analysis with AI (step-by-step)
+  - `AI写小说思路文字稿.md`: Methodology notes for writing novels with AI
+  - `ChatGPT安装过程记录.md`: Notes on local ChatGPT-class tool installation
+  - `概率校准与期望校准误差（ECE）.md`: Model probability calibration & Expected Calibration Error (ECE)
+  - `如何用AI做数据分析_海报_3x4.png`: Companion poster asset
 
 ### ai-programming-tutorials
 
@@ -236,6 +268,8 @@ AI-assisted programming courseware series. See the module's own README for detai
 | 04 | AI frontend web project in practice |
 | 05 | AI-assisted backend code development |
 | 06 | Code testing & compliance review |
+| 07 | Vector database principles & practice |
+| 08 | Building an AI customer-service system on ima |
 
 ### aigc-getting-started
 
@@ -291,6 +325,16 @@ If this repository helps you, you're welcome to buy me a coffee ☕ Donations ar
 ## Changelog
 
 > Reverse-chronological change log for traceability.
+
+### 2026-10-09
+
+- `ai-programming-tutorials/` courseware completed to **01~08**: former "supplementary" `向量数据库.html` promoted to official Lesson **07** with standardized naming; full set complete
+- `ai-getting-started/01_教程文档/` added `概率校准与期望校准误差（ECE）.md`; `AI写小说思路文字稿.md` and `ChatGPT安装过程记录.md` moved here for unified management
+- `ai-data-analysis/` added **房产数据 (Real-Estate Data)** case: `房产数据/` ships Bayuquan second-hand housing xlsx report, interactive dashboard (html), workflow report, plus `.wps` source data and a module README
+
+### 2026-09-25
+
+- `ai-getting-started/` added `ChatGPT安装过程记录.md` (local install notes)
 
 ### 2026-09-24
 
