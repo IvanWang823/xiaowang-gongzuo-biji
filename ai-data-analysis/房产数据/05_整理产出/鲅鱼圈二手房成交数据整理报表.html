@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>鲅鱼圈二手房成交数据整理报表 · 2026.1.1–1.10</title>
+
+<style>
+  :root{
+    --brand:#002FA7; --brand-2:#3B6BF0; --brand-3:#7AA0FF; --brand-soft:#EEF3FF;
+    --ink:#0A0E1A; --ink-2:#2B3547; --muted:#7C8798; --muted-2:#9AA4B4;
+    --line:#E7EAF0; --line-2:#F1F3F8; --bg:#F5F6F9; --surface:#FFFFFF;
+    --bad:#D64545; --warn:#C98A15; --ok:#0F9A5B;
+    --r-sm:10px; --r-md:16px; --r-lg:22px;
+    --sh-1:0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.03);
+    --sh-2:0 4px 14px rgba(16,24,40,.06), 0 1px 4px rgba(16,24,40,.03);
+    --sh-3:0 20px 46px rgba(16,24,40,.10), 0 4px 12px rgba(16,24,40,.04);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;color:var(--ink);background:var(--bg);
+    font-family:Inter,"Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+    background-image:
+      radial-gradient(1200px 500px at 12% -8%, rgba(59,107,240,.09), transparent 60%),
+      radial-gradient(900px 420px at 92% 2%, rgba(122,160,255,.10), transparent 62%);
+    background-repeat:no-repeat;
+  }
+  ::selection{background:rgba(59,107,240,.18)}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:#EEF1F6;border-radius:20px}
+  ::-webkit-scrollbar-thumb{background:#C6CEDC;border-radius:20px;border:2px solid #EEF1F6}
+  ::-webkit-scrollbar-thumb:hover{background:#A8B3C6}
+
+  .topnav{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.82);
+    backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);
+    border-bottom:1px solid rgba(231,234,240,.9);}
+  .topnav-inner{max-width:1220px;margin:0 auto;padding:0 34px;height:56px;
+    display:flex;align-items:center;gap:26px;}
+  .tn-brand{display:flex;align-items:center;gap:9px;font-weight:750;font-size:13.5px;letter-spacing:-.01em;white-space:nowrap}
+  .tn-brand .mark{width:20px;height:20px;border-radius:6px;flex:none;
+    background:linear-gradient(135deg,var(--brand),var(--brand-2) 60%,var(--brand-3));
+    box-shadow:0 3px 9px rgba(0,47,167,.28);}
+  .tn-links{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
+  .tn-links a{color:var(--muted);text-decoration:none;font-size:12.5px;font-weight:600;
+    padding:6px 11px;border-radius:8px;transition:.18s;white-space:nowrap;}
+  .tn-links a:hover{color:var(--brand);background:var(--brand-soft)}
+
+  .wrap{max-width:1220px;margin:0 auto;padding:0 34px 90px}
+
+  .hero{padding:66px 0 40px;border-bottom:1px solid var(--line);position:relative}
+  .hero-eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:11px;font-weight:750;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--brand);background:var(--brand-soft);
+    border:1px solid rgba(59,107,240,.16);padding:6px 14px 6px 11px;border-radius:99px;}
+  .hero-eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--brand-2);
+    box-shadow:0 0 0 4px rgba(59,107,240,.16);}
+  h1{font-size:clamp(30px,4.4vw,52px);line-height:1.1;margin:22px 0 0;
+    letter-spacing:-.035em;font-weight:800;max-width:16em;}
+  h1 .grad{background:linear-gradient(100deg,var(--brand) 0%,var(--brand-2) 48%,#8B6BF0 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .hero-sub{margin:18px 0 0;font-size:14.5px;color:var(--muted);font-weight:500}
+  .hero-sub b{color:var(--ink-2);font-weight:700}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+  .chip{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--line);
+    border-radius:11px;padding:9px 15px;box-shadow:var(--sh-1);font-size:12.5px;transition:.2s;}
+  .chip:hover{box-shadow:var(--sh-2);border-color:#D8DEEA;transform:translateY(-1px)}
+  .chip-k{color:var(--muted-2);font-weight:600;letter-spacing:.02em}
+  .chip-v{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+
+  section{margin-top:78px;scroll-margin-top:76px}
+  .sec-head{margin-bottom:8px}
+  .sec-num{display:inline-flex;align-items:center;gap:10px;font-size:11px;font-weight:800;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--brand-2);}
+  .sec-num::after{content:"";height:1px;width:38px;background:linear-gradient(90deg,var(--brand-2),transparent);}
+  h2{font-size:clamp(21px,2.4vw,27px);font-weight:800;letter-spacing:-.025em;margin:10px 0 0;line-height:1.25;}
+  h2 .en{display:block;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--muted-2);font-weight:700;margin-top:5px;}
+  h3{font-size:16px;font-weight:750;letter-spacing:-.012em;margin:44px 0 14px;
+    display:flex;align-items:center;gap:10px;}
+  h3 .n{font-size:11.5px;font-weight:800;color:var(--brand-2);background:var(--brand-soft);
+    border-radius:7px;padding:3px 9px;font-variant-numeric:tabular-nums;letter-spacing:.02em;flex:none;}
+  p{margin:12px 0}
+  .muted{color:var(--muted)}
+  .strong{font-weight:700;color:var(--ink)}
+  .num{font-variant-numeric:tabular-nums;text-align:right}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:14px;margin-top:26px;}
+  .stat{position:relative;background:var(--surface);border:1px solid var(--line);
+    border-radius:var(--r-md);padding:20px 20px 18px;overflow:hidden;box-shadow:var(--sh-1);
+    transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s,border-color .22s;}
+  .stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+    background:linear-gradient(180deg,var(--brand),var(--brand-2));opacity:.85;}
+  .stat:hover{transform:translateY(-3px);box-shadow:var(--sh-3);border-color:#D9E0EE}
+  .stat-k{font-size:11.5px;color:var(--muted);font-weight:650;letter-spacing:.02em}
+  .stat-v{font-size:33px;font-weight:800;letter-spacing:-.035em;line-height:1.15;margin-top:8px;
+    font-variant-numeric:tabular-nums;}
+  .stat-v span{font-size:13px;font-weight:600;color:var(--muted);margin-left:3px;letter-spacing:0}
+  .stat-s{font-size:11.5px;color:var(--muted-2);margin-top:5px;font-variant-numeric:tabular-nums}
+
+  .note{background:linear-gradient(135deg,#F4F7FF,#FAFBFF);border:1px solid #E2E9FB;
+    border-left:3px solid var(--brand-2);border-radius:0 var(--r-sm) var(--r-sm) 0;
+    padding:16px 20px;margin-top:22px;font-size:13.5px;color:var(--ink-2);}
+  .note.alert{background:linear-gradient(135deg,#FFF7F6,#FFFBFB);border-color:#F6DEDB;border-left-color:var(--bad);}
+  .note b{color:var(--ink);font-weight:750}
+  code{background:#EEF1F7;border:1px solid #E2E7F0;border-radius:5px;padding:1px 6px;font-size:12.5px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#3C4A63;}
+
+  .tf{list-style:none;padding:0;margin:28px 0 0;position:relative}
+  .tf li{position:relative;padding:0 0 26px 30px;border-left:2px solid var(--line);}
+  .tf li:last-child{border-left-color:transparent;padding-bottom:0}
+  .tf li::before{content:"";position:absolute;left:-7px;top:6px;width:12px;height:12px;border-radius:50%;
+    background:var(--surface);border:2.5px solid var(--brand-2);box-shadow:0 0 0 4px rgba(59,107,240,.10);}
+  .tf li:first-child::before{background:var(--brand-2)}
+  .tf .d{font-size:11.5px;color:var(--muted-2);font-weight:650;font-variant-numeric:tabular-nums;letter-spacing:.03em;}
+  .tf .t{font-weight:750;font-size:14.5px;margin-top:3px;letter-spacing:-.01em}
+  .tf .c{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.7}
+
+  .tree{background:#FBFCFE;border:1px solid var(--line);border-radius:var(--r-md);padding:20px 22px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;line-height:2.05;
+    color:#3C4A63;overflow-x:auto;white-space:pre;margin-top:18px;box-shadow:var(--sh-1);}
+  .tree b{color:var(--brand);font-weight:800}
+  .tree .cm{color:#9AA4B4}
+
+  .table-wrap{margin-top:18px;background:var(--surface);border:1px solid var(--line);
+    border-radius:var(--r-md);overflow:hidden;box-shadow:var(--sh-1);}
+  table{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px}
+  thead th{background:#FAFBFD;color:var(--muted);font-size:10.5px;letter-spacing:.09em;
+    text-transform:uppercase;font-weight:750;text-align:left;padding:12px 14px;white-space:nowrap;
+    border-bottom:1px solid var(--line);}
+  tbody td{padding:11px 14px;border-bottom:1px solid var(--line-2);vertical-align:top}
+  tbody td.num{white-space:nowrap}
+  table.rk tbody td{white-space:nowrap}
+  table.rk tbody td:nth-child(2){white-space:normal}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr{transition:background .15s}
+  tbody tr:hover{background:#F7F9FF}
+  td.idx{color:var(--muted-2);font-variant-numeric:tabular-nums;width:40px;text-align:right;font-weight:600}
+  td.fname{font-weight:700;color:var(--ink)}
+  tr.recv td{color:#AEB6C4}
+  tr.recv td.fname{color:#98A1B2}
+  .na{color:#BFC6D2}
+  .path{display:inline-block;font-size:11px;font-weight:700;color:var(--brand-2);background:var(--brand-soft);
+    border-radius:6px;padding:2px 8px;white-space:nowrap;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+
+  .tag{display:inline-block;font-size:10.5px;font-weight:750;letter-spacing:.03em;padding:2.5px 9px;
+    border-radius:99px;white-space:nowrap;color:var(--brand);background:var(--brand-soft);
+    border:1px solid rgba(59,107,240,.18);}
+  .pill{display:inline-block;font-size:10.5px;font-weight:750;letter-spacing:.02em;padding:3px 10px;
+    border-radius:99px;white-space:nowrap;color:#fff;}
+  .pill.bad{background:linear-gradient(135deg,#E05252,#C93A3A);box-shadow:0 2px 6px rgba(214,69,69,.24)}
+  .pill.warn{background:linear-gradient(135deg,#E0A32B,#C98A15);box-shadow:0 2px 6px rgba(201,138,21,.22)}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+  .chart-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);
+    padding:20px 20px 14px;box-shadow:var(--sh-1);}
+  .chart-title{font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:.04em;margin-bottom:10px;
+    display:flex;align-items:center;gap:8px;}
+  .chart-title::before{content:"";width:4px;height:12px;border-radius:3px;
+    background:linear-gradient(180deg,var(--brand),var(--brand-2));}
+  .chart{width:100%;height:auto;display:block;overflow:visible}
+  .chart .lbl{font-size:11.5px;fill:#5A6478;font-family:inherit;font-weight:600}
+  .chart .val{font-size:11.5px;fill:#0A0E1A;font-weight:750;font-family:inherit;font-variant-numeric:tabular-nums}
+  .chart .sub{font-size:10.5px;fill:#9AA4B4;font-family:inherit}
+  .chart .pt{fill:#002FA7;fill-opacity:.42}
+  .chart .pt:hover{fill-opacity:.85}
+
+  .legend{display:flex;flex-wrap:wrap;gap:16px;font-size:12px;color:var(--muted);margin-top:16px}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:7px;vertical-align:middle;
+    background:var(--brand-2)}
+
+  .ctrl{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:22px;background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--r-md);padding:14px;box-shadow:var(--sh-1);}
+  .ctrl input,.ctrl select{font-family:inherit;font-size:13px;padding:9px 13px;border:1px solid var(--line);
+    background:#FBFCFE;color:var(--ink);border-radius:9px;outline:none;transition:.18s;font-weight:550;}
+  .ctrl input{flex:1;min-width:200px}
+  .ctrl input::placeholder{color:#AEB6C4}
+  .ctrl input:focus,.ctrl select:focus{border-color:var(--brand-2);background:#fff;box-shadow:0 0 0 3px rgba(59,107,240,.12)}
+  .ctrl select{cursor:pointer}
+  .cnt{font-size:12px;color:var(--muted);margin-left:auto;font-variant-numeric:tabular-nums;font-weight:650;padding-right:6px;}
+
+  .scroll{max-height:620px;overflow:auto;border-radius:var(--r-md)}
+  .scroll table{margin:0}
+  .scroll thead th{position:sticky;top:0;z-index:2;background:rgba(250,251,253,.97);
+    backdrop-filter:blur(8px);box-shadow:inset 0 -1px 0 var(--line);}
+  table.sortable th[data-s]{cursor:pointer;user-select:none;transition:color .15s}
+  table.sortable th[data-s]:hover{color:var(--brand-2)}
+
+  footer{margin-top:80px;padding-top:26px;border-top:1px solid var(--line);font-size:12.5px;
+    color:var(--muted);line-height:1.9;}
+  footer b{color:var(--ink-2);font-weight:700}
+
+  @media(max-width:920px){
+    .grid2{grid-template-columns:1fr;gap:20px}
+    .wrap{padding:0 20px 64px}
+    .topnav-inner{padding:0 20px}
+    .tn-links{display:none}
+    .hero{padding:44px 0 30px}
+    section{margin-top:58px}
+    .stat-v{font-size:28px}
+  }
+  @media(max-width:560px){.chips{gap:8px}.chip{padding:7px 12px;font-size:12px}.scroll{max-height:520px}}
+</style>
+
+</head>
+<body>
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="tn-brand"><span class="mark"></span>鲅鱼圈 · 二手房成交数据</div>
+    <div class="tn-links">
+      <a href="#s1">文件脉络</a><a href="#s2">核心指标</a><a href="#s3">结构分布</a>
+      <a href="#s4">排行榜</a><a href="#s5">数据质量</a><a href="#s6">区域规则</a><a href="#s7">全量明细</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="hero-eyebrow"><span class="pulse"></span>Data Consolidation Report</div>
+  <h1>鲅鱼圈二手房成交数据<br><span class="grad">整理报表</span></h1>
+  <p class="hero-sub">数据周期 <b>2026.01.01 — 2026.01.10</b> &nbsp;·&nbsp; 样本量 <b>74</b> 条成交记录</p>
+  <div class="chips">
+    <div class="chip"><span class="chip-k">源文件夹</span><span class="chip-v">F:\房产数据</span></div>
+    <div class="chip"><span class="chip-k">原始文件</span><span class="chip-v">9 个</span></div>
+    <div class="chip"><span class="chip-k">归类状态</span><span class="chip-v">已归 5 类</span></div>
+    <div class="chip"><span class="chip-k">分析口径</span><span class="chip-v">成交价 ÷ 建筑面积</span></div>
+    <div class="chip"><span class="chip-k">生成时间</span><span class="chip-v">2026-09-10</span></div>
+  </div>
+</header>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sec-head">
+    <div class="sec-num">01 · Files</div>
+    <h2>文件清单与版本脉络<span class="en">File inventory &amp; version lineage</span></h2>
+  </div>
+  <p class="muted">文件夹内的 9 个文件实际是<b class="strong">同一条数据链的 5 个迭代版本 + 3 份产出报告 + 1 份规则源文件</b>。按修改时间还原的演进链路如下：</p>
+
+  <ul class="tf">
+    <li><div class="d">2026-03-24 19:41</div><div class="t">① 数据质量检查报告</div>
+      <div class="c">对原始表做体检：74 条 / 8 字段，发现「楼层 / 总高」63 条格式错误、1 处单价录入异常，评分 90 分。</div></li>
+    <li><div class="d">2026-03-24 19:42 → 21:33</div><div class="t">② 第一版 → ③ 修正楼层版 → ④ 补全小区名版</div>
+      <div class="c">当晚 3 轮清洗：把 Excel 日期序列号还原成「9/11」格式；把「宋屯 C 区」统一为「宋屯新区 C 区」等。样本始终锁定 74 条，未增未减。</div></li>
+    <li><div class="d">2026-03-24 22:00</div><div class="t">⑤ 区域划分规则（wps）</div>
+      <div class="c">定义北城区 / 南城区 / 红旗镇 / 熊岳城镇 / 芦屯镇 五区边界，是「区域划分」列的唯一依据。</div></li>
+    <li><div class="d">2026-03-25 15:11</div><div class="t">⑥ 最终版本.xlsx（主数据）</div>
+      <div class="c">合并楼层修正 + 小区名标准化 + 区域划分，形成 10 字段标准宽表 —— <b class="strong">本报表全部统计均以此表为唯一数据源</b>。</div></li>
+    <li><div class="d">2026-03-25 15:48 – 16:00</div><div class="t">⑦ 全维度分析报告.md ＋ ⑧ 汇报 PPT</div>
+      <div class="c">基于主数据的分析与汇报产出。</div></li>
+    <li><div class="d">2026-04-03 19:50</div><div class="t">⑨ 最终版本+仪表盘+报表.xlsx（成品）</div>
+      <div class="c">拆出 6 张衍生表：楼层类型表、面积表、北城区、南城区、其他区域、表格清洗后版本，并新增报表页。</div></li>
+    <li><div class="d">2026-09-10</div><div class="t">⑩ 归类归档 + 生成本报表</div>
+      <div class="c">按用途分 5 个目录归档（原文件全部移动、未删除未改名），并输出本报表与整理版数据表。</div></li>
+  </ul>
+
+  <h3><span class="n">1.1</span>当前目录结构</h3>
+  <div class="tree"><b>F:\房产数据\</b>
+├─ <b>01_主数据</b>          <span class="cm">现行数据表，做分析只从这里取</span>
+│   ├─ 最终版本.xlsx
+│   └─ 最终版本+仪表盘+报表.xlsx
+├─ <b>02_过程版本</b>        <span class="cm">清洗历史快照，仅作追溯，不要用于分析</span>
+│   ├─ 第一版_1.1-1.10成交数据.xlsx
+│   ├─ 修正楼层版_1.1-1.10成交数据.xlsx
+│   └─ 补全小区名+修正楼层版_1.1-1.10成交数据.xlsx
+├─ <b>03_报告</b>            <span class="cm">已产出的分析报告与汇报稿</span>
+│   ├─ 鲅鱼圈小区 1.1-1.10 成交数据质量检查报告.md
+│   ├─ 鲅鱼圈房产数据全维度分析报告（每栏解读+隐藏关系挖掘）.md
+│   └─ 鲅鱼圈1月1日—1月10日二手房销售情况分析报告.pptx
+├─ <b>04_规则源文件</b>      <span class="cm">区域划分规则的原始依据</span>
+│   └─ 1月份部分商品房成交数据.wps
+├─ <b>05_整理产出</b>        <span class="cm">本次整理生成</span>
+│   ├─ 鲅鱼圈二手房成交数据整理报表.html
+│   └─ 鲅鱼圈二手房成交数据_整理版.xlsx
+└─ README.md                <span class="cm">目录说明 + 版本脉络 + 已知数据问题</span></div>
+
+  <h3><span class="n">1.2</span>文件明细</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>当前位置</th><th>文件名</th><th>角色</th><th>内容</th><th>备注</th></tr></thead>
+      <tbody>
+<tr><td><span class='path'>01_主数据</span></td><td class='fname'>最终版本.xlsx</td><td><span class='tag'>v4 主数据</span></td><td>10 字段标准宽表，全部分析的唯一数据源</td><td class='muted'>存在冗余列「修正版楼层」重复 2 次</td></tr>
+<tr><td><span class='path'>01_主数据</span></td><td class='fname'>最终版本+仪表盘+报表.xlsx</td><td><span class='tag'>v5 成品</span></td><td>6 张衍生表 + 报表汇总页（含内嵌图表，体积大）</td><td class='muted'>报表页区域前五房源表存在跨行错位</td></tr>
+<tr><td><span class='path'>02_过程版本</span></td><td class='fname'>第一版_1.1-1.10成交数据.xlsx</td><td><span class='tag'>v1 原始</span></td><td>首次落表，8 字段</td><td class='muted'>楼层 63 条为 Excel 日期序列号；1 处单价异常</td></tr>
+<tr><td><span class='path'>02_过程版本</span></td><td class='fname'>修正楼层版_1.1-1.10成交数据.xlsx</td><td><span class='tag'>v2</span></td><td>修正「楼层/总高」为 9/11 格式</td><td class='muted'>单价异常值同步修正为 4,345</td></tr>
+<tr><td><span class='path'>02_过程版本</span></td><td class='fname'>补全小区名+修正楼层版_1.1-1.10成交数据.xlsx</td><td><span class='tag'>v3</span></td><td>小区名标准化（补后缀、统一空格）</td><td class='muted'>减少同小区被拆分的问题</td></tr>
+<tr><td><span class='path'>03_报告</span></td><td class='fname'>鲅鱼圈小区 1.1-1.10 成交数据质量检查报告.md</td><td><span class='tag'>报告</span></td><td>数据质量体检：完整性、唯一性、异常值</td><td class='muted'>结论：90 分 / 良好</td></tr>
+<tr><td><span class='path'>03_报告</span></td><td class='fname'>鲅鱼圈房产数据全维度分析报告（每栏解读+隐藏关系挖掘）.md</td><td><span class='tag'>报告</span></td><td>10 栏逐列分析 + 8 条跨栏关系</td><td class='muted'>⚠ 均价/极值数字与源表不符</td></tr>
+<tr><td><span class='path'>03_报告</span></td><td class='fname'>鲅鱼圈1月1日—1月10日二手房销售情况分析报告.pptx</td><td><span class='tag'>报告</span></td><td>汇报用演示稿</td><td class='muted'>已完成的可视化汇报版本</td></tr>
+<tr><td><span class='path'>04_规则源文件</span></td><td class='fname'>1月份部分商品房成交数据.wps</td><td><span class='tag'>规则</span></td><td>区域划分规则源文件（旧版二进制 WPS）</td><td class='muted'>五区行政边界定义的唯一依据</td></tr>
+<tr><td><span class='path'>05_整理产出</span></td><td class='fname'>鲅鱼圈二手房成交数据整理报表.html</td>
+<td><span class='tag'>本报表</span></td><td>单文件可视化报表，零外部依赖、断网可看</td><td class='muted'>7 张图表 + 可搜索排序的 74 行明细表</td></tr>
+<tr><td><span class='path'>05_整理产出</span></td><td class='fname'>鲅鱼圈二手房成交数据_整理版.xlsx</td>
+<td><span class='tag'>整理数据</span></td><td>规范化主数据：主数据 / 区域汇总 / 结构汇总 / 数据质量说明</td><td class='muted'>已删冗余列，楼层拆为所在/总/类型 3 列</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <b>整理结论：</b>5 份 Excel 属于同一数据的不同阶段快照，<b>只有「01_主数据」下的才需要用于分析</b>；
+    前 3 份过程版本已归档到 <code>02_过程版本\</code> 而非删除 —— 它们记录了数据修正的每一步依据。
+    归档前的原始状态完整备份于工作区 <code>.workbuddy\backup\房产数据_20260910\</code>。
+  </div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sec-head">
+    <div class="sec-num">02 · Overview</div>
+    <h2>核心指标总览<span class="en">Key metrics</span></h2>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-k">成交记录总量</div><div class="stat-v">74<span>条</span></div>
+      <div class="stat-s">含 9 条收房记录</div></div>
+    <div class="stat"><div class="stat-k">有效成交数据</div><div class="stat-v">65<span>条</span></div>
+      <div class="stat-s">可用率 87.8%</div></div>
+    <div class="stat"><div class="stat-k">平均建筑面积</div><div class="stat-v">84.4<span>㎡</span></div>
+      <div class="stat-s">中位数 84.3㎡</div></div>
+    <div class="stat"><div class="stat-k">平均成交价</div><div class="stat-v">26.0<span>万元</span></div>
+      <div class="stat-s">中位数 21.5万</div></div>
+    <div class="stat"><div class="stat-k">平均单价</div><div class="stat-v">2,992<span>元/㎡</span></div>
+      <div class="stat-s">中位数 2,838</div></div>
+    <div class="stat"><div class="stat-k">平均成交周期</div><div class="stat-v">596<span>天</span></div>
+      <div class="stat-s">中位数 459 天</div></div>
+  </div>
+  <div class="legend">
+    <span><i></i>结构分布（区域 / 装修 / 楼层 / 面积段 / 周期分档）均按 <b>全部 74 条</b> 记录统计；成交价与单价类指标仅按 <b>65 条有效成交</b> 计算（9 条收房无价格）</span>
+  </div>
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sec-head">
+    <div class="sec-num">03 · Distribution</div>
+    <h2>结构与分布<span class="en">Structure &amp; distribution</span></h2>
+  </div>
+
+  <h3><span class="n">3.1</span>区域分布与均价</h3>
+  <div class="grid2">
+    <div class="chart-card">
+      <div class="chart-title">各区域房源数量（套）</div>
+      <svg viewBox="0 0 560 180" class="chart" role="img"><defs><linearGradient id="grad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#002FA7"/><stop offset="100%" stop-color="#5B87F5"/></linearGradient></defs>
+<text x="100" y="23" class="lbl" text-anchor="end">北城区</text>
+<rect x="112" y="9" width="230.0" height="18" rx="6" fill="url(#grad)"/>
+<text x="350.0" y="23" class="sub">均价 2,671 元/㎡</text>
+<text x="554" y="23" class="val" text-anchor="end">46</text>
+<title>北城区：46</title>
+<text x="100" y="57" class="lbl" text-anchor="end">南城区</text>
+<rect x="112" y="43" width="115.0" height="18" rx="6" fill="url(#grad)"/>
+<text x="235.0" y="57" class="sub">均价 3,858 元/㎡</text>
+<text x="554" y="57" class="val" text-anchor="end">23</text>
+<title>南城区：23</title>
+<text x="100" y="91" class="lbl" text-anchor="end">熊岳城</text>
+<rect x="112" y="77" width="15.0" height="18" rx="6" fill="url(#grad)"/>
+<text x="135.0" y="91" class="sub">均价 1,693 元/㎡</text>
+<text x="554" y="91" class="val" text-anchor="end">3</text>
+<title>熊岳城：3</title>
+<text x="100" y="125" class="lbl" text-anchor="end">红旗镇</text>
+<rect x="112" y="111" width="5.0" height="18" rx="6" fill="url(#grad)"/>
+<text x="125.0" y="125" class="sub">均价 1,377 元/㎡</text>
+<text x="554" y="125" class="val" text-anchor="end">1</text>
+<title>红旗镇：1</title>
+<text x="100" y="159" class="lbl" text-anchor="end">芦屯镇</text>
+<rect x="112" y="145" width="5.0" height="18" rx="6" fill="url(#grad)"/>
+<text x="125.0" y="159" class="sub">均价 654 元/㎡</text>
+<text x="554" y="159" class="val" text-anchor="end">1</text>
+<title>芦屯镇：1</title>
+</svg>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">各区域平均单价（元/㎡，有效成交 ≥2 套）</div>
+      <svg viewBox="0 0 560 112" class="chart" role="img"><defs><linearGradient id="grad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#3B6BF0"/><stop offset="100%" stop-color="#8FAEFF"/></linearGradient></defs>
+<text x="100" y="23" class="lbl" text-anchor="end">北城区</text>
+<rect x="112" y="9" width="159.2" height="18" rx="6" fill="url(#grad)"/>
+<text x="279.2" y="23" class="sub">共 46 套 · 有价 39 套</text>
+<text x="554" y="23" class="val" text-anchor="end">2,671 元/㎡</text>
+<title>北城区：2,671 元/㎡</title>
+<text x="100" y="57" class="lbl" text-anchor="end">南城区</text>
+<rect x="112" y="43" width="230.0" height="18" rx="6" fill="url(#grad)"/>
+<text x="350.0" y="57" class="sub">共 23 套 · 有价 22 套</text>
+<text x="554" y="57" class="val" text-anchor="end">3,858 元/㎡</text>
+<title>南城区：3,858 元/㎡</title>
+<text x="100" y="91" class="lbl" text-anchor="end">熊岳城</text>
+<rect x="112" y="77" width="100.9" height="18" rx="6" fill="url(#grad)"/>
+<text x="220.9" y="91" class="sub">共 3 套 · 有价 2 套</text>
+<text x="554" y="91" class="val" text-anchor="end">1,693 元/㎡</text>
+<title>熊岳城：1,693 元/㎡</title>
+</svg>
+    </div>
+  </div>
+  <p class="muted">北城区以 <b class="strong">46 套占全部样本 62.2%</b>，是绝对主力片区；
+  南城区 23 套，均价高出北城区约 <b class="strong">44%</b>，两者构成「刚需 / 改善」的清晰分层。
+  红旗镇、芦屯镇各仅 1 套，不具统计意义。均价按该区域内<b>有成交价</b>的记录计算（北城区 39 条、南城区 22 条）。</p>
+
+  <h3><span class="n">3.2</span>装修类型</h3>
+  <div class="chart-card">
+    <div class="chart-title">各装修类型房源数量（套）</div>
+    <svg viewBox="0 0 560 180" class="chart" role="img"><defs><linearGradient id="grad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#002FA7"/><stop offset="100%" stop-color="#6E93F7"/></linearGradient></defs>
+<text x="100" y="23" class="lbl" text-anchor="end">精装</text>
+<rect x="112" y="9" width="230.0" height="18" rx="6" fill="url(#grad)"/>
+<text x="350.0" y="23" class="sub">均价 3,336 元/㎡ ｜ 周期 621 天</text>
+<text x="554" y="23" class="val" text-anchor="end">35</text>
+<title>精装：35</title>
+<text x="100" y="57" class="lbl" text-anchor="end">中装</text>
+<rect x="112" y="43" width="118.3" height="18" rx="6" fill="url(#grad)"/>
+<text x="238.3" y="57" class="sub">均价 2,544 元/㎡ ｜ 周期 586 天</text>
+<text x="554" y="57" class="val" text-anchor="end">18</text>
+<title>中装：18</title>
+<text x="100" y="91" class="lbl" text-anchor="end">简装</text>
+<rect x="112" y="77" width="59.1" height="18" rx="6" fill="url(#grad)"/>
+<text x="179.1" y="91" class="sub">均价 2,529 元/㎡ ｜ 周期 695 天</text>
+<text x="554" y="91" class="val" text-anchor="end">9</text>
+<title>简装：9</title>
+<text x="100" y="125" class="lbl" text-anchor="end">毛坯</text>
+<rect x="112" y="111" width="72.3" height="18" rx="6" fill="url(#grad)"/>
+<text x="192.3" y="125" class="sub">均价 2,889 元/㎡ ｜ 周期 499 天</text>
+<text x="554" y="125" class="val" text-anchor="end">11</text>
+<title>毛坯：11</title>
+<text x="100" y="159" class="lbl" text-anchor="end">回迁</text>
+<rect x="112" y="145" width="6.6" height="18" rx="6" fill="url(#grad)"/>
+<text x="126.6" y="159" class="sub">均价 2,385 元/㎡ ｜ 周期 406 天</text>
+<text x="554" y="159" class="val" text-anchor="end">1</text>
+<title>回迁：1</title>
+</svg>
+  </div>
+  <p class="muted">精装 35 套占全部样本 <b class="strong">47.3%</b>，为各类型最多；
+  其中有成交价的 34 套，占有效成交的 52.3%。
+  精装平均成交周期 <b class="strong">621 天</b> 也是各类型中最长的 —— 高挂牌量 + 高预期定价是拉长周期的直接原因。</p>
+
+  <h3><span class="n">3.3</span>楼层类型</h3>
+  <div class="chart-card">
+    <div class="chart-title">各楼层类型房源数量（套）</div>
+    <svg viewBox="0 0 560 112" class="chart" role="img"><defs><linearGradient id="grad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#002FA7"/><stop offset="100%" stop-color="#6E93F7"/></linearGradient></defs>
+<text x="100" y="23" class="lbl" text-anchor="end">多层</text>
+<rect x="112" y="9" width="230.0" height="18" rx="6" fill="url(#grad)"/>
+<text x="350.0" y="23" class="sub">均价 2,473 元/㎡ ｜ 周期 536 天</text>
+<text x="554" y="23" class="val" text-anchor="end">36</text>
+<title>多层：36</title>
+<text x="100" y="57" class="lbl" text-anchor="end">小高层</text>
+<rect x="112" y="43" width="172.5" height="18" rx="6" fill="url(#grad)"/>
+<text x="292.5" y="57" class="sub">均价 3,508 元/㎡ ｜ 周期 793 天</text>
+<text x="554" y="57" class="val" text-anchor="end">27</text>
+<title>小高层：27</title>
+<text x="100" y="91" class="lbl" text-anchor="end">高层</text>
+<rect x="112" y="77" width="70.3" height="18" rx="6" fill="url(#grad)"/>
+<text x="190.3" y="91" class="sub">均价 3,657 元/㎡ ｜ 周期 459 天</text>
+<text x="554" y="91" class="val" text-anchor="end">11</text>
+<title>高层：11</title>
+</svg>
+  </div>
+  <p class="muted">多层（≤7 层）36 套占全部样本 <b class="strong">48.6%</b>，均价 2,473 元/㎡ 为最低；
+  高层（≥18 层）均价 3,657 元/㎡ 最高，且成交周期 459 天反而<b class="strong">快于</b>小高层的 793 天。
+  这与此前分析报告中「高层最难卖」的结论<b class="strong">方向相反</b>，建议以源数据为准重新核对。</p>
+
+  <h3><span class="n">3.4</span>面积段分布</h3>
+  <div class="chart-card">
+    <div class="chart-title">各面积段房源数量（套）</div>
+    <svg viewBox="0 0 560 215" class="chart" role="img"><defs><linearGradient id="gradV" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3B6BF0"/><stop offset="100%" stop-color="#9CB8FF"/></linearGradient></defs>
+<line x1="34" y1="176" x2="550" y2="176" stroke="#E7EAF0"/>
+<rect x="54.0" y="110.2" width="46" height="65.8" rx="4" fill="url(#gradV)"/>
+<text x="77.0" y="104.2" class="val" text-anchor="middle">10 套</text>
+<text x="77.0" y="192" class="lbl" text-anchor="middle">≤60㎡</text>
+<text x="77.0" y="206" class="sub" text-anchor="middle">均价 2,477</text>
+<rect x="140.0" y="18.0" width="46" height="158.0" rx="4" fill="url(#gradV)"/>
+<text x="163.0" y="12.0" class="val" text-anchor="middle">24 套</text>
+<text x="163.0" y="192" class="lbl" text-anchor="middle">60–80㎡</text>
+<text x="163.0" y="206" class="sub" text-anchor="middle">均价 2,469</text>
+<rect x="226.0" y="18.0" width="46" height="158.0" rx="4" fill="url(#gradV)"/>
+<text x="249.0" y="12.0" class="val" text-anchor="middle">24 套</text>
+<text x="249.0" y="192" class="lbl" text-anchor="middle">80–100㎡</text>
+<text x="249.0" y="206" class="sub" text-anchor="middle">均价 3,069</text>
+<rect x="312.0" y="110.2" width="46" height="65.8" rx="4" fill="url(#gradV)"/>
+<text x="335.0" y="104.2" class="val" text-anchor="middle">10 套</text>
+<text x="335.0" y="192" class="lbl" text-anchor="middle">100–120㎡</text>
+<text x="335.0" y="206" class="sub" text-anchor="middle">均价 4,315</text>
+<rect x="398.0" y="143.1" width="46" height="32.9" rx="4" fill="url(#gradV)"/>
+<text x="421.0" y="137.1" class="val" text-anchor="middle">5 套</text>
+<text x="421.0" y="192" class="lbl" text-anchor="middle">120–140㎡</text>
+<text x="421.0" y="206" class="sub" text-anchor="middle">均价 2,880</text>
+<rect x="484.0" y="169.4" width="46" height="6.6" rx="4" fill="url(#gradV)"/>
+<text x="507.0" y="163.4" class="val" text-anchor="middle">1 套</text>
+<text x="507.0" y="192" class="lbl" text-anchor="middle">&gt;140㎡</text>
+<text x="507.0" y="206" class="sub" text-anchor="middle">无成交价</text>
+</svg>
+  </div>
+  <p class="muted">60–80㎡ 与 80–100㎡ 各 24 套并列第一，合计 48 套占 <b class="strong">64.9%</b>，
+  印证刚需 / 刚改户型主导的市场结构。120㎡ 以上大户型仅 6 套（8.1%）。
+  面积分段为左开右闭区间（如「60–80㎡」含 80 不含 60）。</p>
+
+  <h3><span class="n">3.5</span>成交周期分布</h3>
+  <div class="chart-card">
+    <div class="chart-title">成交周期区间分布（套）</div>
+    <svg viewBox="0 0 560 215" class="chart" role="img"><defs><linearGradient id="gradV" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3B6BF0"/><stop offset="100%" stop-color="#9CB8FF"/></linearGradient></defs>
+<line x1="34" y1="176" x2="550" y2="176" stroke="#E7EAF0"/>
+<rect x="62.6" y="127.0" width="46" height="49.0" rx="4" fill="url(#gradV)"/>
+<text x="85.6" y="121.0" class="val" text-anchor="middle">9 套</text>
+<text x="85.6" y="192" class="lbl" text-anchor="middle">≤30天</text>
+<rect x="165.8" y="94.3" width="46" height="81.7" rx="4" fill="url(#gradV)"/>
+<text x="188.8" y="88.3" class="val" text-anchor="middle">15 套</text>
+<text x="188.8" y="192" class="lbl" text-anchor="middle">31-180天</text>
+<rect x="269.0" y="132.4" width="46" height="43.6" rx="4" fill="url(#gradV)"/>
+<text x="292.0" y="126.4" class="val" text-anchor="middle">8 套</text>
+<text x="292.0" y="192" class="lbl" text-anchor="middle">181-365天</text>
+<rect x="372.2" y="105.2" width="46" height="70.8" rx="4" fill="url(#gradV)"/>
+<text x="395.2" y="99.2" class="val" text-anchor="middle">13 套</text>
+<text x="395.2" y="192" class="lbl" text-anchor="middle">1-2年</text>
+<rect x="475.4" y="18.0" width="46" height="158.0" rx="4" fill="url(#gradV)"/>
+<text x="498.4" y="12.0" class="val" text-anchor="middle">29 套</text>
+<text x="498.4" y="192" class="lbl" text-anchor="middle">2年以上</text>
+</svg>
+  </div>
+  <p class="muted">181-365 天与 1-2 年两档合计 21 套（28.4%）；
+  而<b class="strong">超过 2 年才成交的高达 29 套，占 39.2%</b>，是全样本最大的一档 ——
+  鲅鱼圈二手房整体去化节奏明显偏慢，成交周期中位数 459 天。30 天内极速成交仅 9 套（12.2%）。</p>
+
+  <h3><span class="n">3.6</span>面积 × 成交价关系</h3>
+  <div class="chart-card">
+    <div class="chart-title">建筑面积（㎡）与成交价（万元）散点 · 65 条有效成交</div>
+    <svg viewBox="0 0 560 260" class="chart" role="img">
+<line x1="48" y1="226.0" x2="548" y2="226.0" stroke="#F1F3F8"/>
+<text x="42" y="230.0" class="sub" text-anchor="end">0万</text>
+<line x1="48" y1="173.5" x2="548" y2="173.5" stroke="#F1F3F8"/>
+<text x="42" y="177.5" class="sub" text-anchor="end">17万</text>
+<line x1="48" y1="121.0" x2="548" y2="121.0" stroke="#F1F3F8"/>
+<text x="42" y="125.0" class="sub" text-anchor="end">34万</text>
+<line x1="48" y1="68.5" x2="548" y2="68.5" stroke="#F1F3F8"/>
+<text x="42" y="72.5" class="sub" text-anchor="end">52万</text>
+<line x1="48" y1="16.0" x2="548" y2="16.0" stroke="#F1F3F8"/>
+<text x="42" y="20.0" class="sub" text-anchor="end">69万</text>
+<text x="48.0" y="242" class="sub" text-anchor="middle">37</text>
+<text x="148.0" y="242" class="sub" text-anchor="middle">56</text>
+<text x="248.0" y="242" class="sub" text-anchor="middle">75</text>
+<text x="348.0" y="242" class="sub" text-anchor="middle">93</text>
+<text x="448.0" y="242" class="sub" text-anchor="middle">112</text>
+<text x="548.0" y="242" class="sub" text-anchor="middle">131</text>
+<line x1="48" y1="226.0" x2="548" y2="226.0" stroke="#D9DEE9"/>
+<circle class="pt" cx="202.4" cy="174.7" r="3.4"><title>誉龙华府小区 · 65.99㎡ · 16.8万 · 北城区</title></circle>
+<circle class="pt" cx="380.5" cy="60.3" r="3.4"><title>鸿基国际小区 · 99.41㎡ · 54.3万 · 南城区</title></circle>
+<circle class="pt" cx="394.3" cy="29.7" r="3.4"><title>鸿基海岸 B 区 · 102㎡ · 64.3万 · 南城区</title></circle>
+<circle class="pt" cx="458.0" cy="113.1" r="3.4"><title>山水人家小区 · 113.95㎡ · 37.0万 · 北城区</title></circle>
+<circle class="pt" cx="223.8" cy="158.8" r="3.4"><title>陶然小区 · 70㎡ · 22.0万 · 北城区</title></circle>
+<circle class="pt" cx="439.9" cy="144.2" r="3.4"><title>鞍钢公寓一街 · 110.56㎡ · 26.8万 · 南城区</title></circle>
+<circle class="pt" cx="241.4" cy="173.2" r="3.4"><title>新港小区 · 73.3㎡ · 17.3万 · 北城区</title></circle>
+<circle class="pt" cx="181.2" cy="205.6" r="3.4"><title>富吉家园 · 62㎡ · 6.7万 · 北城区</title></circle>
+<circle class="pt" cx="195.6" cy="166.2" r="3.4"><title>红海新区 F 区 · 64.71㎡ · 19.6万 · 南城区</title></circle>
+<circle class="pt" cx="341.0" cy="152.7" r="3.4"><title>鞍钢公寓四街 · 92㎡ · 24.0万 · 南城区</title></circle>
+<circle class="pt" cx="376.9" cy="95.1" r="3.4"><title>御海尚景小区 · 98.74㎡ · 42.9万 · 北城区</title></circle>
+<circle class="pt" cx="315.7" cy="140.5" r="3.4"><title>新港小区 · 87.25㎡ · 28.0万 · 北城区</title></circle>
+<circle class="pt" cx="289.2" cy="128.9" r="3.4"><title>红旺集团大厦小区 B 区 · 82.27㎡ · 31.8万 · 北城区</title></circle>
+<circle class="pt" cx="202.5" cy="203.1" r="3.4"><title>山海新城小区 · 66㎡ · 7.5万 · 熊岳城</title></circle>
+<circle class="pt" cx="86.5" cy="174.7" r="3.4"><title>朵拉海岸小区 · 44.23㎡ · 16.8万 · 南城区</title></circle>
+<circle class="pt" cx="399.6" cy="64.2" r="3.4"><title>新兴街小区 · 103㎡ · 53.0万 · 北城区</title></circle>
+<circle class="pt" cx="514.5" cy="27.6" r="3.4"><title>金地福苑小区 · 124.57㎡ · 65.0万 · 北城区</title></circle>
+<circle class="pt" cx="394.3" cy="76.4" r="3.4"><title>华海城小区 · 102㎡ · 49.0万 · 南城区</title></circle>
+<circle class="pt" cx="266.8" cy="183.9" r="3.4"><title>馥润嘉园小区 · 78.06㎡ · 13.8万 · 北城区</title></circle>
+<circle class="pt" cx="373.0" cy="175.6" r="3.4"><title>金泰花园 · 98㎡ · 16.5万 · 北城区</title></circle>
+<circle class="pt" cx="238.4" cy="212.3" r="3.4"><title>红旺集团大厦小区 B 区 · 72.74㎡ · 4.5万 · 北城区</title></circle>
+<circle class="pt" cx="266.4" cy="131.4" r="3.4"><title>远兴家园小区 · 77.99㎡ · 31.0万 · 南城区</title></circle>
+<circle class="pt" cx="323.1" cy="168.0" r="3.4"><title>锦绣新城小区 · 88.63㎡ · 19.0万 · 北城区</title></circle>
+<circle class="pt" cx="258.3" cy="197.0" r="3.4"><title>红旺集团大厦小区 B 区 · 76.48㎡ · 9.5万 · 北城区</title></circle>
+<circle class="pt" cx="175.2" cy="172.3" r="3.4"><title>金环花园北区 · 60.88㎡ · 17.6万 · 北城区</title></circle>
+<circle class="pt" cx="156.0" cy="189.4" r="3.4"><title>宋屯新区 D 区 · 57.28㎡ · 12.0万 · 北城区</title></circle>
+<circle class="pt" cx="314.4" cy="174.1" r="3.4"><title>御景城小区 · 87㎡ · 17.0万 · 北城区</title></circle>
+<circle class="pt" cx="490.2" cy="16.0" r="3.4"><title>金泰御园小区 · 120㎡ · 68.8万 · 南城区</title></circle>
+<circle class="pt" cx="170.9" cy="99.3" r="3.4"><title>白鲸公馆小区 · 60.06㎡ · 41.5万 · 南城区</title></circle>
+<circle class="pt" cx="48.0" cy="194.0" r="3.4"><title>金沙滩澜湾 C 区 · 37㎡ · 10.5万 · 南城区</title></circle>
+<circle class="pt" cx="383.6" cy="155.8" r="3.4"><title>站前街 · 100㎡ · 23.0万 · 北城区</title></circle>
+<circle class="pt" cx="158.4" cy="160.4" r="3.4"><title>馥润嘉园小区 · 57.72㎡ · 21.5万 · 北城区</title></circle>
+<circle class="pt" cx="383.6" cy="161.9" r="3.4"><title>站前街 · 100㎡ · 21.0万 · 北城区</title></circle>
+<circle class="pt" cx="548.0" cy="123.7" r="3.4"><title>MOMA 峰汇小区 · 130.85㎡ · 33.5万 · 南城区</title></circle>
+<circle class="pt" cx="336.8" cy="155.2" r="3.4"><title>书香门第小区 · 91.21㎡ · 23.2万 · 南城区</title></circle>
+<circle class="pt" cx="160.4" cy="214.4" r="3.4"><title>惠民小区 · 58.09㎡ · 3.8万 · 芦屯镇</title></circle>
+<circle class="pt" cx="303.7" cy="154.3" r="3.4"><title>金地福苑小区 · 85㎡ · 23.5万 · 北城区</title></circle>
+<circle class="pt" cx="75.2" cy="208.3" r="3.4"><title>红旗家园 B 区 · 42.11㎡ · 5.8万 · 红旗镇</title></circle>
+<circle class="pt" cx="349.7" cy="139.9" r="3.4"><title>怡馨家园 · 93.63㎡ · 28.2万 · 北城区</title></circle>
+<circle class="pt" cx="392.6" cy="122.2" r="3.4"><title>平安家园 · 101.68㎡ · 34.0万 · 南城区</title></circle>
+<circle class="pt" cx="307.5" cy="123.7" r="3.4"><title>御海尚景小区 · 85.7㎡ · 33.5万 · 北城区</title></circle>
+<circle class="pt" cx="522.2" cy="103.9" r="3.4"><title>营城印象小区 · 126㎡ · 40.0万 · 北城区</title></circle>
+<circle class="pt" cx="367.7" cy="168.0" r="3.4"><title>渤海钰珠小区 · 97㎡ · 19.0万 · 北城区</title></circle>
+<circle class="pt" cx="175.4" cy="163.4" r="3.4"><title>恒祥湾富贵园小区 · 60.92㎡ · 20.5万 · 南城区</title></circle>
+<circle class="pt" cx="310.0" cy="149.7" r="3.4"><title>苹果社区 · 86.17㎡ · 25.0万 · 南城区</title></circle>
+<circle class="pt" cx="177.6" cy="178.7" r="3.4"><title>福旺桃源阳光小区 · 61.33㎡ · 15.5万 · 北城区</title></circle>
+<circle class="pt" cx="149.2" cy="186.3" r="3.4"><title>宋屯新区 G 区 · 56㎡ · 13.0万 · 北城区</title></circle>
+<circle class="pt" cx="148.6" cy="174.7" r="3.4"><title>群星国际 D 区 · 55.88㎡ · 16.8万 · 南城区</title></circle>
+<circle class="pt" cx="378.3" cy="91.8" r="3.4"><title>渤海钰珠小区 · 99㎡ · 44.0万 · 北城区</title></circle>
+<circle class="pt" cx="342.0" cy="91.7" r="3.4"><title>恒祥湾富贵园小区 · 92.19㎡ · 44.0万 · 南城区</title></circle>
+<circle class="pt" cx="317.8" cy="187.2" r="3.4"><title>泰山小河沿小区 · 87.65㎡ · 12.7万 · 北城区</title></circle>
+<circle class="pt" cx="230.0" cy="195.5" r="3.4"><title>滨海街 · 71.17㎡ · 10.0万 · 北城区</title></circle>
+<circle class="pt" cx="173.6" cy="180.2" r="3.4"><title>红旺集团大厦小区 B 区 · 60.57㎡ · 15.0万 · 北城区</title></circle>
+<circle class="pt" cx="324.5" cy="165.0" r="3.4"><title>金地佳苑小区 · 88.9㎡ · 20.0万 · 熊岳城</title></circle>
+<circle class="pt" cx="296.4" cy="141.1" r="3.4"><title>御景城小区 · 83.62㎡ · 27.8万 · 北城区</title></circle>
+<circle class="pt" cx="268.7" cy="168.9" r="3.4"><title>龙水河小区 · 78.42㎡ · 18.7万 · 北城区</title></circle>
+<circle class="pt" cx="476.9" cy="52.6" r="3.4"><title>鸿基海岸 B 区 · 117.5㎡ · 56.8万 · 南城区</title></circle>
+<circle class="pt" cx="412.0" cy="108.5" r="3.4"><title>翔峰国际小区 · 105.32㎡ · 38.5万 · 南城区</title></circle>
+<circle class="pt" cx="186.5" cy="183.3" r="3.4"><title>宋屯新区 E 区 · 63㎡ · 14.0万 · 北城区</title></circle>
+<circle class="pt" cx="252.3" cy="174.7" r="3.4"><title>金沙滩澜湾 G 区 · 75.34㎡ · 16.8万 · 南城区</title></circle>
+<circle class="pt" cx="184.5" cy="186.3" r="3.4"><title>白云小区 · 62.63㎡ · 13.0万 · 北城区</title></circle>
+<circle class="pt" cx="433.6" cy="103.9" r="3.4"><title>金地福苑小区 · 109.38㎡ · 40.0万 · 北城区</title></circle>
+<circle class="pt" cx="277.6" cy="132.9" r="3.4"><title>金泰城三期小区 · 80.1㎡ · 30.5万 · 南城区</title></circle>
+<circle class="pt" cx="322.9" cy="122.8" r="3.4"><title>东信桃花源小区 · 88.6㎡ · 33.8万 · 北城区</title></circle>
+<circle class="pt" cx="509.4" cy="204.6" r="3.4"><title>宝山物资经销处综合楼 · 123.61㎡ · 7.0万 · 北城区</title></circle>
+<text x="304" y="254" class="sub" text-anchor="middle">建筑面积（㎡）→</text>
+</svg>
+  </div>
+  <p class="muted">散点整体呈正向关系，但底部存在一批「大面积、超低价」的离群点（如 123.61㎡ / 7.0 万），是拖低全局均价的主因，并非面积与价格关系失效。</p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sec-head">
+    <div class="sec-num">04 · Rankings</div>
+    <h2>排行榜<span class="en">Top rankings</span></h2>
+  </div>
+  <h3><span class="n">4.1</span>单价 TOP 8（元/㎡）</h3>
+  <div class="table-wrap"><table class="rk"><thead><tr><th></th><th>小区</th><th>楼层</th><th>面积</th><th>装修</th><th class="num">成交价</th><th class="num">单价</th></tr></thead><tbody><tr><td class='idx'>1</td><td>白鲸公馆小区</td><td>13/17</td><td>60.06㎡</td><td>精装</td><td class="num">41.5万</td><td class="num">6,910</td></tr><tr><td class='idx'>2</td><td>鸿基海岸 B 区</td><td>13/18</td><td>102㎡</td><td>精装</td><td class="num">64.3万</td><td class="num">6,304</td></tr><tr><td class='idx'>3</td><td>金泰御园小区</td><td>9/9</td><td>120㎡</td><td>毛坯</td><td class="num">68.8万</td><td class="num">5,733</td></tr><tr><td class='idx'>4</td><td>鸿基国际小区</td><td>4/19</td><td>99.41㎡</td><td>精装</td><td class="num">54.3万</td><td class="num">5,432</td></tr><tr><td class='idx'>5</td><td>金地福苑小区</td><td>1/2</td><td>124.57㎡</td><td>简装</td><td class="num">65.0万</td><td class="num">5,218</td></tr><tr><td class='idx'>6</td><td>新兴街小区</td><td>1/1</td><td>103㎡</td><td>中装</td><td class="num">53.0万</td><td class="num">5,146</td></tr><tr><td class='idx'>7</td><td>鸿基海岸 B 区</td><td>16/17</td><td>117.5㎡</td><td>精装</td><td class="num">56.8万</td><td class="num">4,834</td></tr><tr><td class='idx'>8</td><td>华海城小区</td><td>32/33</td><td>102㎡</td><td>精装</td><td class="num">49.0万</td><td class="num">4,804</td></tr></tbody></table></div>
+  <h3><span class="n">4.2</span>成交速度 TOP 8（天）</h3>
+  <div class="table-wrap"><table class="rk"><thead><tr><th></th><th>小区</th><th>楼层</th><th>面积</th><th>装修</th><th class="num">成交价</th><th class="num">单价</th></tr></thead><tbody><tr><td class='idx'>1</td><td>苹果社区</td><td>8/18</td><td>86.17㎡</td><td>精装</td><td class="num">25.0万</td><td class="num">2,901</td><td class="num">0天</td></tr><tr><td class='idx'>2</td><td>华海城小区</td><td>32/33</td><td>102㎡</td><td>精装</td><td class="num">49.0万</td><td class="num">4,804</td><td class="num">2天</td></tr><tr><td class='idx'>3</td><td>东信桃花源小区</td><td>9/11</td><td>88.6㎡</td><td>精装</td><td class="num">33.8万</td><td class="num">3,815</td><td class="num">2天</td></tr><tr><td class='idx'>4</td><td>宝山物资经销处综合楼</td><td>3/6</td><td>123.61㎡</td><td>毛坯</td><td class="num">7.0万</td><td class="num">566</td><td class="num">2天</td></tr><tr><td class='idx'>5</td><td>新港小区</td><td>2/7</td><td>87.25㎡</td><td>精装</td><td class="num">28.0万</td><td class="num">3,209</td><td class="num">3天</td></tr><tr><td class='idx'>6</td><td>群星国际 D 区</td><td>13/33</td><td>55.88㎡</td><td>中装</td><td class="num">16.8万</td><td class="num">3,006</td><td class="num">4天</td></tr><tr><td class='idx'>7</td><td>古城新区</td><td>11/15</td><td>52.61㎡</td><td>毛坯</td><td class="num">收房</td><td class="num">—</td><td class="num">10天</td></tr><tr><td class='idx'>8</td><td>红旺集团大厦小区 B 区</td><td>1/7</td><td>60.57㎡</td><td>中装</td><td class="num">15.0万</td><td class="num">2,476</td><td class="num">13天</td></tr></tbody></table></div>
+  <h3><span class="n">4.3</span>成交总价 TOP 8（万元）</h3>
+  <div class="table-wrap"><table class="rk"><thead><tr><th></th><th>小区</th><th>楼层</th><th>面积</th><th>装修</th><th class="num">成交价</th><th class="num">单价</th></tr></thead><tbody><tr><td class='idx'>1</td><td>金泰御园小区</td><td>9/9</td><td>120㎡</td><td>毛坯</td><td class="num">68.8万</td><td class="num">5,733</td><td>南城区</td></tr><tr><td class='idx'>2</td><td>金地福苑小区</td><td>1/2</td><td>124.57㎡</td><td>简装</td><td class="num">65.0万</td><td class="num">5,218</td><td>北城区</td></tr><tr><td class='idx'>3</td><td>鸿基海岸 B 区</td><td>13/18</td><td>102㎡</td><td>精装</td><td class="num">64.3万</td><td class="num">6,304</td><td>南城区</td></tr><tr><td class='idx'>4</td><td>鸿基海岸 B 区</td><td>16/17</td><td>117.5㎡</td><td>精装</td><td class="num">56.8万</td><td class="num">4,834</td><td>南城区</td></tr><tr><td class='idx'>5</td><td>鸿基国际小区</td><td>4/19</td><td>99.41㎡</td><td>精装</td><td class="num">54.3万</td><td class="num">5,432</td><td>南城区</td></tr><tr><td class='idx'>6</td><td>新兴街小区</td><td>1/1</td><td>103㎡</td><td>中装</td><td class="num">53.0万</td><td class="num">5,146</td><td>北城区</td></tr><tr><td class='idx'>7</td><td>华海城小区</td><td>32/33</td><td>102㎡</td><td>精装</td><td class="num">49.0万</td><td class="num">4,804</td><td>南城区</td></tr><tr><td class='idx'>8</td><td>恒祥湾富贵园小区</td><td>9/17</td><td>92.19㎡</td><td>精装</td><td class="num">44.0万</td><td class="num">4,773</td><td>南城区</td></tr></tbody></table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sec-head">
+    <div class="sec-num">05 · Data Quality</div>
+    <h2>数据质量与异常核对<span class="en">Quality &amp; anomaly audit</span></h2>
+  </div>
+  <p class="muted">本次整理对「主数据 vs 已产出的分析报告」做了逐项交叉核对，结果如下：</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>指标</th><th class="num">全维度分析报告.md 值</th><th class="num">源表实算值</th><th>核对</th></tr></thead>
+      <tbody><tr><td>平均单价</td><td class='num'>7,620 元/㎡</td><td class='num strong'>2,992 元/㎡</td><td><span class='pill bad'>不符</span></td></tr>
+<tr><td>单价区间</td><td class='num'>2,546 – 11,803 元/㎡</td><td class='num strong'>566 – 6,910 元/㎡</td><td><span class='pill bad'>不符</span></td></tr>
+<tr><td>成交价区间</td><td class='num'>16.8 万 – 188.0 万</td><td class='num strong'>3.8 万 – 68.8 万</td><td><span class='pill bad'>不符</span></td></tr>
+<tr><td>面积区间</td><td class='num'>40 – 185 ㎡</td><td class='num strong'>37 – 180 ㎡</td><td><span class='pill bad'>不符</span></td></tr>
+<tr><td>成交周期区间</td><td class='num'>15 – 1,825 天</td><td class='num strong'>0 – 1402 天</td><td><span class='pill bad'>不符</span></td></tr>
+<tr><td>北城区均价</td><td class='num'>7,150 元/㎡</td><td class='num strong'>2,671 元/㎡</td><td><span class='pill bad'>不符</span></td></tr>
+<tr><td>南城区均价</td><td class='num'>8,230 元/㎡</td><td class='num strong'>3,858 元/㎡</td><td><span class='pill bad'>不符</span></td></tr>
+<tr><td>记录数 / 可用数</td><td class='num'>74 / 62</td><td class='num strong'>74 / 65</td><td><span class='pill warn'>部分不符</span></td></tr></tbody>
+    </table>
+  </div>
+  <div class="note alert">
+    <b>⚠ 重要发现：</b>《鲅鱼圈房产数据全维度分析报告（每栏解读+隐藏关系挖掘）.md》中的<b>全部均价、极值与区间数字均与源表对不上</b>
+    （例如该报告称均价 7,620 元/㎡，源表实算 2,992 元/㎡，差 1.5 倍）。
+    该报告的定性结论方向部分仍成立，但<b>所有具体数字不可直接引用</b>，对外使用前需重算。本报表全部数字均直接由主表逐行计算。
+  </div>
+
+  <h3><span class="n">5.1</span>低价离群记录（单价 &lt; 1,500 元/㎡，共 9 条）</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th class="num">编码</th><th>小区</th><th>楼层</th><th>面积</th><th>装修</th><th class="num">成交价</th><th class="num">单价</th><th>区域</th></tr></thead>
+      <tbody><tr><td class='idx'>74</td><td>宝山物资经销处综合楼</td><td>3/6</td><td>123.61㎡</td><td>毛坯</td><td class='num'>7.0万</td><td class='num'>566 元/㎡</td><td>北城区</td></tr><tr><td class='idx'>25</td><td>红旺集团大厦小区 B 区</td><td>7/7</td><td>72.74㎡</td><td>中装</td><td class='num'>4.5万</td><td class='num'>619 元/㎡</td><td>北城区</td></tr><tr><td class='idx'>41</td><td>惠民小区</td><td>6/6</td><td>58.09㎡</td><td>中装</td><td class='num'>3.8万</td><td class='num'>654 元/㎡</td><td>芦屯镇</td></tr><tr><td class='idx'>12</td><td>富吉家园</td><td>6/7</td><td>62㎡</td><td>毛坯</td><td class='num'>6.7万</td><td class='num'>1,077 元/㎡</td><td>北城区</td></tr><tr><td class='idx'>18</td><td>山海新城小区</td><td>5/6</td><td>66㎡</td><td>精装</td><td class='num'>7.5万</td><td class='num'>1,136 元/㎡</td><td>熊岳城</td></tr><tr><td class='idx'>28</td><td>红旺集团大厦小区 B 区</td><td>6/7</td><td>76.48㎡</td><td>中装</td><td class='num'>9.5万</td><td class='num'>1,242 元/㎡</td><td>北城区</td></tr><tr><td class='idx'>43</td><td>红旗家园 B 区</td><td>4/7</td><td>42.11㎡</td><td>简装</td><td class='num'>5.8万</td><td class='num'>1,377 元/㎡</td><td>红旗镇</td></tr><tr><td class='idx'>58</td><td>滨海街</td><td>2/6</td><td>71.17㎡</td><td>简装</td><td class='num'>10.0万</td><td class='num'>1,405 元/㎡</td><td>北城区</td></tr><tr><td class='idx'>57</td><td>泰山小河沿小区</td><td>3/6</td><td>87.65㎡</td><td>简装</td><td class='num'>12.7万</td><td class='num'>1,449 元/㎡</td><td>北城区</td></tr></tbody>
+    </table>
+  </div>
+  <p class="muted">这 9 条记录的单价仅 566–1,449 元/㎡，明显偏离市场价。可能是网签备案价、亲属间过户价或录入误差 ——
+  <b class="strong">建议回源核实</b>，若剔除则整体均价会显著上升。</p>
+
+  <h3><span class="n">5.2</span>其它已知问题</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>问题</th><th>范围</th><th>状态</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td class="strong">楼层字段曾为 Excel 日期序列号</td><td>63 / 74 条</td>
+          <td><span class="pill warn">已修复</span></td>
+          <td>如「46276」→「9/11」，已在 v2 版本修正，主表正常。</td></tr>
+        <tr><td class="strong">御海尚景（编码 15）单价录入错误</td><td>1 条</td>
+          <td><span class="pill warn">已修复</span></td><td>原值 43,447 元/㎡ → 修正为 4,345 元/㎡。</td></tr>
+        <tr><td class="strong">「最终版本.xlsx」存在重复列</td><td>1 列</td>
+          <td><span class="pill warn">整理版已清理</span></td><td>「修正版楼层」重复出现 2 次，属冗余字段；整理版数据表中已删除。</td></tr>
+        <tr><td class="strong">成品表「报表」页跨行错位</td><td>该页 3 张分表</td>
+          <td><span class="pill bad">未修复</span></td>
+          <td>区域前五房源表中，成交价列跨行错位：如渤海钰珠 99㎡ 的真实成交价为 43.98 万，该页却显示 12.7 万、同时保留 4,442 的单价，两列互相矛盾。</td></tr>
+        <tr><td class="strong">9 条收房记录无价格</td><td>9 条</td>
+          <td><span class="pill warn">业务正常</span></td><td>收房未定成交价，符合业务逻辑，不计入价格统计。</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 06 -->
+<section id="s6">
+  <div class="sec-head">
+    <div class="sec-num">06 · Rules</div>
+    <h2>区域划分规则（源文件提取）<span class="en">Zone boundary rules</span></h2>
+  </div>
+  <p class="muted">以下规则提取自 <code>04_规则源文件\1月份部分商品房成交数据.wps</code>，是主表「区域划分」列的判定依据。</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:130px">区域</th><th>边界定义</th></tr></thead>
+      <tbody><tr><td class='strong'>北城区</td><td class='muted'>南至红海河（与南城区分界）；北至金港路（不含芦屯镇）；东至青龙山大街（与红旗镇分界）；西至辽东湾大街及渤海湾</td></tr>
+<tr><td class='strong'>南城区</td><td class='muted'>北至红海河（与北城区分界）；南至山海大道（与熊岳城镇分界）；东至青龙山大街（与红旗镇分界）；西至渤海湾</td></tr>
+<tr><td class='strong'>红旗镇</td><td class='muted'>西至青龙山大街（与南城区分界）；北至芦屯镇界；南至熊岳城镇界；东至盖州市界</td></tr>
+<tr><td class='strong'>熊岳城镇</td><td class='muted'>北至山海大道（与南城区分界）；南至熊岳河（不含仙人岛片区，仙人岛归属盖州）；东至盖州市界；西至渤海湾（含镇域内沿海小区）</td></tr>
+<tr><td class='strong'>芦屯镇</td><td class='muted'>西至海东街道及老城区；北至盖州市沙岗镇界；南至红旗镇界；东至盖州市界</td></tr></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 07 -->
+<section id="s7">
+  <div class="sec-head">
+    <div class="sec-num">07 · Data Table</div>
+    <h2>全量明细（74 条）<span class="en">Full detail records</span></h2>
+  </div>
+  <div class="ctrl">
+    <input id="q" type="text" placeholder="搜索小区 / 区域 / 装修…">
+    <select id="fr">
+      <option value="">全部区域</option>
+      <option>北城区</option><option>南城区</option>
+      <option>熊岳城</option><option>红旗镇</option><option>芦屯镇</option>
+    </select>
+    <select id="fp">
+      <option value="">全部记录</option>
+      <option value="sold">仅有效成交</option>
+      <option value="recv">仅收房</option>
+    </select>
+    <span class="cnt" id="cnt"></span>
+  </div>
+  <div class="table-wrap" style="margin-top:14px">
+    <div class="scroll">
+      <table class="sortable" id="tb">
+        <thead><tr>
+          <th data-s="0">编码</th><th data-s="1">小区</th><th data-s="2">楼层</th>
+          <th data-s="3" class="num">面积㎡</th><th data-s="4">装修</th>
+          <th data-s="5" class="num">成交价万</th><th data-s="6" class="num">单价元/㎡</th>
+          <th data-s="7" class="num">周期天</th><th data-s="8">区域</th><th data-s="9">楼层类型</th>
+        </tr></thead>
+        <tbody>
+<tr><td class='idx'>1</td><td>誉龙华府小区</td><td>9/11</td><td class='num'>65.99</td><td>中装</td><td class='num'>16.8</td><td class='num'>2,546</td><td class='num'>1394</td><td>北城区</td><td>小高层</td></tr>
+<tr><td class='idx'>2</td><td>鸿基国际小区</td><td>4/19</td><td class='num'>99.41</td><td>精装</td><td class='num'>54.3</td><td class='num'>5,432</td><td class='num'>640</td><td>南城区</td><td>高层</td></tr>
+<tr class='recv'><td class='idx'>3</td><td>宋屯新区 C 区</td><td>1/11</td><td class='num'>60.66</td><td>中装</td><td class='num'><span class='na'>收房</span></td><td class='num'><span class='na'>—</span></td><td class='num'>52</td><td>北城区</td><td>小高层</td></tr>
+<tr class='recv'><td class='idx'>4</td><td>塞纳河畔小区</td><td>8/10</td><td class='num'>96.4</td><td>毛坯</td><td class='num'><span class='na'>收房</span></td><td class='num'><span class='na'>—</span></td><td class='num'>257</td><td>南城区</td><td>小高层</td></tr>
+<tr class='recv'><td class='idx'>5</td><td>嘉和庄园小区</td><td>4/7</td><td class='num'>75</td><td>简装</td><td class='num'><span class='na'>收房</span></td><td class='num'><span class='na'>—</span></td><td class='num'>1396</td><td>北城区</td><td>多层</td></tr>
+<tr class='recv'><td class='idx'>6</td><td>鸿园小区</td><td>11/15</td><td class='num'>180</td><td>简装</td><td class='num'><span class='na'>收房</span></td><td class='num'><span class='na'>—</span></td><td class='num'>1261</td><td>北城区</td><td>小高层</td></tr>
+<tr><td class='idx'>7</td><td>鸿基海岸 B 区</td><td>13/18</td><td class='num'>102</td><td>精装</td><td class='num'>64.3</td><td class='num'>6,304</td><td class='num'>75</td><td>南城区</td><td>高层</td></tr>
+<tr><td class='idx'>8</td><td>山水人家小区</td><td>3/7</td><td class='num'>113.95</td><td>精装</td><td class='num'>37.0</td><td class='num'>3,247</td><td class='num'>1183</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>9</td><td>陶然小区</td><td>1/7</td><td class='num'>70</td><td>中装</td><td class='num'>22.0</td><td class='num'>3,143</td><td class='num'>1393</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>10</td><td>鞍钢公寓一街</td><td>1/13</td><td class='num'>110.56</td><td>精装</td><td class='num'>26.8</td><td class='num'>2,424</td><td class='num'>1397</td><td>南城区</td><td>小高层</td></tr>
+<tr><td class='idx'>11</td><td>新港小区</td><td>1/6</td><td class='num'>73.3</td><td>简装</td><td class='num'>17.3</td><td class='num'>2,360</td><td class='num'>652</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>12</td><td>富吉家园</td><td>6/7</td><td class='num'>62</td><td>毛坯</td><td class='num'>6.7</td><td class='num'>1,077</td><td class='num'>465</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>13</td><td>红海新区 F 区</td><td>2/6</td><td class='num'>64.71</td><td>精装</td><td class='num'>19.6</td><td class='num'>3,029</td><td class='num'>840</td><td>南城区</td><td>多层</td></tr>
+<tr><td class='idx'>14</td><td>鞍钢公寓四街</td><td>12/15</td><td class='num'>92</td><td>中装</td><td class='num'>24.0</td><td class='num'>2,609</td><td class='num'>393</td><td>南城区</td><td>小高层</td></tr>
+<tr><td class='idx'>15</td><td>御海尚景小区</td><td>7/7</td><td class='num'>98.74</td><td>精装</td><td class='num'>42.9</td><td class='num'>4,345</td><td class='num'>1005</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>16</td><td>新港小区</td><td>2/7</td><td class='num'>87.25</td><td>精装</td><td class='num'>28.0</td><td class='num'>3,209</td><td class='num'>3</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>17</td><td>红旺集团大厦小区 B 区</td><td>1/7</td><td class='num'>82.27</td><td>精装</td><td class='num'>31.8</td><td class='num'>3,865</td><td class='num'>209</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>18</td><td>山海新城小区</td><td>5/6</td><td class='num'>66</td><td>精装</td><td class='num'>7.5</td><td class='num'>1,136</td><td class='num'>186</td><td>熊岳城</td><td>多层</td></tr>
+<tr><td class='idx'>19</td><td>朵拉海岸小区</td><td>8/18</td><td class='num'>44.23</td><td>精装</td><td class='num'>16.8</td><td class='num'>3,798</td><td class='num'>215</td><td>南城区</td><td>高层</td></tr>
+<tr><td class='idx'>20</td><td>新兴街小区</td><td>1/1</td><td class='num'>103</td><td>中装</td><td class='num'>53.0</td><td class='num'>5,146</td><td class='num'>324</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>21</td><td>金地福苑小区</td><td>1/2</td><td class='num'>124.57</td><td>简装</td><td class='num'>65.0</td><td class='num'>5,218</td><td class='num'>798</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>22</td><td>华海城小区</td><td>32/33</td><td class='num'>102</td><td>精装</td><td class='num'>49.0</td><td class='num'>4,804</td><td class='num'>2</td><td>南城区</td><td>高层</td></tr>
+<tr><td class='idx'>23</td><td>馥润嘉园小区</td><td>5/7</td><td class='num'>78.06</td><td>中装</td><td class='num'>13.8</td><td class='num'>1,768</td><td class='num'>777</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>24</td><td>金泰花园</td><td>5/6</td><td class='num'>98</td><td>精装</td><td class='num'>16.5</td><td class='num'>1,684</td><td class='num'>397</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>25</td><td>红旺集团大厦小区 B 区</td><td>7/7</td><td class='num'>72.74</td><td>中装</td><td class='num'>4.5</td><td class='num'>619</td><td class='num'>502</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>26</td><td>远兴家园小区</td><td>16/17</td><td class='num'>77.99</td><td>精装</td><td class='num'>31.0</td><td class='num'>3,975</td><td class='num'>55</td><td>南城区</td><td>小高层</td></tr>
+<tr><td class='idx'>27</td><td>锦绣新城小区</td><td>6/7</td><td class='num'>88.63</td><td>精装</td><td class='num'>19.0</td><td class='num'>2,144</td><td class='num'>578</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>28</td><td>红旺集团大厦小区 B 区</td><td>6/7</td><td class='num'>76.48</td><td>中装</td><td class='num'>9.5</td><td class='num'>1,242</td><td class='num'>453</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>29</td><td>金环花园北区</td><td>1/6</td><td class='num'>60.88</td><td>中装</td><td class='num'>17.6</td><td class='num'>2,891</td><td class='num'>1399</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>30</td><td>宋屯新区 D 区</td><td>13/15</td><td class='num'>57.28</td><td>精装</td><td class='num'>12.0</td><td class='num'>2,095</td><td class='num'>1287</td><td>北城区</td><td>小高层</td></tr>
+<tr><td class='idx'>31</td><td>御景城小区</td><td>5/6</td><td class='num'>87</td><td>毛坯</td><td class='num'>17.0</td><td class='num'>1,954</td><td class='num'>1400</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>32</td><td>金泰御园小区</td><td>9/9</td><td class='num'>120</td><td>毛坯</td><td class='num'>68.8</td><td class='num'>5,733</td><td class='num'>447</td><td>南城区</td><td>小高层</td></tr>
+<tr><td class='idx'>33</td><td>白鲸公馆小区</td><td>13/17</td><td class='num'>60.06</td><td>精装</td><td class='num'>41.5</td><td class='num'>6,910</td><td class='num'>864</td><td>南城区</td><td>小高层</td></tr>
+<tr><td class='idx'>34</td><td>金沙滩澜湾 C 区</td><td>10/19</td><td class='num'>37</td><td>中装</td><td class='num'>10.5</td><td class='num'>2,838</td><td class='num'>853</td><td>南城区</td><td>高层</td></tr>
+<tr><td class='idx'>35</td><td>站前街</td><td>3/6</td><td class='num'>100</td><td>精装</td><td class='num'>23.0</td><td class='num'>2,300</td><td class='num'>104</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>36</td><td>馥润嘉园小区</td><td>1/7</td><td class='num'>57.72</td><td>中装</td><td class='num'>21.5</td><td class='num'>3,725</td><td class='num'>91</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>37</td><td>站前街</td><td>4/6</td><td class='num'>100</td><td>精装</td><td class='num'>21.0</td><td class='num'>2,100</td><td class='num'>104</td><td>北城区</td><td>多层</td></tr>
+<tr class='recv'><td class='idx'>38</td><td>宋屯新区 G 区</td><td>11/17</td><td class='num'>78</td><td>精装</td><td class='num'><span class='na'>收房</span></td><td class='num'><span class='na'>—</span></td><td class='num'>936</td><td>北城区</td><td>小高层</td></tr>
+<tr><td class='idx'>39</td><td>MOMA 峰汇小区</td><td>4/31</td><td class='num'>130.85</td><td>精装</td><td class='num'>33.5</td><td class='num'>2,560</td><td class='num'>1401</td><td>南城区</td><td>高层</td></tr>
+<tr><td class='idx'>40</td><td>书香门第小区</td><td>18/19</td><td class='num'>91.21</td><td>精装</td><td class='num'>23.2</td><td class='num'>2,544</td><td class='num'>231</td><td>南城区</td><td>高层</td></tr>
+<tr><td class='idx'>41</td><td>惠民小区</td><td>6/6</td><td class='num'>58.09</td><td>中装</td><td class='num'>3.8</td><td class='num'>654</td><td class='num'>172</td><td>芦屯镇</td><td>多层</td></tr>
+<tr><td class='idx'>42</td><td>金地福苑小区</td><td>6/6</td><td class='num'>85</td><td>精装</td><td class='num'>23.5</td><td class='num'>2,765</td><td class='num'>1002</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>43</td><td>红旗家园 B 区</td><td>4/7</td><td class='num'>42.11</td><td>简装</td><td class='num'>5.8</td><td class='num'>1,377</td><td class='num'>1388</td><td>红旗镇</td><td>多层</td></tr>
+<tr><td class='idx'>44</td><td>怡馨家园</td><td>5/11</td><td class='num'>93.63</td><td>精装</td><td class='num'>28.2</td><td class='num'>3,012</td><td class='num'>1323</td><td>北城区</td><td>小高层</td></tr>
+<tr class='recv'><td class='idx'>45</td><td>富吉家园</td><td>1/6</td><td class='num'>74.82</td><td>毛坯</td><td class='num'><span class='na'>收房</span></td><td class='num'><span class='na'>—</span></td><td class='num'>973</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>46</td><td>平安家园</td><td>11/17</td><td class='num'>101.68</td><td>精装</td><td class='num'>34.0</td><td class='num'>3,344</td><td class='num'>1016</td><td>南城区</td><td>小高层</td></tr>
+<tr><td class='idx'>47</td><td>御海尚景小区</td><td>6/7</td><td class='num'>85.7</td><td>毛坯</td><td class='num'>33.5</td><td class='num'>3,909</td><td class='num'>117</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>48</td><td>营城印象小区</td><td>4/11</td><td class='num'>126</td><td>毛坯</td><td class='num'>40.0</td><td class='num'>3,175</td><td class='num'>48</td><td>北城区</td><td>小高层</td></tr>
+<tr><td class='idx'>49</td><td>渤海钰珠小区</td><td>6/7</td><td class='num'>97</td><td>精装</td><td class='num'>19.0</td><td class='num'>1,959</td><td class='num'>198</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>50</td><td>恒祥湾富贵园小区</td><td>9/11</td><td class='num'>60.92</td><td>简装</td><td class='num'>20.5</td><td class='num'>3,365</td><td class='num'>363</td><td>南城区</td><td>小高层</td></tr>
+<tr><td class='idx'>51</td><td>苹果社区</td><td>8/18</td><td class='num'>86.17</td><td>精装</td><td class='num'>25.0</td><td class='num'>2,901</td><td class='num'>0</td><td>南城区</td><td>高层</td></tr>
+<tr><td class='idx'>52</td><td>福旺桃源阳光小区</td><td>6/17</td><td class='num'>61.33</td><td>中装</td><td class='num'>15.5</td><td class='num'>2,527</td><td class='num'>1398</td><td>北城区</td><td>小高层</td></tr>
+<tr><td class='idx'>53</td><td>宋屯新区 G 区</td><td>8/17</td><td class='num'>56</td><td>中装</td><td class='num'>13.0</td><td class='num'>2,321</td><td class='num'>99</td><td>北城区</td><td>小高层</td></tr>
+<tr><td class='idx'>54</td><td>群星国际 D 区</td><td>13/33</td><td class='num'>55.88</td><td>中装</td><td class='num'>16.8</td><td class='num'>3,006</td><td class='num'>4</td><td>南城区</td><td>高层</td></tr>
+<tr><td class='idx'>55</td><td>渤海钰珠小区</td><td>6/15</td><td class='num'>99</td><td>精装</td><td class='num'>44.0</td><td class='num'>4,442</td><td class='num'>1402</td><td>北城区</td><td>小高层</td></tr>
+<tr><td class='idx'>56</td><td>恒祥湾富贵园小区</td><td>9/17</td><td class='num'>92.19</td><td>精装</td><td class='num'>44.0</td><td class='num'>4,773</td><td class='num'>1402</td><td>南城区</td><td>小高层</td></tr>
+<tr><td class='idx'>57</td><td>泰山小河沿小区</td><td>3/6</td><td class='num'>87.65</td><td>简装</td><td class='num'>12.7</td><td class='num'>1,449</td><td class='num'>794</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>58</td><td>滨海街</td><td>2/6</td><td class='num'>71.17</td><td>简装</td><td class='num'>10.0</td><td class='num'>1,405</td><td class='num'>175</td><td>北城区</td><td>多层</td></tr>
+<tr class='recv'><td class='idx'>59</td><td>金地福苑小区</td><td>9/11</td><td class='num'>131</td><td>毛坯</td><td class='num'><span class='na'>收房</span></td><td class='num'><span class='na'>—</span></td><td class='num'>78</td><td>北城区</td><td>小高层</td></tr>
+<tr><td class='idx'>60</td><td>红旺集团大厦小区 B 区</td><td>1/7</td><td class='num'>60.57</td><td>中装</td><td class='num'>15.0</td><td class='num'>2,476</td><td class='num'>13</td><td>北城区</td><td>多层</td></tr>
+<tr class='recv'><td class='idx'>61</td><td>古城新区</td><td>11/15</td><td class='num'>52.61</td><td>毛坯</td><td class='num'><span class='na'>收房</span></td><td class='num'><span class='na'>—</span></td><td class='num'>10</td><td>熊岳城</td><td>小高层</td></tr>
+<tr class='recv'><td class='idx'>62</td><td>龙水河小区</td><td>8/17</td><td class='num'>45.74</td><td>简装</td><td class='num'><span class='na'>收房</span></td><td class='num'><span class='na'>—</span></td><td class='num'>18</td><td>北城区</td><td>小高层</td></tr>
+<tr><td class='idx'>63</td><td>金地佳苑小区</td><td>3/7</td><td class='num'>88.9</td><td>精装</td><td class='num'>20.0</td><td class='num'>2,250</td><td class='num'>33</td><td>熊岳城</td><td>多层</td></tr>
+<tr><td class='idx'>64</td><td>御景城小区</td><td>5/6</td><td class='num'>83.62</td><td>精装</td><td class='num'>27.8</td><td class='num'>3,325</td><td class='num'>114</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>65</td><td>龙水河小区</td><td>6/17</td><td class='num'>78.42</td><td>回迁</td><td class='num'>18.7</td><td class='num'>2,385</td><td class='num'>406</td><td>北城区</td><td>小高层</td></tr>
+<tr><td class='idx'>66</td><td>鸿基海岸 B 区</td><td>16/17</td><td class='num'>117.5</td><td>精装</td><td class='num'>56.8</td><td class='num'>4,834</td><td class='num'>1283</td><td>南城区</td><td>小高层</td></tr>
+<tr><td class='idx'>67</td><td>翔峰国际小区</td><td>3/11</td><td class='num'>105.32</td><td>中装</td><td class='num'>38.5</td><td class='num'>3,656</td><td class='num'>605</td><td>南城区</td><td>小高层</td></tr>
+<tr><td class='idx'>68</td><td>宋屯新区 E 区</td><td>8/15</td><td class='num'>63</td><td>精装</td><td class='num'>14.0</td><td class='num'>2,222</td><td class='num'>668</td><td>北城区</td><td>小高层</td></tr>
+<tr><td class='idx'>69</td><td>金沙滩澜湾 G 区</td><td>24/34</td><td class='num'>75.34</td><td>精装</td><td class='num'>16.8</td><td class='num'>2,230</td><td class='num'>612</td><td>南城区</td><td>高层</td></tr>
+<tr><td class='idx'>70</td><td>白云小区</td><td>3/6</td><td class='num'>62.63</td><td>中装</td><td class='num'>13.0</td><td class='num'>2,076</td><td class='num'>88</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>71</td><td>金地福苑小区</td><td>6/6</td><td class='num'>109.38</td><td>精装</td><td class='num'>40.0</td><td class='num'>3,657</td><td class='num'>1269</td><td>北城区</td><td>多层</td></tr>
+<tr><td class='idx'>72</td><td>金泰城三期小区</td><td>22/33</td><td class='num'>80.1</td><td>毛坯</td><td class='num'>30.5</td><td class='num'>3,808</td><td class='num'>1016</td><td>南城区</td><td>高层</td></tr>
+<tr><td class='idx'>73</td><td>东信桃花源小区</td><td>9/11</td><td class='num'>88.6</td><td>精装</td><td class='num'>33.8</td><td class='num'>3,815</td><td class='num'>2</td><td>北城区</td><td>小高层</td></tr>
+<tr><td class='idx'>74</td><td>宝山物资经销处综合楼</td><td>3/6</td><td class='num'>123.61</td><td>毛坯</td><td class='num'>7.0</td><td class='num'>566</td><td class='num'>2</td><td>北城区</td><td>多层</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="muted" style="font-size:12.5px">提示：点击表头可排序；灰色行为收房记录（无成交价）。</p>
+</section>
+
+<footer>
+  <div>数据来源：<b>F:\房产数据</b> ｜ 主数据表：<code>01_主数据\最终版本.xlsx</code>「用户表格_清洗后版本」及 <code>01_主数据\最终版本+仪表盘+报表.xlsx</code>「表格清洗后版本」</div>
+  <div style="margin-top:6px">本报表所有统计值均由源表逐行计算得出，未引用任何二手报告中的数字。生成于 2026-09-10。</div>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var tb=document.getElementById('tb'), tbody=tb.tBodies[0];
+  var rows=Array.prototype.slice.call(tbody.rows);
+  var q=document.getElementById('q'), fr=document.getElementById('fr'), fp=document.getElementById('fp'),
+      cnt=document.getElementById('cnt');
+  function apply(){
+    var t=q.value.trim().toLowerCase(), r=fr.value, p=fp.value, n=0;
+    rows.forEach(function(row){
+      var txt=row.innerText.toLowerCase();
+      var recv=row.classList.contains('recv');
+      var ok = (!t||txt.indexOf(t)>-1) && (!r||row.cells[8].innerText===r) &&
+               (!p || (p==='sold'&&!recv) || (p==='recv'&&recv));
+      row.style.display = ok?'':'none'; if(ok) n++;
+    });
+    cnt.textContent='显示 '+n+' / '+rows.length+' 条';
+  }
+  q.addEventListener('input',apply); fr.addEventListener('change',apply); fp.addEventListener('change',apply);
+  apply();
+  var dir={};
+  tb.querySelectorAll('th[data-s]').forEach(function(th){
+    th.addEventListener('click',function(){
+      var i=+th.dataset.s; dir[i]=!dir[i];
+      var s=dir[i]?1:-1;
+      var vis=rows.filter(function(r){return r.style.display!=='none';});
+      vis.sort(function(a,b){
+        var x=a.cells[i].innerText.replace(/[^\d.\-]/g,''), y=b.cells[i].innerText.replace(/[^\d.\-]/g,'');
+        var nx=parseFloat(x), ny=parseFloat(y);
+        if(!isNaN(nx)&&!isNaN(ny)&&x!==''&&y!=='') return (nx-ny)*s;
+        return a.cells[i].innerText.localeCompare(b.cells[i].innerText,'zh')*s;
+      });
+      vis.forEach(function(r){tbody.appendChild(r);});
+    });
+  });
+})();
+</script>
+
+
+</body>
+</html>
