@@ -163,6 +163,10 @@ If this repository helps you, you're welcome to buy me a coffee ☕ Donations ar
   - Fixed 11 broken links (`汽车视频/` → `汽车运镜视频/`; `AI写小说思路文字稿.md` moved into `01_教程文档/`)
   - Added an "AI-Assisted Exam-Paper Authoring" section (4 specs and mock papers)
   - Added two previously missing analysis entries: feed-in tariff report and the real-estate interactive dashboard
+- Removed dead file pointers repo-wide (option A: delete the dead links, keep plain-text notes marked "not shipped with this repo"):
+  - 18 occurrences across 9 documents (light/solar, curtailment, shipping, coal, finance, "how to do data analysis with AI" — both `.md` and rendered `.html`)
+  - Targets were the per-module `_元信息/论文辅助.md`, `03_论文综述/弃风弃光率相关论文综述.md`, and `弃风弃光率/02_分析看板/弃风弃光率分析看板.html` (none shipped)
+  - Verified: zero broken relative links across all `.md` + `.html`
 
 ### 2026-10-09
 
