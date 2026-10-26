@@ -2,7 +2,7 @@
 
 🌐 中文版: [README.md](README.md)
 
-> AI Data Analysis Case Studies (Power & Renewables, Coal, Shipping, Finance) + AI Getting-Started, AI Programming Tutorials, AIGC Content Creation, and AI Automation Task Engineering (self-media publishing automation, Marvis dev-environment setup).
+> AI Data Analysis Case Studies (Power & Renewables, Coal, Shipping, Finance, Real Estate) + AI Getting-Started, AI-Assisted Exam-Paper Authoring & Mock Papers, AI Programming Tutorials, AIGC Content Creation, and AI Automation Task Engineering (self-media publishing automation, Marvis dev-environment setup).
 > Author: Douyin (TikTok CN) channel "小王工作笔记" (ID: 163277992)
 
 ## Project Overview
@@ -28,12 +28,14 @@ xiaowang-gongzuo-biji/
 │   ├── 房产数据 (Real-Estate Data)
 │   └── 理财分析 (Personal Finance)
 ├── ai-getting-started/        # AI getting-started materials
-│   └── 01_教程文档/           # How to do data analysis / AI getting-started
-│       ├── 如何用AI做数据分析.md         (How to do data analysis with AI)
-│       ├── 如何用AI做数据分析_海报_3x4.png (Poster)
-│       ├── AI写小说思路文字稿.md         (How to write novels with AI)
-│       ├── ChatGPT安装过程记录.md        (ChatGPT install notes)
-│       └── 概率校准与期望校准误差（ECE）.md (Probability calibration & ECE)
+│   ├── 01_教程文档/           # How to do data analysis / AI getting-started
+│   │   ├── 如何用AI做数据分析.md         (How to do data analysis with AI)
+│   │   ├── AI写小说思路文字稿.md         (How to write novels with AI)
+│   │   ├── ChatGPT安装过程记录.md        (ChatGPT install notes)
+│   │   └── 概率校准与期望校准误差（ECE）.md (Probability calibration & ECE)
+│   └── 02_出题与试卷/          # AI-assisted exam-paper authoring
+│       ├── 01_出题思路/        (CET-4 / calculus paper-authoring specs)
+│       └── 02_模拟试卷/        (Mock paper A / limit-topic sample paper)
 ├── ai-programming-tutorials/  # Full AI programming tutorial series (01~08)
 │   └── Lessons 01~08 (Markdown prompting / AI workflows / SQL / frontend / backend / testing & review / vector DB / ima customer service)
 ├── aigc-getting-started/      # AIGC content creation materials
@@ -72,7 +74,9 @@ xiaowang-gongzuo-biji/
   - `AI写小说思路文字稿.md`: Methodology notes for writing novels with AI
   - `ChatGPT安装过程记录.md`: Notes on local ChatGPT-class tool installation
   - `概率校准与期望校准误差（ECE）.md`: Model probability calibration & Expected Calibration Error (ECE)
-  - `如何用AI做数据分析_海报_3x4.png`: Companion poster asset
+- `02_出题与试卷/`: AI-assisted exam-paper authoring (methodology + mock papers). See the folder's own `README.md`:
+  - `01_出题思路/`: `大学英语四级出题思路 v1.2.md` (CET-4 structure spec + external difficulty anchoring), `高等数学出题思路 v0.3.5.md` (final exam / Liaoning top-up degree / postgraduate exam + six-step verification)
+  - `02_模拟试卷/`: `试卷-模拟卷A.md` (CET-4 mock paper A), `样例01-极限五题-考研.md` (sample paper validating the verification pipeline)
 
 ### ai-programming-tutorials
 
@@ -143,6 +147,18 @@ If this repository helps you, you're welcome to buy me a coffee ☕ Donations ar
 ## Changelog
 
 > Reverse-chronological change log for traceability.
+
+### 2026-10-26
+
+- **File organization**: the 4 loose exam-authoring docs at the root of `ai-getting-started/` were consolidated into a dedicated sub-module `02_出题与试卷/`:
+  - `01_出题思路/`: `大学英语四级出题思路 v1.2.md`, `高等数学出题思路 v0.3.5.md`
+  - `02_模拟试卷/`: `试卷-模拟卷A.md`, `样例01-极限五题-考研.md`
+  - Added a folder `README.md` documenting scope (home-made practice specs, not official), file list, and naming conventions
+- `ai-data-analysis/如何用AI分析上网侧电价/` sub-directory numbering aligned with the rest of the repo:
+  - `_元信息/` → `01_元信息/`
+  - `②分析处理/` → `02_分析处理/`
+  - Relative path references updated in `01_元信息/工作流映射.md` and `02_分析处理/辽宁省上网侧电价2026年7月分析报告.md`
+- Repo tree synced: `ai-getting-started/` now shows both sub-directories; removed the non-existent `如何用AI做数据分析_海报_3x4.png` entry
 
 ### 2026-10-09
 
