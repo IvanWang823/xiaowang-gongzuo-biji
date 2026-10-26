@@ -159,6 +159,10 @@ If this repository helps you, you're welcome to buy me a coffee ☕ Donations ar
   - `②分析处理/` → `02_分析处理/`
   - Relative path references updated in `01_元信息/工作流映射.md` and `02_分析处理/辽宁省上网侧电价2026年7月分析报告.md`
 - Repo tree synced: `ai-getting-started/` now shows both sub-directories; removed the non-existent `如何用AI做数据分析_海报_3x4.png` entry
+- `index.html` landing page fixed and extended:
+  - Fixed 11 broken links (`汽车视频/` → `汽车运镜视频/`; `AI写小说思路文字稿.md` moved into `01_教程文档/`)
+  - Added an "AI-Assisted Exam-Paper Authoring" section (4 specs and mock papers)
+  - Added two previously missing analysis entries: feed-in tariff report and the real-estate interactive dashboard
 
 ### 2026-10-09
 
