@@ -4,6 +4,25 @@
 > AI 数据分析实战案例集，覆盖电力新能源、煤炭、海运、理财、房产多个领域；同时包含 AI 入门指南、AI 辅助出题与自制模拟卷、AI 编程实操教程、AIGC 内容创作实战案例，以及 AI 自动化任务工程交付（自媒体发布流程自动化、Marvis 开发环境安装）。
 > 作者：抖音「小王工作笔记」（ID：163277992）
 
+## 📺 视频专栏 / Video Channels
+
+本仓库是抖音「小王工作笔记」的配套资料库，视频教程与实操演示首发于以下平台，欢迎关注：
+
+- **抖音**：搜索「小王工作笔记」（ID：163277992）
+- **微信视频号**：搜索「小王工作笔记」
+
+## 内容索引（Content Index）
+
+> 按栏目梳理全站资源，快速定位所需资料；每行「配套资料」可点进对应目录，「视频」见各平台主页。
+
+| 栏目 | 主题 | 一句话 | 配套资料 | 视频 |
+| --- | --- | --- | --- | --- |
+| AI 数据分析 | 光伏风电 / 上网侧电价 / 弃风弃光 / 海运 / 煤炭 / 房产 / 理财 | 用 AI 做真实业务数据分析的完整思路与方法论 | [ai-data-analysis/](ai-data-analysis/) | 抖音「小王工作笔记」 |
+| AI 入门 | 如何用 AI 做数据分析 / 写小说 / ChatGPT 安装 / 概率校准(ECE) / 出题与试卷 | AI 应用入门、数据分析与命题实操指南 | [ai-getting-started/](ai-getting-started/) | 抖音「小王工作笔记」 |
+| AI 编程教程 | 01~08：Markdown / 工作流 / SQL / 前后端 / 测试 / 向量DB / ima 客服 | 从"人写"到"机写"的 AI 辅助编程全流程 | [ai-programming-tutorials/](ai-programming-tutorials/) | 抖音「小王工作笔记」 |
+| AIGC 创作 | 汽车运镜 / 首尾帧 / 换装特效 / 视频标准化 | AIGC 图文短视频全流程实战素材 | [aigc-getting-started/](aigc-getting-started/) | 抖音「小王工作笔记」 |
+| AI 自动化 | Marvis 安装 / 小红书 · 抖音 自动发布 | 自媒体发布流程自动化 + 开发环境搭建 | [ai-automated-tasks/](ai-automated-tasks/) | 抖音「小王工作笔记」 |
+
 ## 项目简介
 
 本仓库沉淀 **AI 辅助数据分析与程序开发的实践思路、工作方法**，项目内不包含原始业务数据以及最终生成的可视化图表，方便大家学习借鉴、二次复用。
@@ -206,10 +225,35 @@ AI 辅助自媒体运营与开发环境搭建的自动化方案、流程文档�
 
 ---
 
+## 免责声明
+
+本仓库所有内容仅用于 **技术教学与经验分享**。所涉及的任何数据分析、理财、量化等内容均不构成投资建议，也不构成荐股或任何投资引导；示例均为历史 / 模拟数据，**历史表现不代表未来收益**。据此操作，风险自负。
+
+---
+
 # English Version
 
 > AI Data Analysis Case Studies (Power & Renewables, Coal, Shipping, Finance) + AI Getting-Started, AI Programming Tutorials, AIGC Content Creation, and AI Automation Task Engineering (self-media publishing automation, Marvis dev-environment setup).
 > Author: Douyin (TikTok CN) channel "小王工作笔记" (ID: 163277992)
+
+## 📺 Video Channels
+
+This repo is the companion code/data library for the Douyin channel "小王工作笔记". Video tutorials and demos are published first on:
+
+- **Douyin (TikTok CN)**: search "小王工作笔记" (ID: 163277992)
+- **WeChat Channels**: search "小王工作笔记"
+
+## Content Index
+
+> Browse all resources by column; each "Materials" cell links into its folder, "Video" points to the channels above.
+
+| Column | Topic | One-liner | Materials | Video |
+| --- | --- | --- | --- | --- |
+| AI Data Analysis | Wind/solar, feed-in tariff, curtailment, shipping, coal, real estate, finance | Full AI-assisted data-analysis thinking & methodology | [ai-data-analysis/](ai-data-analysis/) | Douyin "小王工作笔记" |
+| AI Getting-Started | Data analysis with AI / novel writing / ChatGPT install / ECE / exam papers | Getting-started & practical guides | [ai-getting-started/](ai-getting-started/) | Douyin "小王工作笔记" |
+| AI Programming | Lessons 01~08: Markdown / workflows / SQL / frontend-backend / testing / vector DB / ima | End-to-end AI-assisted programming | [ai-programming-tutorials/](ai-programming-tutorials/) | Douyin "小王工作笔记" |
+| AIGC Creation | Car motion / first-last frames / outfit try-on / video standardization | Full AIGC image & short-video kits | [aigc-getting-started/](aigc-getting-started/) | Douyin "小王工作笔记" |
+| AI Automation | Marvis setup / Xiaohongshu · Douyin auto-publish | Publishing automation + dev-env setup | [ai-automated-tasks/](ai-automated-tasks/) | Douyin "小王工作笔记" |
 
 ## Project Overview
 
@@ -350,6 +394,24 @@ If this repository helps you, you're welcome to buy me a coffee ☕ Donations ar
 
 > Reverse-chronological change log for traceability.
 
+### 2026-10-26
+
+- **File organization**: the 4 loose exam-authoring docs at the root of `ai-getting-started/` were consolidated into a dedicated sub-module `02_出题与试卷/`:
+  - `01_出题思路/`: `大学英语四级出题思路 v1.2.md`, `高等数学出题思路 v0.3.5.md`
+  - `02_模拟试卷/`: `试卷-模拟卷A.md`, `样例01-极限五题-考研.md`
+  - Added a folder `README.md` documenting scope (home-made practice specs, not official), file list, and naming conventions
+- `ai-data-analysis/如何用AI分析上网侧电价/` sub-directory numbering aligned with the rest of the repo:
+  - `_元信息/` → `01_元信息/`
+  - `②分析处理/` → `02_分析处理/`
+  - Relative path references updated in `01_元信息/工作流映射.md` and `02_分析处理/辽宁省上网侧电价2026年7月分析报告.md`
+- Repo tree synced: `ai-getting-started/` now shows both sub-directories; removed the non-existent `如何用AI做数据分析_海报_3x4.png` entry
+- `index.html` landing page fixed and extended:
+  - Fixed 11 broken links (`汽车视频/` → `汽车运镜视频/`; `AI写小说思路文字稿.md` moved into `01_教程文档/`)
+  - Added an "AI-Assisted Exam-Paper Authoring" section (4 specs and mock papers)
+  - Added two previously missing analysis entries: feed-in tariff report and the real-estate interactive dashboard
+- Removed dead file pointers repo-wide (option A: delete the dead links, keep plain-text notes marked "not shipped with this repo"):
+  - 18 occurrences across 9 documents (light/solar, curtailment, shipping, coal, finance, "how to do data analysis with AI" — both `.md` and rendered `.html`)
+
 ### 2026-10-09
 
 - `ai-programming-tutorials/` courseware completed to **01~08**: former "supplementary" `向量数据库.html` promoted to official Lesson **07** with standardized naming; full set complete
@@ -386,3 +448,9 @@ If this repository helps you, you're welcome to buy me a coffee ☕ Donations ar
   - 04 AI frontend web development
   - 05 AI-generated backend code
   - 06 Testing & review
+
+---
+
+## Disclaimer
+
+All content in this repository is for **technical education and experience sharing only**. Anything related to data analysis, personal finance, or quant is **not** investment advice or a stock tip; all examples use historical / simulated data, and **past performance does not predict future results**. Use at your own risk.

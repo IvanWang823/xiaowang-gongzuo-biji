@@ -5,6 +5,25 @@
 > AI Data Analysis Case Studies (Power & Renewables, Coal, Shipping, Finance, Real Estate) + AI Getting-Started, AI-Assisted Exam-Paper Authoring & Mock Papers, AI Programming Tutorials, AIGC Content Creation, and AI Automation Task Engineering (self-media publishing automation, Marvis dev-environment setup).
 > Author: Douyin (TikTok CN) channel "小王工作笔记" (ID: 163277992)
 
+## 📺 Video Channels
+
+This repo is the companion code/data library for the Douyin channel "小王工作笔记". Video tutorials and demos are published first on:
+
+- **Douyin (TikTok CN)**: search "小王工作笔记" (ID: 163277992)
+- **WeChat Channels**: search "小王工作笔记"
+
+## Content Index
+
+> Browse all resources by column; each "Materials" cell links into its folder, "Video" points to the channels above.
+
+| Column | Topic | One-liner | Materials | Video |
+| --- | --- | --- | --- | --- |
+| AI Data Analysis | Wind/solar, feed-in tariff, curtailment, shipping, coal, real estate, finance | Full AI-assisted data-analysis thinking & methodology | [ai-data-analysis/](ai-data-analysis/) | Douyin "小王工作笔记" |
+| AI Getting-Started | Data analysis with AI / novel writing / ChatGPT install / ECE / exam papers | Getting-started & practical guides | [ai-getting-started/](ai-getting-started/) | Douyin "小王工作笔记" |
+| AI Programming | Lessons 01~08: Markdown / workflows / SQL / frontend-backend / testing / vector DB / ima | End-to-end AI-assisted programming | [ai-programming-tutorials/](ai-programming-tutorials/) | Douyin "小王工作笔记" |
+| AIGC Creation | Car motion / first-last frames / outfit try-on / video standardization | Full AIGC image & short-video kits | [aigc-getting-started/](aigc-getting-started/) | Douyin "小王工作笔记" |
+| AI Automation | Marvis setup / Xiaohongshu · Douyin auto-publish | Publishing automation + dev-env setup | [ai-automated-tasks/](ai-automated-tasks/) | Douyin "小王工作笔记" |
+
 ## Project Overview
 
 This repository collects **practical thinking and methodology** for AI-assisted data analysis and programming. Raw business data and final output charts are excluded, so the workflows are easy to learn from and reuse.
@@ -204,3 +223,9 @@ If this repository helps you, you're welcome to buy me a coffee ☕ Donations ar
   - 04 AI frontend web development
   - 05 AI-generated backend code
   - 06 Testing & review
+
+---
+
+## Disclaimer
+
+All content in this repository is for **technical education and experience sharing only**. Anything related to data analysis, personal finance, or quant is **not** investment advice or a stock tip; all examples use historical / simulated data, and **past performance does not predict future results**. Use at your own risk.
