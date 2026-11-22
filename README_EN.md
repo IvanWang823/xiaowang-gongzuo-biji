@@ -67,8 +67,10 @@ xiaowang-gongzuo-biji/
 │   ├── 换装特效/              # AI outfit / try-on effects practice
 │   │   ├── 图片/                (5 outfit reference images)
 │   │   └── 文档/                (Storyboard & prompt table.xlsx)
-│   └── AI视频制作全流程标准化/  # Standardized AI video production guide
-│       └── AI视频制作全流程标准化-内容整理.md
+│   ├── AI视频制作全流程标准化/  # Standardized AI video production guide
+│   │   └── AI视频制作全流程标准化-内容整理.md
+│   └── AI视频提示词该如何写/    # AI video prompt-writing guide
+│       └── AI视频提示词该如何写.md
 └── ai-automated-tasks/        # AI automation task engineering (publishing + Marvis setup)
 ```
 
@@ -124,6 +126,7 @@ AI-assisted programming courseware series. See the module's own README for detai
 - **`换装特效/`**: AI outfit / try-on effects practice pack
   - `图片/`: 5 outfit reference images (`01-街景背景.png` + 02~05, four outfits: striped shirt & khaki pants, black knit & white dress, grey knit knot dress, sleeveless plaid skirt)
   - `文档/`: `分镜提示词表.xlsx` storyboard & prompt practice table
+- **`AI视频提示词该如何写/`**: AI video prompt-writing guide (`AI视频提示词该如何写.md`) — core idea (learn sentence-building first; language-to-visual), film terminology correction (standard categories of shot size / angle / camera movement / camera motion), and a prompt-writing checklist (subject / action / setting / detail / camera / motion + generate-and-refine loop)
 
 ### ai-automated-tasks
 
@@ -166,6 +169,10 @@ If this repository helps you, you're welcome to buy me a coffee ☕ Donations ar
 ## Changelog
 
 > Reverse-chronological change log for traceability.
+
+### 2026-11-22
+
+- Added **AI video prompt-writing guide** to `aigc-getting-started/`: `AI视频提示词该如何写/AI视频提示词该如何写.md`, covering core idea, terminology correction, and a quick checklist.
 
 ### 2026-10-26
 

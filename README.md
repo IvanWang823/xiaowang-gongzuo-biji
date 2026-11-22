@@ -66,8 +66,10 @@ xiaowang-gongzuo-biji/
 │   ├── 换装特效/              # AI 换装 / 穿搭特效练习素材
 │   │   ├── 图片/                # 5 张穿搭参考图（街景背景 + 4 套穿搭）
 │   │   └── 文档/                # 分镜提示词表.xlsx（练习用表格）
-│   └── AI视频制作全流程标准化/  # AI 视频项目制作规范与协作指南
-│       └── AI视频制作全流程标准化-内容整理.md  # 8 份源文档整合：原理 / 文件夹规范 / 编号规则 / Excel 总表 / 协作 / FAQ / 工具清单
+│   ├── AI视频制作全流程标准化/  # AI 视频项目制作规范与协作指南
+│   │   └── AI视频制作全流程标准化-内容整理.md  # 8 份源文档整合：原理 / 文件夹规范 / 编号规则 / Excel 总表 / 协作 / FAQ / 工具清单
+│   └── AI视频提示词该如何写/    # AI 视频提示词撰写方法整理稿
+│       └── AI视频提示词该如何写.md  # 核心思路 / 术语勘误 / 速查卡
 └── ai-automated-tasks/     # AI 自动化任务工程交付（自媒体发布流程 + Marvis 环境安装）
 ```
 
@@ -123,6 +125,7 @@ AI 辅助编程系列课程课件，详细内容可查阅模块内部 README 文
 - **`换装特效/`**：AI 换装 / 穿搭特效练习素材包
   - `图片/`：5 张穿搭参考图，含 `01-街景背景.png` 及 `02~05` 四套穿搭（条纹衬衫卡其裤、黑色针织白裙、灰色针织扭结裙、无袖格纹半裙）
   - `文档/`：`分镜提示词表.xlsx`：换装镜头分镜与提示词练习表
+- **`AI视频提示词该如何写/`**：AI 视频提示词撰写方法整理稿（`AI视频提示词该如何写.md`），含核心思路（先学造句，语言转视觉）、影视术语勘误（景别 / 角度 / 运镜 / 镜头运动规范分类）、写提示词速查卡（主体 / 动作 / 环境 / 细节 / 镜头 / 动态 + 生成调整流程）
 
 ### ai-automated-tasks ｜ AI 自动化任务工程交付
 
@@ -165,6 +168,10 @@ AI 辅助自媒体运营与开发环境搭建的自动化方案、流程文档�
 ## 更新日志
 
 > 按时间倒序记录版本变更，方便追溯迭代历史
+
+### 2026-11-22
+
+- `aigc-getting-started/` 新增 **AI视频提示词该如何写** 资料：`AI视频提示词该如何写/AI视频提示词该如何写.md`，整理 AI 视频提示词的撰写方法（核心思路 / 术语勘误 / 速查卡）
 
 ### 2026-10-26
 
@@ -296,8 +303,10 @@ xiaowang-gongzuo-biji/
 │   ├── 换装特效/              # AI outfit / try-on effects practice
 │   │   ├── 图片/                (5 outfit reference images)
 │   │   └── 文档/                (Storyboard & prompt table.xlsx)
-│   └── AI视频制作全流程标准化/  # Standardized AI video production guide
-│       └── AI视频制作全流程标准化-内容整理.md
+│   ├── AI视频制作全流程标准化/  # Standardized AI video production guide
+│   │   └── AI视频制作全流程标准化-内容整理.md
+│   └── AI视频提示词该如何写/    # AI video prompt-writing guide
+│       └── AI视频提示词该如何写.md
 └── ai-automated-tasks/        # AI automation task engineering (publishing + Marvis setup)
 ```
 
@@ -351,6 +360,7 @@ AI-assisted programming courseware series. See the module's own README for detai
 - **`换装特效/`**: AI outfit / try-on effects practice pack
   - `图片/`: 5 outfit reference images (`01-街景背景.png` + 02~05, four outfits: striped shirt & khaki pants, black knit & white dress, grey knit knot dress, sleeveless plaid skirt)
   - `文档/`: `分镜提示词表.xlsx` storyboard & prompt practice table
+- **`AI视频提示词该如何写/`**: AI video prompt-writing guide (`AI视频提示词该如何写.md`) — core idea (learn sentence-building first; language-to-visual), film terminology correction (standard categories of shot size / angle / camera movement / camera motion), and a prompt-writing checklist (subject / action / setting / detail / camera / motion + generate-and-refine loop)
 
 ### ai-automated-tasks
 
@@ -393,6 +403,10 @@ If this repository helps you, you're welcome to buy me a coffee ☕ Donations ar
 ## Changelog
 
 > Reverse-chronological change log for traceability.
+
+### 2026-11-22
+
+- Added **AI video prompt-writing guide** to `aigc-getting-started/`: `AI视频提示词该如何写/AI视频提示词该如何写.md`, covering core idea, terminology correction, and a quick checklist.
 
 ### 2026-10-26
 
